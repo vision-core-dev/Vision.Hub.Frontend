@@ -6,6 +6,8 @@ import ProtectedRoute from "./components/System/ProtectedRoute";
 import Dashboard from "./components/Pages/Dashboard/DashboardPage.tsx";
 import Login from "./components/Pages/Login/LoginPage.tsx";
 
+import "./global.css";
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
         <BrowserRouter>
