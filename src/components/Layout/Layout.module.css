@@ -1,0 +1,80 @@
+.app {
+    display: flex;
+    min-height: 100vh;
+    background: #f9fafb;
+    font-family: "Inter", sans-serif;
+}
+
+.sidebar {
+    width: 240px;
+    background: #ffffff;
+    border-right: 1px solid #e5e7eb;
+    padding: 2rem 1.5rem;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+}
+
+.nav {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.navItem {
+    text-decoration: none;
+    color: #374151;
+    font-weight: 500;
+    transition: 0.2s;
+}
+
+.navItem:hover {
+    color: #2563eb;
+}
+
+.mainWrapper {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.header {
+    padding: 1.5rem 2rem;
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logoutBtn {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.main {
+    flex: 1;
+    padding: 2rem;
+}
+
+.pageContent {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.footer {
+    padding: 1rem 2rem;
+    background: #f3f4f6;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #6b7280;
+}
