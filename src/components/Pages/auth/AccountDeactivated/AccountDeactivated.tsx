@@ -13,7 +13,7 @@ const AccountDeactivated = () => {
                 <AlertTriangle className={styles.icon} size={48} />
                 <h1 className={styles.title}>Акаунт деактивований</h1>
                 <p className={styles.text}>
-                    Ваш акаунт було деактивовано адміністратором.
+                    Ваш акаунт було <strong>реально</strong> деактивовано адміністратором.
                     Якщо ви вважаєте це помилкою — зверніться до підтримки або власника системи.
                 </p>
                 <button className={styles.button} onClick={() => {
