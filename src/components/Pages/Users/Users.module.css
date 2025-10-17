@@ -1,0 +1,95 @@
+.page {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    align-items: center;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #111827;
+}
+
+.button {
+    background: #00a86b;
+    color: #fff;
+    border: none;
+    padding: 0.7rem 1.2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.button:hover {
+    background: #00925e;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.table th {
+    text-align: left;
+    padding: 1rem;
+    background: #f9fafb;
+    font-weight: 600;
+    color: #374151;
+}
+
+.table td {
+    padding: 1rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.table tr:hover {
+    background: #f3f4f6;
+    cursor: pointer;
+}
+
+.details {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.details h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.label {
+    font-weight: 600;
+    color: #374151;
+}
+
+.value {
+    color: #111827;
+}
+
+.backButton {
+    margin-bottom: 1rem;
+    color: #00a86b;
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-size: 0.95rem;
+}
+
+.backButton:hover {
+    text-decoration: underline;
+}

@@ -1,6 +1,7 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 import type { JSX } from "react";
+import Layout from "../Layout/Layout.tsx";
 
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
     const { isAuthenticated, role } = useAuth();
@@ -19,7 +20,7 @@ const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
     const currentPath = location.pathname.split("/")[1];
 
     if (currentPath === "dashboard" || currentPath === "") {
-        return children;
+        return <Layout>{children}</Layout>;
     }
 
     const isAllowed = role.menu.some((allowed: string) =>
@@ -38,7 +39,7 @@ const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
         );
     }
 
-    return children;
+    return <Layout>{children}</Layout>;
 };
 
 export default ProtectedRoute;
