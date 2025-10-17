@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { api } from "../../../utils/api";
 import { useNavigate } from "react-router-dom";
 import styles from "./Users.module.css";
+import Table from "../../basic/Table/Table.tsx";
 
 interface User {
     id: string;
@@ -42,26 +43,16 @@ const UsersListPage = () => {
             ) : users.length === 0 ? (
                 <p>Поки немає жодного користувача.</p>
             ) : (
-                <table className={styles.table}>
-                    <thead>
-                    <tr>
-                        <th>Email</th>
-                        <th>Ім’я</th>
-                        <th>Роль</th>
-                        <th>Створено</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {users.map((u) => (
-                        <tr key={u.id} onClick={() => navigate(`/users/u/${u.id}/details`)}>
-                            <td>{u.email}</td>
-                            <td>{u.first_name || "—"} {u.last_name || ""}</td>
-                            <td>{u.role?.name || "—"}</td>
-                            <td>{new Date(u.created_at).toLocaleDateString("uk-UA")}</td>
-                        </tr>
-                    ))}
-                    </tbody>
-                </table>
+                <Table
+                    columns={[
+                        { key: "email", label: "Email" },
+                        { key: "first_name", label: "Ім’я", render: (v, row) => `${v || "—"} ${row.last_name || ""}` },
+                        { key: "role", label: "Роль", render: (v) => v?.name || "—" },
+                        { key: "created_at", label: "Створено", render: (v) => new Date(v).toLocaleDateString("uk-UA") },
+                    ]}
+                    data={users}
+                    onRowClick={(row) => navigate(`/users/u/${row.id}/details`)}
+                />
             )}
         </div>
     );

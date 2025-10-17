@@ -1,8 +1,17 @@
 import React, { useState } from "react";
 import styles from "./SmartForm.module.css";
-import {getErrorText} from "../../../types/Messages.ts";
+import { getErrorText } from "../../../types/Messages";
+import UserSelect from "../UserSelect/UserSelect.tsx";
 
-type FieldType = "text" | "email" | "password" | "select" | "textarea" | "date";
+type FieldType =
+    | "text"
+    | "email"
+    | "password"
+    | "select"
+    | "textarea"
+    | "date"
+    | "time"
+    | "user-select";
 
 interface Field {
     name: string;
@@ -18,16 +27,16 @@ interface SmartFormProps {
     fields: Field[];
     submitText?: string;
     onSubmit: (values: Record<string, any>) => Promise<void> | void;
-    onSuccess?: () => void; // ✅ новий проп
+    onSuccess?: () => void;
 }
 
 const SmartForm: React.FC<SmartFormProps> = ({
-                                                 title,
-                                                 fields,
-                                                 submitText = "Зберегти",
-                                                 onSubmit,
-                                                 onSuccess,
-                                             }) => {
+    title,
+    fields,
+    submitText = "Зберегти",
+    onSubmit,
+    onSuccess,
+}) => {
     const [values, setValues] = useState<Record<string, any>>({});
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -46,7 +55,7 @@ const SmartForm: React.FC<SmartFormProps> = ({
         try {
             await onSubmit(values);
             setSuccess(true);
-            if (onSuccess) onSuccess(); // ✅ викликаємо колбек після успіху
+            if (onSuccess) onSuccess();
         } catch (err: any) {
             const detail =
                 err?.response?.data?.detail ||
@@ -65,6 +74,7 @@ const SmartForm: React.FC<SmartFormProps> = ({
             {fields.map((field) => (
                 <div key={field.name} className={styles.field}>
                     <label htmlFor={field.name}>{field.label}</label>
+
                     {field.type === "select" ? (
                         <select
                             id={field.name}
@@ -85,6 +95,8 @@ const SmartForm: React.FC<SmartFormProps> = ({
                             required={field.required}
                             onChange={(e) => handleChange(field.name, e.target.value)}
                         />
+                    ) : field.type === "user-select" ? (
+                        <UserSelect onChange={(ids) => handleChange(field.name, ids)} />
                     ) : (
                         <input
                             type={field.type}

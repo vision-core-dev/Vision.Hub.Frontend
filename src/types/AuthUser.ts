@@ -21,6 +21,7 @@ export interface CheckMeResponse {
     ok: boolean;
     user: MeUser;
     role: MyRole;
+    detail?: string;
 }
 
 export interface AuthContextType {

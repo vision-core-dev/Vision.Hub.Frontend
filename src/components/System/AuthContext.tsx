@@ -1,11 +1,14 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import {createContext, useContext, useState, useEffect} from "react";
 import type { ReactNode } from "react";
 import { api } from "../../utils/api";
 import type {AuthContextType, CheckMeResponse, MeUser, MyRole} from "../../types/AuthUser.ts";
+import {useNavigate} from "react-router-dom";
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
 const AuthProvider = ({ children }: { children: ReactNode }) => {
+    const navigate = useNavigate()
+
     const [user, setUser] = useState<MeUser | null>(null);
     const [role, setRole] = useState<MyRole | null>(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -27,13 +30,16 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         const checkAuth = async () => {
             try {
                 const response = await api.get("/v1/Hub/Auth/CheckMe");
+                const data: CheckMeResponse = await response.json();
 
                 if (response.ok) {
-                    const data: CheckMeResponse = await response.json();
-
                     setIsAuthenticated(true);
                     setUser(data.user);
                     setRole(data.role);
+                } else {
+                    if (data.detail === "user_is_deactivated") {
+                        navigate("/deactivated")
+                    }
                 }
             } finally {
                 setIsLoading(false);

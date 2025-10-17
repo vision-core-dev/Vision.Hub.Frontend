@@ -1,0 +1,68 @@
+import { useEffect, useState } from "react";
+import { api } from "../../../utils/api";
+import UserValue from "../UserValue/UserValue.tsx";
+import type {SmallUser} from "../../../types/Users.ts";
+
+import styles from "./UserSelect.module.css";
+
+interface Props {
+    onChange: (ids: string[]) => void;
+}
+
+const UserSelect: React.FC<Props> = ({ onChange }) => {
+    const [users, setUsers] = useState<SmallUser[]>([]);
+    const [selected, setSelected] = useState<string[]>([]);
+
+    useEffect(() => {
+        (async () => {
+            const res = await api.get("/v1/Hub/Users/List");
+            const data = await res.json();
+            setUsers(data.users || []);
+        })();
+    }, []);
+
+    const toggleUser = (id: string) => {
+        const newSelected = selected.includes(id)
+            ? selected.filter((u) => u !== id)
+            : [...selected, id];
+        setSelected(newSelected);
+        onChange(newSelected);
+    };
+
+    const selectAll = () => {
+        const all = users.map((u) => u.id);
+        setSelected(all);
+        onChange(all);
+    };
+
+    return (
+        <div className={styles.wrapper}>
+            <div className={styles.input}>
+                {users.map((u) => (
+                    <label key={u.id} style={{ display: "block", marginBottom: "0.25rem" }}>
+                        <input
+                            type="checkbox"
+                            checked={selected.includes(u.id)}
+                            onChange={() => toggleUser(u.id)}
+                        />{" "}
+                        <UserValue
+                            user={{
+                                id: u.id,
+                                email: u.email,
+                                first_name: u.first_name,
+                                last_name: u.last_name || "",
+                                role_name: u.role?.name,
+                            }}
+                            showAvatar={false}
+                        />
+                    </label>
+                ))}
+            </div>
+            <button type="button" onClick={selectAll} style={{ marginBottom: "0.5rem" }}>
+                Вибрати всіх
+            </button>
+        </div>
+    );
+};
+
+export default UserSelect;

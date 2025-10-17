@@ -11,6 +11,9 @@ button {
     border: none;
     outline: none;
     background-color: transparent;
+    font-size: 1rem;
+    font-weight: 500;
+    border-radius: 10px;
 }
 
 p {
@@ -22,4 +25,8 @@ hr {
     height: 1px;
     width: 100%;
     background-color: #cdbff8;
+}
+
+input[type="checkbox"] {
+    accent-color: #00a86b;
 }

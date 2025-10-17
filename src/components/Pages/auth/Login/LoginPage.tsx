@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { api } from "../../../utils/api";
-import { useAuth } from "../../System/AuthContext";
+import { api } from "../../../../utils/api.ts";
+import { useAuth } from "../../../System/AuthContext.tsx";
 import { Lock, Mail } from "lucide-react";
 import styles from "./LoginPage.module.css";
 
