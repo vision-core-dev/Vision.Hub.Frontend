@@ -20,6 +20,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <BrowserRouter>
             <AuthProvider>
                 <Routes>
+                    <Route path="/" element={<Navigate to="/login" replace />} />
+
                     <Route path="/login" element={<Login />} />
                     <Route path="/deactivated" element={<AccountDeactivated />} />
 
