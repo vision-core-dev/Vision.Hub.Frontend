@@ -6,14 +6,14 @@ import ProtectedRoute from "./components/System/ProtectedRoute";
 import Dashboard from "./components/Pages/Dashboard/DashboardPage.tsx";
 import Login from "./components/Pages/auth/Login/LoginPage.tsx";
 
-import "./global.css";
-
 import UsersListPage from "./components/Pages/users/UsersListPage.tsx";
 import CreateUserPage from "./components/Pages/users/CreateUserPage.tsx";
 import UserDetailsPage from "./components/Pages/users/UserDetails/UserDetailsPage.tsx";
 import CreateEventPage from "./components/Pages/Events/CreateEventPage.tsx";
 import EventsListPage from "./components/Pages/Events/EventsListPage.tsx";
 import AccountDeactivated from "./components/Pages/auth/AccountDeactivated/AccountDeactivated.tsx";
+
+import "./global.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
