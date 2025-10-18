@@ -1,4 +1,4 @@
-const messagesList: Record<string, string> = {
+const errorMessagesList: Record<string, string> = {
     "password_too_short": "Пароль замалий (потрібно мінімум 8 символів)",
     "email_already_exists": "Цей email вже зареєстрований",
     "role_not_found": "Вибрана роль не знайдена",
@@ -6,5 +6,5 @@ const messagesList: Record<string, string> = {
 };
 
 export function getErrorText(code: string, fallback = "Сталася невідома помилка"): string {
-    return messagesList[code] || fallback;
+    return errorMessagesList[code] || fallback;
 }

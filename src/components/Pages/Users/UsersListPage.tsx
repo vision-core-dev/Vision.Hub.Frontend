@@ -21,7 +21,7 @@ const UsersListPage = () => {
     useEffect(() => {
         api.get("/v1/Hub/Users/List").then(async (res) => {
             const data = await res.json();
-            setUsers(data.users);
+            setUsers(data.list);
             setLoading(false);
         });
     }, []);

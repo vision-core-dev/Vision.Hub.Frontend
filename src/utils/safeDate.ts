@@ -14,7 +14,14 @@ export const safeDatetime = (d: string | null | undefined) => {
         return "—"
     }
     try {
-        return new Date(d.includes(" ") ? d.replace(" ", "T") : d).toLocaleString("uk-UA");
+        // return new Date(d.includes(" ") ? d.replace(" ", "T") : d).toLocaleString("uk-UA");
+        return new Date(d.includes(" ") ? d.replace(" ", "T") : d).toLocaleString("uk-UA", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+        })
     } catch {
         return "—"
     }

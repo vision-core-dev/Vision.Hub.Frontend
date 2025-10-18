@@ -14,7 +14,7 @@ const UsersListPage = () => {
     useEffect(() => {
         api.get("/v1/Hub/Events/List").then(async (res) => {
             const data = await res.json();
-            setEvents(data.events);
+            setEvents(data.list);
             setLoading(false);
         });
     }, []);

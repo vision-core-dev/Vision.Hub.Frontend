@@ -4,6 +4,18 @@ import { api } from "../../utils/api";
 import type {AuthContextType, CheckMeResponse, MeUser, MyRole} from "../../types/AuthUser.ts";
 import {useNavigate} from "react-router-dom";
 
+const greetings = [
+    "Радий тебе бачити сьогодні 🚀",
+    "Чудово, що ти тут 💡",
+    "Готовий підкорювати нові вершини? ⚡️",
+    "Давай зробимо цей день продуктивним 🔥",
+    "Твій прогрес вражає — рухаємося далі 💪",
+    "Сьогодні точно буде класний день 🌞",
+    "Час творити щось велике 🚀",
+    "Крок за кроком до мети 🧠",
+    "Світ чекає на твої ідеї ✨",
+];
+
 const AuthContext = createContext<AuthContextType | null>(null);
 
 const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -26,6 +38,11 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         setIsAuthenticated(true);
     };
 
+    const chooseGreeting = () => {
+        const greeting = greetings[Math.floor(Math.random() * greetings.length)];
+        localStorage.setItem("greeting", greeting);
+    }
+
     useEffect(() => {
         const checkAuth = async () => {
             try {
@@ -36,6 +53,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
                     setIsAuthenticated(true);
                     setUser(data.user);
                     setRole(data.role);
+                    chooseGreeting()
                 } else {
                     if (data.detail === "user_is_deactivated") {
                         navigate("/deactivated")
