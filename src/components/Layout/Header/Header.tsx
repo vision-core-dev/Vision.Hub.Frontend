@@ -36,7 +36,7 @@ const Header: React.FC = () => {
 
     useEffect(() => {
         if (unreadCount > 0) {
-            document.title = `(🔔${unreadCount}) Vision Core Hub`;
+            document.title = `🔔 (${unreadCount}) Vision Core Hub`;
         } else {
             document.title = "Vision Core Hub";
         }
