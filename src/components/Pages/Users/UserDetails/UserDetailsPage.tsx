@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { api } from "../../../../utils/api.ts";
-import styles from "./UserDetails.module.css";
+import styles from "./UserDetailsPage.module.css";
 import { safeDate, safeDatetime } from "../../../../utils/safeDate.ts";
 import type { SmallUser, UserType } from "../../../../types/Users.ts";
 import UserValue from "../../../basic/UserValue/UserValue.tsx";
@@ -30,7 +30,7 @@ interface Response {
     badges: Badge[];
 }
 
-const UserDetails = () => {
+const UserDetailsPage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
 
@@ -334,4 +334,4 @@ const UserDetails = () => {
     );
 };
 
-export default UserDetails;
+export default UserDetailsPage;

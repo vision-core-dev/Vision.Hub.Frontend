@@ -8,7 +8,7 @@ import Login from "./components/Pages/auth/Login/LoginPage.tsx";
 
 import UsersListPage from "./components/Pages/Users/UsersListPage.tsx";
 import CreateUserPage from "./components/Pages/Users/CreateUserPage.tsx";
-import UserDetails from "./components/Pages/Users/UserDetails/UserDetails.tsx";
+import UserDetailsPage from "./components/Pages/Users/UserDetails/UserDetailsPage.tsx";
 import CreateEventPage from "./components/Pages/Events/CreateEventPage.tsx";
 import EventsListPage from "./components/Pages/Events/EventsListPage.tsx";
 import AccountDeactivated from "./components/Pages/auth/AccountDeactivated/AccountDeactivated.tsx";
@@ -30,7 +30,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                     <Route path="/users" element={<ProtectedRoute><Navigate to="/users/list" replace /></ProtectedRoute>} />
                     <Route path="/users/list" element={<ProtectedRoute><UsersListPage /></ProtectedRoute>} />
                     <Route path="/users/add-user" element={<ProtectedRoute><CreateUserPage /></ProtectedRoute>} />
-                    <Route path="/users/u/:id/details" element={<ProtectedRoute><UserDetails /></ProtectedRoute>} />
+                    <Route path="/users/u/:id/details" element={<ProtectedRoute><UserDetailsPage /></ProtectedRoute>} />
 
                     <Route path="/events" element={<ProtectedRoute><Navigate to="/events/list" replace /></ProtectedRoute>} />
                     <Route path="/events/list" element={<ProtectedRoute><EventsListPage /></ProtectedRoute>} />
