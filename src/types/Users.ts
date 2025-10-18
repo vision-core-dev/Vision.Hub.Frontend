@@ -30,6 +30,7 @@ export interface UserType {
     avatar_url?: string;
     birthday?: string;
     role: UserRoleType;
+    is_active: boolean;
     last_login?: string;
     created_at: string;
 }

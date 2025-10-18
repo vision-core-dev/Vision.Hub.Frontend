@@ -45,10 +45,10 @@ const UsersListPage = () => {
             ) : (
                 <Table
                     columns={[
-                        { key: "email", label: "Email" },
+                        { key: "avatar_url", label: "Аватар", render: (v) => v && <img src={v} alt="Avatar" style={{ width: 34, height: 34, borderRadius: "50%" }} /> },
                         { key: "first_name", label: "Ім’я", render: (v, row) => `${v || "—"} ${row.last_name || ""}` },
                         { key: "role", label: "Роль", render: (v) => v?.name || "—" },
-                        { key: "created_at", label: "Створено", render: (v) => new Date(v).toLocaleDateString("uk-UA") },
+                        { key: "email", label: "Email" },
                     ]}
                     data={users}
                     onRowClick={(row) => navigate(`/users/u/${row.id}/details`)}
