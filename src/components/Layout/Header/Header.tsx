@@ -1,14 +1,16 @@
 import React, {useEffect, useState} from "react";
 import { useAuth } from "../../System/AuthContext.tsx";
-import { Bell, LogOut, User } from "lucide-react";
+import { Bell } from "lucide-react";
 import styles from "./Header.module.css";
 import { useNavigate } from "react-router-dom";
 import Notifs from "../Notifications/Notifs.tsx";
 import {api} from "../../../utils/api.ts";
 
 const Header: React.FC = () => {
-    const { user, logout } = useAuth();
+    const { user } = useAuth();
     const navigate = useNavigate();
+
+    const [balance, ] = useState<number>(0);
 
     const [showNotifs, setShowNotifs] = useState(false);
     const [unreadCount, setUnreadCount] = useState(0);
@@ -62,16 +64,23 @@ const Header: React.FC = () => {
                 </button>
 
                 <button
-                    className={styles.secondaryButton}
+                    className={styles.profileButton}
                     onClick={() => navigate("/my/profile")}
+                    title="Мій профіль"
                 >
-                    <User size={18} />
-                    <span>Профіль</span>
-                </button>
+                    <span className={styles.balance}>
+                        {balance} грн.
+                    </span>
 
-                <button className={styles.dangerButton} onClick={logout}>
-                    <LogOut size={18} />
-                    <span>Вийти</span>
+                    <div className={styles.avatarWrapper}>
+                        {user?.avatar_url ? (
+                            <img src={user.avatar_url} alt="Avatar" className={styles.avatar} />
+                        ) : (
+                            <div className={styles.avatarFallback}>
+                                {user?.first_name?.[0]?.toUpperCase() || "?"}
+                            </div>
+                        )}
+                    </div>
                 </button>
             </div>
 
