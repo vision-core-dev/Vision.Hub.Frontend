@@ -30,7 +30,7 @@ interface Response {
     badges: Badge[];
 }
 
-const UserDetailsPage = () => {
+const UserDetails = () => {
     const { id } = useParams();
     const navigate = useNavigate();
 
@@ -334,4 +334,4 @@ const UserDetailsPage = () => {
     );
 };
 
-export default UserDetailsPage;
+export default UserDetails;
