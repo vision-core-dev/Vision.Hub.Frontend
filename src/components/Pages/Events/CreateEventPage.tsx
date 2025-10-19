@@ -1,14 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import SmartForm from "../../basic/SmartForm/SmartForm.tsx";
 import {api} from "../../../utils/api.ts";
+import DefaultPage from "../../basic/DefaultPage/DefaultPage.tsx";
 
 const CreateEventPage = () => {
     const navigate = useNavigate();
 
     return (
-        <div style={{ padding: "2rem", maxWidth: 600, margin: "0 auto" }}>
-            <h1 style={{ fontSize: "1.8rem", marginBottom: "1.5rem" }}>📅 Створити подію</h1>
-
+        <DefaultPage title={"Створити подію"}>
             <SmartForm
                 title="Нова подія"
                 submitText="Створити подію"
@@ -34,7 +33,7 @@ const CreateEventPage = () => {
                     console.log("✅ Подія створена!");
                 }}
             />
-        </div>
+        </DefaultPage>
     );
 };
 

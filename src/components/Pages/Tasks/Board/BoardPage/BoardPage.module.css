@@ -3,7 +3,6 @@
     flex-direction: column;
     min-height: 100vh;
     height: 100%;
-    overflow: hidden;
 
     background-image: url('https://trello-backgrounds.s3.amazonaws.com/60a6a55d8b5def7ed6b846f2/2560x1369/62de1fc7d1268fb9e985a8d4e6af9fc3/521983310_137476020893768_1740424275863.webp');
     background-size: cover;
@@ -22,7 +21,6 @@
 .content {
     flex: 1;
     display: flex;
-    overflow: hidden;
 }
 
 .lists {
@@ -44,12 +42,6 @@
     background: #c1c7d0;
     border-radius: 4px;
 }
-
-
-
-
-
-
 
 
 
