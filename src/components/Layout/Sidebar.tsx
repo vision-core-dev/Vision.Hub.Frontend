@@ -9,12 +9,13 @@ import {
     CalendarClock,
     SquareKanban,
     ChevronLeft,
-    ChevronRight,
+    ChevronRight, LayoutDashboard,
 } from "lucide-react";
 import styles from "./Layout.module.css";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const icons: Record<string, React.ReactNode> = {
+    dashboard: <LayoutDashboard size={20} />,
     boards: <SquareKanban size={20} />,
     events: <CalendarClock size={20} />,
     users: <Users size={20} />,

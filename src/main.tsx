@@ -14,7 +14,7 @@ import EventsListPage from "./components/Pages/Events/EventsListPage.tsx";
 import AccountDeactivated from "./components/Pages/auth/AccountDeactivated/AccountDeactivated.tsx";
 
 import "./global.css";
-import BoardsListPage from "./components/Pages/Tasks/BoardsList/BoardsListPage.tsx";
+import BoardsListPage from "./components/Pages/Tasks/BoardsListPage.tsx";
 import BoardPage from "./components/Pages/Tasks/Board/BoardPage/BoardPage.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(

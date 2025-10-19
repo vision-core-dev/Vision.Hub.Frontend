@@ -31,6 +31,15 @@
     background: #e5e7eb;
 }
 
+.link {
+    background: transparent;
+    color: #00a86b;
+    padding: 0;
+}
+.link:hover {
+    text-decoration: underline;
+}
+
 /* 📦 Якщо лише іконка — квадратна */
 .adaptive {
     width: 42px;

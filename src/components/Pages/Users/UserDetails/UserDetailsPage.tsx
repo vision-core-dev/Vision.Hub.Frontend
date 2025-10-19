@@ -5,6 +5,9 @@ import styles from "./UserDetailsPage.module.css";
 import { safeDate, safeDatetime } from "../../../../utils/safeDate.ts";
 import type { SmallUser, UserType } from "../../../../types/Users.ts";
 import UserValue from "../../../basic/UserValue/UserValue.tsx";
+import DefaultPage from "../../../basic/DefaultPage/DefaultPage.tsx";
+import Button from "../../../basic/Button/Button.tsx";
+import {ArrowLeft} from "lucide-react";
 
 interface Badge {
     id: string;
@@ -127,16 +130,22 @@ const UserDetailsPage = () => {
         refreshUserData()
     };
 
+    const backButton = (
+        <Button variant="link" onClick={() => navigate("/users/list")}>
+            <ArrowLeft /> Назад до списку
+        </Button>
+    );
 
-    if (loading) return <p>⏳ Завантаження...</p>;
-    if (!user) return <p>❌ Користувача не знайдено</p>;
+    if (!user) return (
+        <DefaultPage isLoading={loading}>
+            {backButton}
+            <p>Користувача не знайдено.</p>
+        </DefaultPage>
+    );
 
     return (
-        <div className={styles.page}>
-            <button className={styles.backButton} onClick={() => navigate("/users/list")}>
-                ← Назад до списку
-            </button>
-
+        <DefaultPage isLoading={loading}>
+            {backButton}
             <div className={styles.card}>
                 <div className={styles.header}>
                     {user.avatar_url && (
@@ -150,7 +159,6 @@ const UserDetailsPage = () => {
                     </div>
                 </div>
 
-                {/* 🏅 Бейджики */}
                 {badges.length > 0 && (
                     <div className={styles.topBadges}>
                         {badges.map((badge) => (
@@ -174,7 +182,6 @@ const UserDetailsPage = () => {
                     </div>
                 )}
 
-                {/* ℹ️ Інфо */}
                 <div className={styles.info}>
                     <div>
                         <p className={styles.label}>📧 Email</p>
@@ -239,32 +246,31 @@ const UserDetailsPage = () => {
                         </div>
                     </>
                 ) : (
-                  <>
-                      {supervisors.length > 0 && (
-                          <div className={styles.section}>
-                              <h3>👨‍💼 Керівники</h3>
-                              <div className={styles.userList}>
-                                  {supervisors.map((s) => (
-                                      <UserValue key={s.id} user={s} />
-                                  ))}
-                              </div>
-                          </div>
-                      )}
+                    <>
+                        {supervisors.length > 0 && (
+                            <div className={styles.section}>
+                                <h3>👨‍💼 Керівники</h3>
+                                    <div className={styles.userList}>
+                                    {supervisors.map((s) => (
+                                        <UserValue key={s.id} user={s} />
+                                    ))}
+                                </div>
+                            </div>
+                        )}
 
-                      {subordinates.length > 0 && (
-                          <div className={styles.section}>
-                              <h3>👥 Підлеглі</h3>
-                              <div className={styles.userList}>
-                                  {subordinates.map((s) => (
-                                      <UserValue key={s.id} user={s} />
-                                  ))}
-                              </div>
-                          </div>
-                      )}
-                  </>
+                        {subordinates.length > 0 && (
+                            <div className={styles.section}>
+                                <h3>👥 Підлеглі</h3>
+                                <div className={styles.userList}>
+                                    {subordinates.map((s) => (
+                                        <UserValue key={s.id} user={s} />
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </>
                 )}
 
-                {/* ⚙️ Дії */}
                 {actions && actions.length > 0 && (
                     <div className={styles.section}>
                         <h3>⚙️ Дії</h3>
@@ -330,7 +336,7 @@ const UserDetailsPage = () => {
                     </div>
                 )}
             </div>
-        </div>
+        </DefaultPage>
     );
 };
 

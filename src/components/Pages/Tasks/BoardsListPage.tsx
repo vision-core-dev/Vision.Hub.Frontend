@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import styles from "./BoardsListPage.module.css";
-import {safeDate} from "../../../../utils/safeDate.ts";
-import Table from "../../../basic/Table/Table.tsx";
+import {safeDate} from "../../../utils/safeDate.ts";
+import Table from "../../basic/Table/Table.tsx";
+import DefaultPage from "../../basic/DefaultPage/DefaultPage.tsx";
+import Button from "../../basic/Button/Button.tsx";
+import {Plus} from "lucide-react";
 
 type BoardType = {
     id: string;
@@ -57,20 +59,17 @@ const BoardsListPage = () => {
     // }, []);
 
     return (
-        <div className={styles.page}>
-            <div className={styles.header}>
-                <h1 className={styles.title}>📋 Дошки задач</h1>
-                <button
-                    className={styles.button}
-                    onClick={() => navigate("/workspace/tasks/boards/create")}
+        <DefaultPage
+            title="Дошки"
+            action={
+                <Button adaptive={true} onClick={() => navigate("/users/add-user")}
                 >
-                    ➕ Створити дошку
-                </button>
-            </div>
-
-            {loading ? (
-                <p>⏳ Завантаження...</p>
-            ) : boards.length === 0 ? (
+                    <Plus strokeWidth={2.25} />Додати
+                </Button>
+            }
+            isLoading={loading}
+        >
+            {boards.length === 0 ? (
                 <p>Поки немає жодної дошки.</p>
             ) : (
                 <Table
@@ -101,7 +100,7 @@ const BoardsListPage = () => {
                 />
 
             )}
-        </div>
+        </DefaultPage>
     );
 };
 

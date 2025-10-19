@@ -38,9 +38,8 @@ const UsersListPage = () => {
                 <Table
                     columns={[
                         { key: "date", label: "Дата", render: (v) => safeDate(v) },
+                        { key: "time", label: "Час", render: (_v, row) => `${formatTime(row.time_from)} - ${formatTime(row.time_to)}` },
                         { key: "name", label: "Назва події", render: (v) => v || "—" },
-                        { key: "time_from", label: "Початок", render: (v) => formatTime(v) || "—" },
-                        { key: "time_to", label: "Завершення", render: (v) => formatTime(v) || "—" },
                     ]}
                     data={events}
                     onRowClick={(row) => navigate(`/events/e/${row.id}`)}

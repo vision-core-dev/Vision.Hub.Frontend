@@ -5,7 +5,7 @@ interface ButtonProps {
     onClick?: () => void;
     children: React.ReactNode;
     disabled?: boolean;
-    variant?: "primary" | "secondary";
+    variant?: "primary" | "secondary" | "link";
     adaptive?: boolean;
 }
 
