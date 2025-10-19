@@ -33,6 +33,7 @@
     display: flex;
     align-items: center;
     gap: 1.5rem;
+    flex-wrap: wrap;
 }
 
 .avatar {
@@ -54,7 +55,8 @@
 
 .info {
     display: grid;
-    grid-template-columns: .3fr .3fr .3fr .3fr;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    /*grid-template-columns: .3fr .3fr .3fr .3fr;*/
     gap: 1.5rem;
 }
 
@@ -309,4 +311,38 @@
     font-size: 0.8rem;
     color: #6b7280;
     pointer-events: none;
+}
+
+
+@media (max-width: 768px) {
+    .page {
+        padding: 1rem;
+    }
+
+    .card {
+        padding: 1rem;
+    }
+
+    .avatar {
+        width: 70px;
+        height: 70px;
+    }
+
+    .name {
+        font-size: 1.4rem;
+    }
+
+    .info {
+        grid-template-columns: 1fr 1fr; /* ✅ 2 колонки замість 4 */
+    }
+}
+
+@media (max-width: 480px) {
+    .info {
+        grid-template-columns: 1fr; /* ✅ одна колонка на дуже вузьких екранах */
+    }
+
+    .name {
+        font-size: 1.2rem;
+    }
 }

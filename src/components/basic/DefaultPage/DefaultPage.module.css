@@ -1,6 +1,7 @@
 .pageWrapper {
     display: flex;
     flex-direction: column;
+    align-items: center;
     min-height: 100vh;
     width: auto;
     background: #f9fafb;
@@ -10,6 +11,7 @@
 }
 
 .pageHeader {
+    width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
@@ -48,9 +50,10 @@
 
 /* 📦 Контент */
 .pageContent {
-    width: auto;
+    width: 100%;
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: 1.5rem;
     background: transparent;
     animation: fadeInUp 0.4s ease;

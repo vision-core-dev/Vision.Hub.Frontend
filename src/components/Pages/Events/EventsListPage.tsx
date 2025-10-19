@@ -23,14 +23,14 @@ const UsersListPage = () => {
 
     return (
         <DefaultPage
-        title="Події"
-        action={
-            <Button adaptive={true} onClick={() => navigate("/events/create-event")}
-            >
-                <Plus strokeWidth={2.25} />Додати
-            </Button>
-        }
-        isLoading={loading}
+            title="Події"
+            action={
+                <Button adaptive={true} onClick={() => navigate("/events/create-event")}
+                >
+                    <Plus strokeWidth={2.25} />Додати
+                </Button>
+            }
+            isLoading={loading}
         >
             {events.length === 0 ? (
                 <p>Поки немає жодної події.</p>

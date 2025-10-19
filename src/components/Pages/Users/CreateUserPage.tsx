@@ -1,13 +1,18 @@
 import { api } from "../../../utils/api";
 import SmartForm from "../../basic/SmartForm/SmartForm";
 import { useNavigate } from "react-router-dom";
+import DefaultPage from "../../basic/DefaultPage/DefaultPage.tsx";
+import Button from "../../basic/Button/Button.tsx";
+import {ArrowLeft} from "lucide-react";
 
 const CreateUserPage = () => {
     const navigate = useNavigate();
 
     return (
-        <>
-            <button onClick={() => navigate("/users/list")}>← Назад</button>
+        <DefaultPage>
+            <Button variant="link" onClick={() => navigate("/users/list")}>
+                <ArrowLeft size={20} /> Назад до списку
+            </Button>
 
             <SmartForm
                 title="Створити користувача"
@@ -23,7 +28,7 @@ const CreateUserPage = () => {
                 }}
                 onSuccess={() => navigate("/users/list")} // ✅ автоматичний редірект
             />
-        </>
+        </DefaultPage>
     );
 };
 

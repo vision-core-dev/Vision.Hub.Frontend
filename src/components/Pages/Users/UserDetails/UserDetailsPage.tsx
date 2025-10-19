@@ -132,7 +132,7 @@ const UserDetailsPage = () => {
 
     const backButton = (
         <Button variant="link" onClick={() => navigate("/users/list")}>
-            <ArrowLeft /> Назад до списку
+            <ArrowLeft size={20} /> Назад до списку
         </Button>
     );
 
