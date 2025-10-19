@@ -33,7 +33,7 @@ const Header: React.FC = () => {
 
     useEffect(() => {
         const handleResize = () => {
-            const status = window.innerWidth < 500;
+            const status = window.innerWidth < 700;
             setSidebarCollapsed(status);
         };
         window.addEventListener("resize", handleResize);
