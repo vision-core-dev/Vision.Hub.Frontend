@@ -18,6 +18,13 @@
     color: #374151;
 }
 
+.table > tbody > tr {
+    transition: background 0.1s;
+}
+.table > tbody > tr:hover {
+    background: #f2fff8;
+}
+
 .table td {
     cursor: pointer;
     padding: 1rem;

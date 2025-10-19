@@ -45,10 +45,6 @@ const Sidebar: React.FC = () => {
             }`}
         >
             <div className={styles.topSection}>
-                <div className={styles.logo} onClick={() => navigate("/dashboard")}>
-                    {!collapsed ? "Vision Core Hub" : "VCH"}
-                </div>
-
                 <nav className={styles.nav}>
                     {role?.menu?.map((item: string) => {
                         const path = `/${item}`;

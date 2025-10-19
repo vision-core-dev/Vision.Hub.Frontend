@@ -16,7 +16,7 @@ const DefaultPage: React.FC<DefaultPageProps> = ({
     description,
     action,
     children,
-    maxWidth = "1200px",
+    maxWidth = "100%",
     isLoading = false,
 }) => {
     return (
