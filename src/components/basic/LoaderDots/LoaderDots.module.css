@@ -1,0 +1,40 @@
+.loader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 100%;
+}
+
+.loader span {
+    width: 10px;
+    height: 10px;
+    background: #00a86b;
+    border-radius: 50%;
+    opacity: 0.8;
+    transform: scale(0.8);
+    animation: pulse 1.4s infinite;
+}
+
+.loader span:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.loader span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.loader span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes pulse {
+    0%, 80%, 100% {
+        transform: scale(0.8);
+        opacity: 0.6;
+    }
+    40% {
+        transform: scale(1.4);
+        opacity: 1;
+    }
+}

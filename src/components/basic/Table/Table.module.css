@@ -1,5 +1,5 @@
 .wrapper {
-    width: 100%;
+    /*width: 100%;*/
 }
 
 .table {
@@ -7,7 +7,6 @@
     border-collapse: collapse;
     background: #fff;
     border-radius: 12px;
-    overflow: hidden;
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
@@ -20,15 +19,16 @@
 }
 
 .table td {
+    cursor: pointer;
+    padding: 1rem;
+    border-top: 1px solid #e5e7eb;
+}
+.table td {
+    cursor: pointer;
     padding: 1rem;
     border-top: 1px solid #e5e7eb;
 }
 
 .table tr {
     transition: background 0.15s ease;
-}
-
-.table tr:hover {
-    background: #f3f4f6;
-    cursor: pointer;
 }

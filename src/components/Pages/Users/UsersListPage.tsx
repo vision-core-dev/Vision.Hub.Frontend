@@ -1,14 +1,18 @@
 import { useEffect, useState } from "react";
 import { api } from "../../../utils/api";
 import { useNavigate } from "react-router-dom";
-import styles from "./Users.module.css";
 import Table from "../../basic/Table/Table.tsx";
+import UserLabel from "../../basic/User/UserLabel.tsx";
+import DefaultPage from "../../basic/DefaultPage/DefaultPage.tsx";
+import Button from "../../basic/Button/Button.tsx";
+import {Plus} from "lucide-react";
 
 interface User {
     id: string;
     email: string;
-    first_name: string | null;
-    last_name: string | null;
+    avatar_url?: string;
+    first_name?: string;
+    last_name?: string;
     role: { name: string };
     created_at: string;
 }
@@ -27,26 +31,31 @@ const UsersListPage = () => {
     }, []);
 
     return (
-        <div className={styles.page}>
-            <div className={styles.header}>
-                <h1 className={styles.title}>👥 Користувачі</h1>
-                <button
-                    className={styles.button}
-                    onClick={() => navigate("/users/add-user")}
+        <DefaultPage
+            title="Користувачі"
+            action={
+                <Button adaptive={true} onClick={() => navigate("/users/add-user")}
                 >
-                    Додати користувача
-                </button>
-            </div>
-
-            {loading ? (
-                <p>⏳ Завантаження...</p>
-            ) : users.length === 0 ? (
+                    <Plus strokeWidth={2.25} />Додати
+                </Button>
+            }
+            isLoading={loading}
+        >
+            {users.length === 0 ? (
                 <p>Поки немає жодного користувача.</p>
             ) : (
                 <Table
                     columns={[
-                        { key: "avatar_url", label: "Аватар", render: (v) => v && <img src={v} alt="Avatar" style={{ width: 34, height: 34, borderRadius: "50%" }} /> },
-                        { key: "first_name", label: "Ім’я", render: (v, row) => `${v || "—"} ${row.last_name || ""}` },
+                        {
+                            key: "first_name",
+                            label: "Користувач",
+                            render: (v, row) => v && (
+                                <UserLabel
+                                    name={`${row.first_name} ${row.last_name || ""}`.trim()}
+                                    avatar_url={row.avatar_url}
+                                />
+                            ),
+                        },
                         { key: "role", label: "Роль", render: (v) => v?.name || "—" },
                         { key: "email", label: "Email" },
                     ]}
@@ -54,7 +63,7 @@ const UsersListPage = () => {
                     onRowClick={(row) => navigate(`/users/u/${row.id}`)}
                 />
             )}
-        </div>
+        </DefaultPage>
     );
 };
 

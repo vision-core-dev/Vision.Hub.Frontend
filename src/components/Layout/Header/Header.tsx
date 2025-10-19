@@ -10,6 +10,8 @@ const Header: React.FC = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
 
+    const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(JSON.parse(localStorage.getItem("sidebar-collapsed") || "false"));
+
     const [balance, ] = useState<number>(-1);
 
     const [showNotifs, setShowNotifs] = useState(false);
@@ -29,7 +31,15 @@ const Header: React.FC = () => {
         }
     };
 
-    // 📬 Фетч при першому рендері + інтервал кожні 7 секунд
+    useEffect(() => {
+        const handleResize = () => {
+            const status = window.innerWidth < 900;
+            setSidebarCollapsed(status);
+        };
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
     useEffect(() => {
         fetchUnreadCount();
         const interval = setInterval(fetchUnreadCount, 7000); // ⏱️ 7 сек (оптимально)
@@ -47,10 +57,14 @@ const Header: React.FC = () => {
     return (
         <header className={styles.header}>
             <div className={styles.left}>
-                <h1 className={styles.greeting}>
-                    👋 Привіт, <span>{user?.first_name || "користувач"}</span>
-                </h1>
-                <p className={styles.subtext}>{randomGreeting}</p>
+                {!sidebarCollapsed && (
+                    <>
+                        <h1 className={styles.greeting}>
+                            👋 Привіт, <span>{user?.first_name || "користувач"}</span>
+                        </h1>
+                        <p className={styles.subtext}>{randomGreeting}</p>
+                    </>
+                )}
             </div>
 
             <div className={styles.actions}>

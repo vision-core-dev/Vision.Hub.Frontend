@@ -12,23 +12,25 @@ interface TableProps<T> {
     data: T[];
     onRowClick?: (row: T) => void;
     emptyText?: string;
+    maxWidth?: string;
 }
 
 const Table = <T extends Record<string, any>>({
-                                                  columns,
-                                                  data,
-                                                  onRowClick,
-                                                  emptyText = "Немає даних",
-                                              }: TableProps<T>) => {
+    columns,
+    data,
+    onRowClick,
+    emptyText = "Немає даних",
+    maxWidth,
+}: TableProps<T>) => {
     return (
-        <div className={styles.wrapper}>
+        <div className={styles.wrapper} style={{maxWidth: maxWidth}}>
             <table className={styles.table}>
                 <thead>
-                <tr>
-                    {columns.map((col) => (
-                        <th key={col.key as string}>{col.label}</th>
-                    ))}
-                </tr>
+                    <tr>
+                        {columns.map((col) => (
+                            <th key={col.key as string}>{col.label}</th>
+                        ))}
+                    </tr>
                 </thead>
                 <tbody>
                 {data.length > 0 ? (
