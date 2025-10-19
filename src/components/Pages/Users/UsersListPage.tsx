@@ -51,7 +51,7 @@ const UsersListPage = () => {
                         { key: "email", label: "Email" },
                     ]}
                     data={users}
-                    onRowClick={(row) => navigate(`/users/u/${row.id}/details`)}
+                    onRowClick={(row) => navigate(`/users/u/${row.id}`)}
                 />
             )}
         </div>

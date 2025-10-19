@@ -35,7 +35,7 @@ const UserValue: React.FC<Props> = ({ user, showAvatar = true }) => {
             )}
 
             <div className={styles.info}>
-                <div className={styles.name} onClick={() => navigate(`/users/u/${user.id}/details`)}>
+                <div className={styles.name} onClick={() => navigate(`/users/u/${user.id}`)}>
                     {user.first_name} {user.last_name}
                 </div>
                 {user.email && <div className={styles.email}>{user.email}</div>}

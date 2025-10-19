@@ -1,7 +1,8 @@
 .app {
     display: flex;
     flex-direction: row;
-    min-height: 100vh;
+    height: 100vh; /* ✅ було min-height */
+    overflow: hidden; /* ✅ забороняємо вертикальний скрол */
     background: #f9fafb;
 }
 
@@ -12,17 +13,52 @@
     padding: 2rem 1.5rem;
     display: flex;
     flex-direction: column;
-    /*position: fixed;*/
-    /*top: 0;*/
-    /*bottom: 0;*/
-    /*left: 0;*/
 }
 
 .wrapper {
     display: flex;
     flex-direction: column;
     flex: 1;
+    height: 100vh; /* ✅ важливо */
+    overflow: hidden; /* ✅ */
 }
+
+.content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* ✅ ключове */
+}
+
+.header {
+    flex-shrink: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.main {
+    flex: 1;
+    overflow: hidden; /* ✅ головне — щоб BoardPage сама керувала скролом */
+}
+
+.footer {
+    flex-shrink: 0;
+    padding: 1rem 2rem;
+    background: #f3f4f6;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #6b7280;
+    border-top: 1px solid #e5e7eb;
+}
+
+/*dddddddddddddddddddddddddddddddddd*/
 
 .logo {
     font-size: 1.5rem;
@@ -55,25 +91,6 @@
 .navItem:hover {
     background: #e6f8ef;
     color: #00a86b;
-}
-
-.content {
-    margin-left: 250px;
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-}
-
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.5rem 2rem;
-    background: #ffffff;
-    border-bottom: 1px solid #e5e7eb;
-    position: sticky;
-    top: 0;
-    z-index: 10;
 }
 
 .greeting {
@@ -141,21 +158,6 @@
 }
 .profile:hover {
     color: #00a86b;
-}
-
-
-.main {
-    flex: 1;
-    padding: 2rem;
-}
-
-.footer {
-    padding: 1rem 2rem;
-    background: #f3f4f6;
-    text-align: center;
-    font-size: 0.9rem;
-    color: #6b7280;
-    border-top: 1px solid #e5e7eb;
 }
 
 @media (max-width: 900px) {

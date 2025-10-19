@@ -1,0 +1,90 @@
+.page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    height: 100%;
+    overflow: hidden;
+
+    background-image: url('https://trello-backgrounds.s3.amazonaws.com/60a6a55d8b5def7ed6b846f2/2560x1369/62de1fc7d1268fb9e985a8d4e6af9fc3/521983310_137476020893768_1740424275863.webp');
+    background-size: cover;
+    background-position: center center;
+}
+
+.header {
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    backdrop-filter: blur(20px);
+    background: rgba(163, 162, 162, 0.24);
+}
+
+.content {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+}
+
+.lists {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    overflow-x: auto;
+    overflow-y: hidden;
+    height: calc(100vh - 80px);
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.lists::-webkit-scrollbar {
+    height: 10px;
+}
+
+.lists::-webkit-scrollbar-thumb {
+    background: #c1c7d0;
+    border-radius: 4px;
+}
+
+
+
+
+
+
+
+
+
+.extraActions {
+    display: flex;
+    height: 100%;
+    position: relative;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    min-height: 32px;
+    margin-left: auto;
+    gap: 4px;
+}
+
+.extraActions button {
+    background: rgba(255, 255, 255, 0.3);
+    border: none;
+    border-radius: 6px;
+    color: #FFFFFF;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 6px 12px;
+    height: 100%;
+    transition: background 0.2s;
+}
+
+.title {
+    height: 100%;
+    overflow: hidden;
+    background: transparent;
+    color: #FFFFFF;
+    font-size: 18px;
+    font-weight: bold;
+    line-height: 32px;
+    text-decoration: none;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

@@ -1,19 +1,18 @@
 import React from "react";
 import { useAuth } from "../System/AuthContext";
 import {
-    LayoutDashboard,
     ClipboardList,
     Users,
     Wallet,
     BarChart3,
-    Settings,
+    Settings, CalendarClock, SquareKanban,
 } from "lucide-react";
 import styles from "./Layout.module.css";
 import {useNavigate} from "react-router-dom";
 
 const icons: Record<string, React.ReactNode> = {
-    dashboard: <LayoutDashboard size={20} />,
-    tasks: <ClipboardList size={20} />,
+    boards: <SquareKanban size={20} />,
+    events: <CalendarClock size={20} />,
     users: <Users size={20} />,
     finance: <Wallet size={20} />,
     reports: <BarChart3 size={20} />,

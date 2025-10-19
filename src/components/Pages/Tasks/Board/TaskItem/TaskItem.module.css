@@ -1,0 +1,52 @@
+.task {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: background 0.2s, outline-color 0.1s;
+    display: flex;
+    flex-direction: column;
+    outline: 2px solid #ffffff;
+    outline-offset: -2px;
+}
+
+.task:hover {
+    background: #f4f5f7;
+    outline-color: #00a86b;
+    /*transform: translateY(-1px);*/
+}
+
+.taskTitle {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+}
+
+.done {
+    width: 16px;
+    height: 16px;
+    border-radius: 50px;
+    background-color: #00a86b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.done svg {
+    color: #ffffff;
+    width: 10px;
+    height: 10px;
+}
+
+.title {
+    font-size: 15px;
+    font-weight: 500;
+    color: #172b4d;
+}
+
+.description {
+    font-size: 13px;
+    color: #5e6c84;
+    margin-top: 4px;
+    line-height: 1.4;
+}

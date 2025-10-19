@@ -10,7 +10,7 @@ const Header: React.FC = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
 
-    const [balance, ] = useState<number>(0);
+    const [balance, ] = useState<number>(-1);
 
     const [showNotifs, setShowNotifs] = useState(false);
     const [unreadCount, setUnreadCount] = useState(0);

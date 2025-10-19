@@ -1,0 +1,82 @@
+.list {
+    background: #f1f2f4;
+    width: 280px;
+    flex-shrink: 0;
+    border-radius: 12px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    max-height: 100%;
+    box-sizing: border-box;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.tasks {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow-y: auto;
+    flex: 1; /* ✅ це ключ, щоб tasks займали все місце і скролились */
+    padding-right: 4px;
+    min-height: 0; /* 👈 обовʼязково, щоб flex працював зі скролом */
+}
+
+.tasks::-webkit-scrollbar {
+    width: 6px;
+}
+
+.tasks::-webkit-scrollbar-thumb {
+    background: #c1c7d0;
+    border-radius: 4px;
+}
+
+.addTask {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+    padding: 10px;
+    font-size: 14px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    gap: 4px;
+    transition: 0.2s;
+}
+
+.addTask:hover {
+    background: #dfe1e6;
+}
+
+
+
+
+
+
+
+
+
+.title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #172b4d;
+}
+
+.count {
+    background: #dfe1e6;
+    border-radius: 20px;
+    padding: 2px 8px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #5e6c84;
+}
+
+

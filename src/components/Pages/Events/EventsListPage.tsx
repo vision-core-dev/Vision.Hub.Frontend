@@ -44,7 +44,7 @@ const UsersListPage = () => {
                         { key: "time_to", label: "Завершення", render: (v) => v.time_to?.slice(0, 5) || "—" },
                     ]}
                     data={events}
-                    onRowClick={(row) => navigate(`/events/e/${row.id}/details`)}
+                    onRowClick={(row) => navigate(`/events/e/${row.id}`)}
                 />
             )}
         </div>

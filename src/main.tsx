@@ -14,6 +14,8 @@ import EventsListPage from "./components/Pages/Events/EventsListPage.tsx";
 import AccountDeactivated from "./components/Pages/auth/AccountDeactivated/AccountDeactivated.tsx";
 
 import "./global.css";
+import BoardsListPage from "./components/Pages/Tasks/BoardsList/BoardsListPage.tsx";
+import BoardPage from "./components/Pages/Tasks/Board/BoardPage/BoardPage.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
@@ -27,14 +29,21 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
 
                     <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>}/>
 
+                    {/*users*/}
                     <Route path="/users" element={<ProtectedRoute><Navigate to="/users/list" replace /></ProtectedRoute>} />
                     <Route path="/users/list" element={<ProtectedRoute><UsersListPage /></ProtectedRoute>} />
                     <Route path="/users/add-user" element={<ProtectedRoute><CreateUserPage /></ProtectedRoute>} />
-                    <Route path="/users/u/:id/details" element={<ProtectedRoute><UserDetailsPage /></ProtectedRoute>} />
+                    <Route path="/users/u/:id" element={<ProtectedRoute><UserDetailsPage /></ProtectedRoute>} />
 
+                    {/*events*/}
                     <Route path="/events" element={<ProtectedRoute><Navigate to="/events/list" replace /></ProtectedRoute>} />
                     <Route path="/events/list" element={<ProtectedRoute><EventsListPage /></ProtectedRoute>} />
                     <Route path="/events/create-event" element={<ProtectedRoute><CreateEventPage /></ProtectedRoute>} />
+
+                    {/*boards*/}
+                    <Route path="/boards" element={<ProtectedRoute><Navigate to="/boards/list" replace /></ProtectedRoute>} />
+                    <Route path="/boards/list" element={<ProtectedRoute><BoardsListPage /></ProtectedRoute>} />
+                    <Route path="/boards/b/:id" element={<ProtectedRoute><BoardPage /></ProtectedRoute>} />
 
                     <Route path="*" element={<div>404</div>} />
                 </Routes>
