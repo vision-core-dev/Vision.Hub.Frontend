@@ -71,9 +71,12 @@ const Notifs: React.FC<{ onClose: () => void; onReadAll: () => void }> = ({ onCl
                         >
                             <div className={styles.notifContent}>
                                 <h3>{notif.title}</h3>
-                                <p>{notif.message}</p>
+                                <p
+                                    dangerouslySetInnerHTML={{ __html: notif.message }}
+                                />
                                 <span className={styles.timestamp}>
-                                    <Clock strokeWidth={2.5} /> {safeDatetime(notif.created_at)} {notif.is_read && <CheckCheck strokeWidth={2.5} />}
+                                    <Clock strokeWidth={2.5} /> {safeDatetime(notif.created_at)}{" "}
+                                    {notif.is_read && <CheckCheck strokeWidth={2.5} />}
                                 </span>
                             </div>
 

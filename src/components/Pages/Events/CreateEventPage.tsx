@@ -25,7 +25,7 @@ const CreateEventPage = () => {
                     { name: "time_to", label: "Час завершення", type: "time", required: true },
                     { name: "location", label: "Локація", type: "text" },
                     { name: "location_url", label: "Посилання на локацію", type: "text" },
-                    { name: "invites", label: "Учасники", type: "user-select" },
+                    { name: "invitees", label: "Учасники", type: "user-select" },
                 ]}
                 onSubmit={async (values) => {
                     const res = await api.post("/v1/Hub/Events/Create", values);
