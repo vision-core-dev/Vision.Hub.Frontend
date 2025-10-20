@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import styles from "./Layout.module.css";
 import { useNavigate, useLocation } from "react-router-dom";
+import {getSidebarText} from "../../types/Messages.ts";
 
 const icons: Record<string, React.ReactNode> = {
     dashboard: <LayoutDashboard size={20} />,
@@ -60,7 +61,7 @@ const Sidebar: React.FC = () => {
                             >
                                 {icons[item] || <ClipboardList size={20} />}
                                 {!collapsed && (
-                                    <span>{item.charAt(0).toUpperCase() + item.slice(1)}</span>
+                                    <span>{getSidebarText(item)}</span>
                                 )}
                             </button>
                         );
