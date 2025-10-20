@@ -49,6 +49,10 @@ const PublicEventDetails = () => {
         fetchEvent();
     }, []);
 
+    if (loading) {
+        return <DefaultPage isLoading={loading} />;
+    }
+
     if (!event) {
         return <div className={styles.noAccess}>❌ Івент не знайдено</div>;
     }
@@ -58,11 +62,13 @@ const PublicEventDetails = () => {
     }
 
     const acceptInvite = async () => {
+        setLoading(true);
         await api.post(`/v1/Hub/Events/${event.id}/AcceptInvite`);
         fetchEvent();
     };
 
     const declineInvite = async () => {
+        setLoading(true);
         await api.post(`/v1/Hub/Events/${event.id}/DeclineInvite`);
         fetchEvent();
     };

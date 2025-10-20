@@ -1,8 +1,14 @@
 .page {
-    width: 100%;
+    width: 40%;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
+}
+
+@media (max-width: 900px) {
+    .page {
+        width: 100%;
+    }
 }
 
 .header {
@@ -185,3 +191,4 @@
     width: 22px;
     height: 22px;
 }
+
