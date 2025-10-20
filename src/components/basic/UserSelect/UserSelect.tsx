@@ -17,7 +17,7 @@ const UserSelect: React.FC<Props> = ({ onChange }) => {
         (async () => {
             const res = await api.get("/v1/Hub/Users/List");
             const data = await res.json();
-            setUsers(data.users || []);
+            setUsers(data.list || []);
         })();
     }, []);
 

@@ -21,13 +21,16 @@ const DefaultPage: React.FC<DefaultPageProps> = ({
 }) => {
     return (
         <div className={styles.pageWrapper}>
-            <div className={styles.pageHeader}>
-                <div className={styles.pageTitleBlock}>
-                    {title && <h1 className={styles.title}>{title}</h1>}
-                    {description && <p className={styles.description}>{description}</p>}
-                </div>
-                {action && <div className={styles.action}>{action}</div>}
-            </div>
+            { (title || description || action) && (
+                    <div className={styles.pageHeader}>
+                        <div className={styles.pageTitleBlock}>
+                            {title && <h1 className={styles.title}>{title}</h1>}
+                            {description && <p className={styles.description}>{description}</p>}
+                        </div>
+                        {action && <div className={styles.action}>{action}</div>}
+                    </div>
+                )
+            }
 
             <div className={styles.pageContent} style={{ maxWidth }}>
                 {isLoading ? <LoaderDots /> : children}

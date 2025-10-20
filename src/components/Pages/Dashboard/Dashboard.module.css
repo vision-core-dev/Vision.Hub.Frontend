@@ -1,0 +1,40 @@
+/*import CalendarTimeline from "./CalendarTimeline/CalendarTimeline.tsx";*/
+
+/*import styles from "./DashboardPage.module.css";*/
+
+/*const Dashboard = () => {*/
+/*                      // const { role } = useAuth();*/
+
+/*                          return (*/
+/*                          <div className={styles.dashboardPage}>*/
+/*                      <h1 className={styles.title}>Панель керування</h1>*/
+/*                      <div className={styles.content}>*/
+/*                                                     {!* {role === "admin" && <AdminPanel />} *!}*/
+/*                      <CalendarTimeline />*/
+/*                      </div>*/
+/*                      </div>*/
+/*                      );*/
+/*                      };*/
+
+/*export default Dashboard;*/
+
+
+.dashboardPage {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 1rem;
+}
+
+.content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}

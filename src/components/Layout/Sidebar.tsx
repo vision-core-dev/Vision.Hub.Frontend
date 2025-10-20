@@ -6,18 +6,18 @@ import {
     Wallet,
     BarChart3,
     Settings,
-    CalendarClock,
     SquareKanban,
     ChevronLeft,
-    ChevronRight, LayoutDashboard,
+    ChevronRight, LayoutDashboard, CalendarDays, CalendarRange,
 } from "lucide-react";
 import styles from "./Layout.module.css";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const icons: Record<string, React.ReactNode> = {
     dashboard: <LayoutDashboard size={20} />,
+    calendar: <CalendarDays size={20} />,
     boards: <SquareKanban size={20} />,
-    events: <CalendarClock size={20} />,
+    events: <CalendarRange size={20} />,
     users: <Users size={20} />,
     finance: <Wallet size={20} />,
     reports: <BarChart3 size={20} />,

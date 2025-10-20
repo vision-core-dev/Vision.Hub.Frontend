@@ -16,6 +16,8 @@ import AccountDeactivated from "./components/Pages/auth/AccountDeactivated/Accou
 import "./global.css";
 import BoardsListPage from "./components/Pages/Tasks/BoardsListPage.tsx";
 import BoardPage from "./components/Pages/Tasks/Board/BoardPage/BoardPage.tsx";
+import CalendarTimeline from "./components/Pages/Events/CalendarTimeline/CalendarTimeline.tsx";
+import PublicEventDetails from "./components/Pages/Events/EventDetails/PublicEventDetails.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
@@ -35,9 +37,14 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                     <Route path="/users/add-user" element={<ProtectedRoute><CreateUserPage /></ProtectedRoute>} />
                     <Route path="/users/u/:id" element={<ProtectedRoute><UserDetailsPage /></ProtectedRoute>} />
 
+                    {/*calendar*/}
+                    <Route path="/calendar" element={<ProtectedRoute><CalendarTimeline /></ProtectedRoute>} />
+                    <Route path="/calendar/e/:id" element={<ProtectedRoute><PublicEventDetails /></ProtectedRoute>} />
+
                     {/*events*/}
                     <Route path="/events" element={<ProtectedRoute><Navigate to="/events/list" replace /></ProtectedRoute>} />
                     <Route path="/events/list" element={<ProtectedRoute><EventsListPage /></ProtectedRoute>} />
+                    <Route path="/events/e/:id" element={<ProtectedRoute><PublicEventDetails /></ProtectedRoute>} />
                     <Route path="/events/create-event" element={<ProtectedRoute><CreateEventPage /></ProtectedRoute>} />
 
                     {/*boards*/}

@@ -24,6 +24,7 @@ const CreateEventPage = () => {
                     { name: "time_from", label: "Час початку", type: "time", required: true },
                     { name: "time_to", label: "Час завершення", type: "time", required: true },
                     { name: "location", label: "Локація", type: "text" },
+                    { name: "location_url", label: "Посилання на локацію", type: "text" },
                     { name: "invites", label: "Учасники", type: "user-select" },
                 ]}
                 onSubmit={async (values) => {

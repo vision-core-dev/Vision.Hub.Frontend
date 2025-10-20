@@ -26,17 +26,6 @@ const Button: React.FC<ButtonProps> = ({
         }
     }, [adaptive]);
 
-    // 🧠 Розбиваємо children на іконку та текст
-    const childArray = React.Children.toArray(children);
-    const iconChild = childArray.find(
-        (child) =>
-            React.isValidElement(child) &&
-            (typeof child.type === "function" || typeof child.type === "object")
-    );
-    const textChild = childArray.find(
-        (child) => typeof child === "string" || typeof child === "number"
-    );
-
     return (
         <button
             onClick={onClick}
@@ -47,8 +36,16 @@ const Button: React.FC<ButtonProps> = ({
                 adaptive && isCompact ? styles.adaptive : "",
             ].join(" ")}
         >
-            {iconChild}
-            {!adaptive || !isCompact ? <span className={styles.text}>{textChild}</span> : null}
+            {React.Children.map(children, (child) => {
+                if (
+                    adaptive &&
+                    isCompact &&
+                    typeof child === "string" // якщо текст — ховаємо
+                ) {
+                    return null;
+                }
+                return child;
+            })}
         </button>
     );
 };
