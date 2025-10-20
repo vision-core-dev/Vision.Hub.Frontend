@@ -27,5 +27,4 @@ export interface EventType {
     location: string;
     location_url?: string;
     created_at: string;
-    // invite?: EventInviteType;
 }

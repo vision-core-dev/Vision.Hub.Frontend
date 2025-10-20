@@ -7,8 +7,8 @@ import styles from "./EventDetails.module.css";
 import Button from "../../../basic/Button/Button";
 import { api } from "../../../../utils/api";
 import DefaultPage from "../../../basic/DefaultPage/DefaultPage";
-import { useParams } from "react-router-dom";
-import {MapPin, Clock, Check, X, Undo2, ExternalLink, Pin, TextAlignEnd, CalendarClock} from "lucide-react";
+import {useNavigate, useParams} from "react-router-dom";
+import {MapPin, Clock, Check, X, Undo2, ExternalLink, Pin, TextAlignEnd, CalendarClock, ArrowLeft} from "lucide-react";
 
 interface PublicEventDetailsResponse {
     event: EventType;
@@ -25,6 +25,8 @@ const STATUS_MAP: Record<string, { emoji: string; text: string }> = {
 };
 
 const PublicEventDetails = () => {
+    const navigate = useNavigate();
+
     const { id } = useParams();
     const [event, setEvent] = useState<EventType | null>(null);
     const [invite, setInvite] = useState<EventInviteType | null>(null);
@@ -159,6 +161,10 @@ const PublicEventDetails = () => {
                         <Button onClick={acceptInvite}><Undo2 strokeWidth={2.5} /> Передумати</Button>
                     )}
                 </div>
+
+                <Button variant="link" onClick={() => navigate("/calendar")}>
+                    <ArrowLeft size={20} /> Назад до списку
+                </Button>
             </div>
         </DefaultPage>
     );
