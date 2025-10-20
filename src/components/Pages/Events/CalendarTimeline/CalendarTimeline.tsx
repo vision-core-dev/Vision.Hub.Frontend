@@ -7,8 +7,11 @@ import DefaultPage from "../../../basic/DefaultPage/DefaultPage";
 import Button from "../../../basic/Button/Button";
 import { ChevronLeft, ChevronRight, Undo2 } from "lucide-react";
 import { api } from "../../../../utils/api";
+import {useNavigate} from "react-router-dom";
 
 const CalendarTimeline: React.FC = () => {
+    const navigate = useNavigate();
+
     const [events, setEvents] = useState<EventType[]>([]);
     const today = new Date();
 
@@ -176,6 +179,7 @@ const CalendarTimeline: React.FC = () => {
                                                     top: `${(startHour - minTime) * 60}px`,
                                                     height: `${durationHours * 60 - 16}px`,
                                                 }}
+                                                onClick={() => navigate(`/calendar/e/${e.id}`)}
                                             >
                                                 <strong>{e.name}</strong>
                                                 {e.location && (
