@@ -1,40 +1,98 @@
-/*import CalendarTimeline from "./CalendarTimeline/CalendarTimeline.tsx";*/
-
-/*import styles from "./DashboardPage.module.css";*/
-
-/*const Dashboard = () => {*/
-/*                      // const { role } = useAuth();*/
-
-/*                          return (*/
-/*                          <div className={styles.dashboardPage}>*/
-/*                      <h1 className={styles.title}>Панель керування</h1>*/
-/*                      <div className={styles.content}>*/
-/*                                                     {!* {role === "admin" && <AdminPanel />} *!}*/
-/*                      <CalendarTimeline />*/
-/*                      </div>*/
-/*                      </div>*/
-/*                      );*/
-/*                      };*/
-
-/*export default Dashboard;*/
-
-
-.dashboardPage {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
+.dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 1.8rem;
+    padding: 2rem;
 }
 
-.title {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: #111827;
-    margin-bottom: 1rem;
-}
-
-.content {
-    width: 100%;
+.card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.8rem;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.06);
     display: flex;
     flex-direction: column;
+    gap: 1rem;
+    transition: transform 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+}
+
+.cardHeader {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.amount {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #16a34a;
+}
+
+.progressBar {
+    width: 100%;
+    height: 8px;
+    background: #e5e7eb;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress {
+    height: 100%;
+    background: #3b82f6;
+}
+
+.badges {
+    display: flex;
+    gap: 0.8rem;
+}
+
+.badges img {
+    width: 40px;
+    height: 40px;
+}
+
+.transactions div {
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+}
+
+.actionsRow {
+    display: flex;
+    gap: 0.8rem;
+}
+
+/*.action {*/
+/*    background: #16a34a;*/
+/*    color: white;*/
+/*    border: none;*/
+/*    padding: 0.6rem 1rem;*/
+/*    border-radius: 8px;*/
+/*    cursor: pointer;*/
+/*    font-weight: 500;*/
+/*}*/
+
+/*.actionSecondary {*/
+/*    background: transparent;*/
+/*    color: #3b82f6;*/
+/*    border: 1px solid #3b82f6;*/
+/*    padding: 0.6rem 1rem;*/
+/*    border-radius: 8px;*/
+/*    cursor: pointer;*/
+/*}*/
+
+.awards { border-top: 5px solid #f59e0b; }
+.cases { border-top: 5px solid #ef4444; }
+.balance { border-top: 5px solid #16a34a; }
+.tasks { border-top: 5px solid #3b82f6; }
+.events { border-top: 5px solid #8b5cf6; }
+
+@media (max-width: 768px) {
+    .dashboard {
+        grid-template-columns: 1fr;
+        padding: 1rem;
+    }
 }

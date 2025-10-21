@@ -1,6 +1,7 @@
 .wrapper {
     display: block;
     width: 100%;
+    max-width: 100%;
     overflow: auto;
     border-radius: 12px;
     background-color: #f8f8fa;
@@ -8,7 +9,8 @@
 }
 
 .table {
-    min-width: 50rem;
+    /*max-width: 100%;*/
+    min-width: 30rem;
     border-spacing: 0;
     border-collapse: collapse;
     width: 100%;

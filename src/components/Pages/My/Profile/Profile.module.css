@@ -1,0 +1,184 @@
+.profilePage {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+}
+
+.section {
+    background: #fff;
+    padding: 1.8rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+}
+
+.section h2 {
+    font-size: 1.3rem;
+    margin-bottom: 1.2rem;
+}
+
+.row {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.avatarWrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.avatar {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.uploadBtn {
+    background: #f3f4f6;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.inputs {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+label {
+    font-size: 0.95rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+input, select {
+    padding: 0.7rem;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    font-size: 0.95rem;
+}
+
+.warning {
+    background: #fff3cd;
+    color: #92400e;
+    padding: 0.8rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    line-height: 1.4;
+}
+
+.integrations {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.integrationCard {
+    flex: 1;
+    min-width: 180px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    background: #f9fafb;
+    transition: 0.2s;
+}
+
+.integrationCard:hover {
+    background: #f3f4f6;
+    transform: translateY(-2px);
+}
+
+.integrationCard img {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 0.6rem;
+}
+
+.linkBtn {
+    background: #3b82f6;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+}
+
+.saveBtn {
+    background: #16a34a;
+    color: white;
+    padding: 0.8rem 1.4rem;
+    border-radius: 10px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.actions {
+    text-align: right;
+}
+
+@media (max-width: 768px) {
+    .profilePage {
+        padding: 1rem;
+    }
+    .row {
+        flex-direction: column;
+    }
+    .integrationCard {
+        min-width: 100%;
+    }
+}
+
+
+.sectionActions {
+    display: flex;
+    gap: 0.8rem;
+    margin-top: 1rem;
+}
+
+.cancelBtn {
+    background: #e5e7eb;
+    color: #374151;
+    border: none;
+    padding: 0.7rem 1.2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.cancelBtn:hover {
+    background: #d1d5db;
+}

@@ -1,9 +1,9 @@
 .app {
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    /*height: 100vh;*/
     max-width: 100vw;
-    overflow: hidden;
+    /*overflow: hidden;*/
     background: #f9fafb;
 }
 
@@ -21,6 +21,7 @@
 .wrapper {
     display: flex;
     flex-direction: row;
+    min-height: 100vh;
     flex: 1;
 }
 
@@ -45,9 +46,9 @@
 
 .main {
     flex: 1;
-    overflow-y: auto;
+    /*overflow-y: auto;*/
     overflow-x: hidden;
-    max-height: 84vh;
+    /*max-height: 84vh;*/
 }
 
 .footer {

@@ -1,0 +1,77 @@
+.sidebar {
+    width: 280px;
+    border-right: 1px solid #e5e7eb;
+    background: #fff;
+    height: 100%;
+    overflow-y: auto;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.folder {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    /*margin-bottom: 0.6rem;*/
+}
+
+.folder svg {
+    min-width: 18px;
+    height: 18px;
+}
+
+.folderHeader {
+    display: flex;
+    gap: 0.6rem;
+    cursor: pointer;
+    align-items: center;
+    padding: 0.7rem;
+    background-color: #f8f8f8;
+    color: #374151;
+    font-weight: 500;
+    font-size: 1rem;
+    border-radius: 10px;
+    transition: all 0.25s ease;
+    position: relative;
+}
+
+.folderHeader:hover {
+    background: #e6f8ef;
+    color: #00a86b;
+}
+
+.folderContent {
+    display: flex;
+    flex-direction: column;
+    margin-left: 20px;
+    /*margin-top: 4px;*/
+    gap: 0.6rem;
+}
+
+.document {
+    display: flex;
+    cursor: pointer;
+
+    gap: 0.6rem;
+    padding: 0.7rem;
+    background-color: #f8f8f8;
+    color: #374151;
+    font-weight: 500;
+    font-size: 1rem;
+    border-radius: 10px;
+    transition: all 0.25s ease;
+    position: relative;
+}
+
+.document:hover {
+    background: #e6f8ef;
+    color: #00a86b;
+}
+
+.active {
+    background: #e6f8ef;
+    color: #00a86b;
+    font-weight: 600;
+}

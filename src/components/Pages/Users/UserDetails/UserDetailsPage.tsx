@@ -130,6 +130,20 @@ const UserDetailsPage = () => {
         refreshUserData()
     };
 
+    const getAge = (birthday) => {
+        console.log(birthday);
+        if (!birthday) return null;
+        const birthDate = new Date(birthday);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        return <span className={styles.age}>({age} років)</span>;
+    };
+
+
     const backButton = (
         <Button variant="link" onClick={() => navigate("/users/list")}>
             <ArrowLeft size={20} /> Назад до списку
@@ -189,7 +203,9 @@ const UserDetailsPage = () => {
                     </div>
                     <div>
                         <p className={styles.label}>🎉 День народження</p>
-                        <p className={styles.value}>{safeDate(user.birthday)}</p>
+                        <p className={styles.value}>
+                            {safeDate(user.birthday)} {getAge(user.birthday)}
+                        </p>
                     </div>
                     <div>
                         <p className={styles.label}>🧭 Остання активність</p>

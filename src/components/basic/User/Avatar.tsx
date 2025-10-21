@@ -2,7 +2,7 @@ import React from "react";
 import styles from "./User.module.css";
 
 interface AvatarProps {
-    url?: string;
+    url?: string | null;
     name?: string;
     noFallback?: boolean;
 }

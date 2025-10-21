@@ -11,6 +11,7 @@ const sidebarList: Record<string, string> = {
     "boards": "Дошки",
     "events": "Події",
     "users": "Користувачі",
+    "knowledge": "База знань",
 };
 
 export function getErrorText(code: string, fallback = "Сталася невідома помилка"): string {

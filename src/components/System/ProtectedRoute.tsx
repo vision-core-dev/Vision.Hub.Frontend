@@ -18,8 +18,9 @@ const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
     }
 
     const currentPath = location.pathname.split("/")[1];
+    const allowedPaths = ["dashboard", "my"];
 
-    if (currentPath === "dashboard" || currentPath === "") {
+    if (allowedPaths.includes(currentPath) || currentPath === "") {
         return <Layout>{children}</Layout>;
     }
 

@@ -8,7 +8,7 @@ import {
     Settings,
     SquareKanban,
     ChevronLeft,
-    ChevronRight, LayoutDashboard, CalendarDays, CalendarRange,
+    ChevronRight, LayoutDashboard, CalendarDays, CalendarRange, BookMarked,
 } from "lucide-react";
 import styles from "./Layout.module.css";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -23,6 +23,7 @@ const icons: Record<string, React.ReactNode> = {
     finance: <Wallet size={20} />,
     reports: <BarChart3 size={20} />,
     settings: <Settings size={20} />,
+    knowledge: <BookMarked size={20} />
 };
 
 const Sidebar: React.FC = () => {

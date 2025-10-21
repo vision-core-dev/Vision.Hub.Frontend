@@ -13,6 +13,7 @@ const Header: React.FC = () => {
     const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(JSON.parse(localStorage.getItem("sidebar-collapsed") || "false"));
 
     const [balance, ] = useState<number>(-1);
+    const [balanceEnabled, ] = useState<boolean>(true);
 
     const [showNotifs, setShowNotifs] = useState(false);
     const [unreadCount, setUnreadCount] = useState(0);
@@ -82,9 +83,11 @@ const Header: React.FC = () => {
                     onClick={() => navigate("/my/profile")}
                     title="Мій профіль"
                 >
-                    <span className={styles.balance}>
-                        {balance} грн.
-                    </span>
+                    {balanceEnabled && (
+                        <span className={styles.balance}>
+                            {balance} грн.
+                        </span>
+                    )}
 
                     <div className={styles.avatarWrapper}>
                         {user?.avatar_url ? (

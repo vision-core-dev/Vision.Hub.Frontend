@@ -1,9 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+
 import {BrowserRouter, Routes, Route, Navigate} from "react-router-dom";
+
 import { AuthProvider } from "./components/System/AuthContext";
 import ProtectedRoute from "./components/System/ProtectedRoute";
-import Dashboard from "./components/Pages/Dashboard/DashboardPage.tsx";
+
 import Login from "./components/Pages/auth/Login/LoginPage.tsx";
 
 import UsersListPage from "./components/Pages/Users/UsersListPage.tsx";
@@ -19,6 +21,9 @@ import BoardPage from "./components/Pages/Tasks/Board/BoardPage/BoardPage.tsx";
 import CalendarTimeline from "./components/Pages/Events/CalendarTimeline/CalendarTimeline.tsx";
 import PublicEventDetails from "./components/Pages/Events/EventDetails/PublicEventDetails.tsx";
 import CreateBoardPage from "./components/Pages/Tasks/CreateBoardPage.tsx";
+import ProfilePage from "./components/Pages/My/Profile/Profile.tsx";
+import DashboardPage from "./components/Pages/Dashboard/Dashboard.tsx";
+import KnowledgeLayout from "./components/Pages/Knowledge/KnowledgeLayout/KnowledgeLayout.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
@@ -30,7 +35,10 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                     <Route path="/login" element={<Login />} />
                     <Route path="/deactivated" element={<AccountDeactivated />} />
 
-                    <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>}/>
+                    <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>}/>
+
+                    {/*profile*/}
+                    <Route path="/my/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
 
                     {/*users*/}
                     <Route path="/users" element={<ProtectedRoute><Navigate to="/users/list" replace /></ProtectedRoute>} />
@@ -53,6 +61,10 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                     <Route path="/boards/list" element={<ProtectedRoute><BoardsListPage /></ProtectedRoute>} />
                     <Route path="/boards/b/:id" element={<ProtectedRoute><BoardPage /></ProtectedRoute>} />
                     <Route path="/boards/create-board" element={<ProtectedRoute><CreateBoardPage /></ProtectedRoute>} />
+
+                    {/*knowledge*/}
+                    <Route path="/knowledge" element={<ProtectedRoute><KnowledgeLayout /></ProtectedRoute>} />
+                    <Route path="/knowledge/d/:id" element={<ProtectedRoute><KnowledgeLayout /></ProtectedRoute>} />
 
                     <Route path="*" element={<div>404</div>} />
                 </Routes>
