@@ -4,6 +4,7 @@ import { api } from "../../../../utils/api.ts";
 import { useAuth } from "../../../System/AuthContext.tsx";
 import { Lock, Mail } from "lucide-react";
 import styles from "./LoginPage.module.css";
+import {getErrorText} from "../../../../types/Messages.ts";
 
 const LoginPage = () => {
     const [email, setEmail] = useState("");
@@ -24,7 +25,7 @@ const LoginPage = () => {
                 window.location.reload();
             } else {
                 const err = await response.json();
-                setError(err.detail || "Невірні дані");
+                setError(getErrorText(err.detail, "Невірні дані"));
             }
         } catch {
             setError("Помилка підключення до сервера");

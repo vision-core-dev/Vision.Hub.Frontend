@@ -18,6 +18,7 @@ import BoardsListPage from "./components/Pages/Tasks/BoardsListPage.tsx";
 import BoardPage from "./components/Pages/Tasks/Board/BoardPage/BoardPage.tsx";
 import CalendarTimeline from "./components/Pages/Events/CalendarTimeline/CalendarTimeline.tsx";
 import PublicEventDetails from "./components/Pages/Events/EventDetails/PublicEventDetails.tsx";
+import CreateBoardPage from "./components/Pages/Tasks/CreateBoardPage.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
@@ -51,6 +52,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                     <Route path="/boards" element={<ProtectedRoute><Navigate to="/boards/list" replace /></ProtectedRoute>} />
                     <Route path="/boards/list" element={<ProtectedRoute><BoardsListPage /></ProtectedRoute>} />
                     <Route path="/boards/b/:id" element={<ProtectedRoute><BoardPage /></ProtectedRoute>} />
+                    <Route path="/boards/create-board" element={<ProtectedRoute><CreateBoardPage /></ProtectedRoute>} />
 
                     <Route path="*" element={<div>404</div>} />
                 </Routes>

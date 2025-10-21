@@ -62,7 +62,7 @@ const BoardsListPage = () => {
         <DefaultPage
             title="Дошки"
             action={
-                <Button adaptive={true} onClick={() => navigate("/users/add-user")}
+                <Button adaptive={true} onClick={() => navigate("/boards/create-board")}
                 >
                     <Plus strokeWidth={2.25} />Додати
                 </Button>
@@ -80,20 +80,15 @@ const BoardsListPage = () => {
                             render: (value) => value, // value = row.name
                         },
                         {
+                            key: "description",
+                            label: "Опис",
+                            render: (value) => value,
+                        },
+                        {
                             key: "created_at",
                             label: "Створено",
                             render: (value) => safeDate(value),
-                        },
-                        {
-                            key: "updated_at",
-                            label: "Оновлено",
-                            render: (value) => (value ? safeDate(value) : "—"),
-                        },
-                        {
-                            key: "tasks_count",
-                            label: "Кількість задач",
-                            render: (value) => value ?? "—",
-                        },
+                        }
                     ]}
                     data={boards}
                     onRowClick={(row) => navigate(`/boards/b/${row.id}`)}

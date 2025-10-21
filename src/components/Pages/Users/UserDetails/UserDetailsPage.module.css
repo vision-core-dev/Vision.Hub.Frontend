@@ -335,7 +335,7 @@
     }
 
     .info {
-        grid-template-columns: 1fr 1fr; /* ✅ 2 колонки замість 4 */
+        /*grid-template-columns: 1fr 1fr; !* ✅ 2 колонки замість 4 *!*/
     }
 }
 

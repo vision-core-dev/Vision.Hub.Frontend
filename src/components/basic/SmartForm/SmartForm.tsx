@@ -73,7 +73,7 @@ const SmartForm: React.FC<SmartFormProps> = ({
 
             {fields.map((field) => (
                 <div key={field.name} className={styles.field}>
-                    <label htmlFor={field.name}>{field.label}</label>
+                    <label htmlFor={field.name}>{field.label} {field.required && (<span>*</span>)}</label>
 
                     {field.type === "select" ? (
                         <select
