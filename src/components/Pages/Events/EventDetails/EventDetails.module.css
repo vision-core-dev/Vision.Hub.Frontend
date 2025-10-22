@@ -4,6 +4,10 @@
     display: flex;
     flex-direction: column;
 }
+.moderate {
+    width: 50%;
+    gap: 1.5rem;
+}
 
 @media (max-width: 900px) {
     .page {
@@ -193,3 +197,9 @@
     height: 22px;
 }
 
+
+.actionsCell {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}

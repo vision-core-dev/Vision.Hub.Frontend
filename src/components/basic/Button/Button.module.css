@@ -21,6 +21,14 @@
     background: #00925e;
 }
 
+.danger {
+    background: #EF4444;
+    color: #fff;
+}
+.danger:hover {
+    background: #DC2626;
+}
+
 /* 🪄 Secondary */
 .secondary {
     background: #f3f4f6;

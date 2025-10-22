@@ -5,17 +5,19 @@ interface ButtonProps {
     onClick?: () => void;
     children: React.ReactNode;
     disabled?: boolean;
-    variant?: "primary" | "secondary" | "link";
+    variant?: "primary" | "secondary" | "link" | "danger";
     adaptive?: boolean;
+    title?: string;
 }
 
 const Button: React.FC<ButtonProps> = ({
-                                           onClick = () => {},
-                                           children,
-                                           disabled = false,
-                                           variant = "primary",
-                                           adaptive = false,
-                                       }) => {
+    onClick = () => {},
+    children,
+    disabled = false,
+    variant = "primary",
+    adaptive = false,
+    title
+}) => {
     const [isCompact, setIsCompact] = useState(window.innerWidth < 900);
 
     useEffect(() => {
@@ -28,6 +30,7 @@ const Button: React.FC<ButtonProps> = ({
 
     return (
         <button
+            title={title}
             onClick={onClick}
             disabled={disabled}
             className={[

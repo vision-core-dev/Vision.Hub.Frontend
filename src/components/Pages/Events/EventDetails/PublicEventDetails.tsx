@@ -163,7 +163,7 @@ const PublicEventDetails = () => {
                 </div>
 
                 <Button variant="link" onClick={() => navigate("/calendar")}>
-                    <ArrowLeft size={20} /> Назад до списку
+                    <ArrowLeft size={20} /> Назад до календаря
                 </Button>
             </div>
         </DefaultPage>

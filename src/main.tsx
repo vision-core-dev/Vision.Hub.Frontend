@@ -24,6 +24,7 @@ import CreateBoardPage from "./components/Pages/Tasks/CreateBoardPage.tsx";
 import ProfilePage from "./components/Pages/My/Profile/Profile.tsx";
 import DashboardPage from "./components/Pages/Dashboard/Dashboard.tsx";
 import KnowledgeLayout from "./components/Pages/Knowledge/KnowledgeLayout/KnowledgeLayout.tsx";
+import ModerateEventDetails from "./components/Pages/Events/EventDetails/ModerateEventDetails.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
@@ -53,7 +54,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                     {/*events*/}
                     <Route path="/events" element={<ProtectedRoute><Navigate to="/events/list" replace /></ProtectedRoute>} />
                     <Route path="/events/list" element={<ProtectedRoute><EventsListPage /></ProtectedRoute>} />
-                    <Route path="/events/e/:id" element={<ProtectedRoute><PublicEventDetails /></ProtectedRoute>} />
+                    <Route path="/events/e/:id" element={<ProtectedRoute><ModerateEventDetails /></ProtectedRoute>} />
                     <Route path="/events/create-event" element={<ProtectedRoute><CreateEventPage /></ProtectedRoute>} />
 
                     {/*boards*/}
