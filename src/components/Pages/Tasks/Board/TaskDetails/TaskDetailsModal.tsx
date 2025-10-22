@@ -1,7 +1,8 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import styles from "./TaskDetailsModal.module.css";
-import { X, Link as LinkIcon, Paperclip } from "lucide-react";
+import {X, Link as LinkIcon, Paperclip} from "lucide-react";
 import Button from "../../../../basic/Button/Button.tsx";
+import {api} from "../../../../../utils/api.ts";
 
 interface User {
     id: string;
@@ -44,62 +45,120 @@ export interface TaskDetails {
 }
 
 interface Props {
-    task: TaskDetails;
-    onClose: () => void;
+    taskId: string,
+    boardTags: Tag[],
+    onClose: () => void,
 }
 
-const TaskDetailsModal: React.FC<Props> = ({ task, onClose }) => {
+const TaskDetailsModal: React.FC<Props> = ({taskId, onClose}) => {
+    const [task, setTask] = useState<TaskDetails | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error] = useState<string | null>(null);
+
+    // 🧠 Фетч деталей задачі
+    const fetchTaskDetails = async () => {
+        try {
+            setLoading(true);
+            const res = await api.get(`/v1/Hub/Tasks/${taskId}/GetDetails`);
+            const data = await res.json();
+            if (!res.ok) {
+                throw new Error(data.detail || "Failed to fetch task details");
+            }
+            setTask(data.task || data); // залежно від формату
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (taskId) fetchTaskDetails();
+    }, [taskId]);
+
+    // 🌀 Стан завантаження
+    if (loading) {
+        return (
+            <div className={styles.overlay}>
+                <div className={styles.modal}>
+                    <div className={styles.loading}>Завантаження...</div>
+                </div>
+                <div className={styles.backdrop} onClick={onClose}></div>
+            </div>
+        );
+    }
+
+    // ⚠️ Помилка
+    if (error || !task) {
+        return (
+            <div className={styles.overlay}>
+                <div className={styles.modal}>
+                    <div className={styles.error}>{error || "Помилка завантаження"}</div>
+                    <Button variant="secondary" onClick={onClose}>
+                        Закрити
+                    </Button>
+                </div>
+                <div className={styles.backdrop} onClick={onClose}></div>
+            </div>
+        );
+    }
+
+    // ✅ Основний вміст
     return (
         <div className={styles.overlay}>
             <div className={styles.modal}>
-                <div className={`${styles.header} ${task.banner_url ? styles.banner : ""}`} style={{ backgroundImage: `url(${task.banner_url})` }}>
+                <div
+                    className={`${styles.header} ${task.banner_url ? styles.banner : ""}`}
+                    style={{backgroundImage: task.banner_url ? `url(${task.banner_url})` : "none"}}
+                >
                     <h2>{task.name}</h2>
                     <Button variant="secondary" onClick={onClose}>
-                        <X size={18} />
+                        <X size={18}/>
                     </Button>
                 </div>
 
-                {/*{task.banner_url && (*/}
-                {/*    <div className={styles.banner}>*/}
-                {/*        <img src={task.banner_url} alt="Banner" />*/}
-                {/*    </div>*/}
-                {/*)}*/}
-
                 <div className={styles.content}>
                     {/* 🏷️ Теги */}
-                    <div className={styles.tags}>
-                        {task.tags.map((tag) => (
-                            <span
-                                key={tag.id}
-                                className={styles.tag}
-                                style={{ backgroundColor: tag.color }}
-                            >
-                {tag.name}
-              </span>
-                        ))}
-                    </div>
+                    {task.tags?.length > 0 && (
+                        <div className={styles.tags}>
+                            {task.tags.map((tag) => (
+                                <span
+                                    key={tag.id}
+                                    className={styles.tag}
+                                    style={{backgroundColor: tag.color}}
+                                >
+                                    {tag.name}
+                                </span>
+                            ))}
+                        </div>
+                    )}
 
                     {/* 👥 Виконавці */}
-                    <div className={styles.assignees}>
-                        {task.assignees.map((a) => (
-                            <div key={a.id} className={styles.assignee}>
-                                <img src={a.avatar_url} alt={a.first_name} />
-                                <span>{a.first_name}</span>
-                            </div>
-                        ))}
-                    </div>
+                    {task.assignees?.length > 0 && (
+                        <div className={styles.assignees}>
+                            {task.assignees.map((a) => (
+                                <div key={a.id} className={styles.assignee}>
+                                    <img
+                                        src={a.avatar_url || "/default-avatar.png"}
+                                        alt={a.first_name}
+                                    />
+                                    <span>{a.first_name}</span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
 
                     {/* 📄 Опис */}
-                    <div className={styles.section}>
-                        <h3>Опис</h3>
-                        <div
-                            className={styles.description}
-                            dangerouslySetInnerHTML={{ __html: task.description }}
-                        />
-                    </div>
+                    {task.description && (
+                        <div className={styles.section}>
+                            <h3>Опис</h3>
+                            <div
+                                className={styles.description}
+                                dangerouslySetInnerHTML={{__html: task.description}}
+                            />
+                        </div>
+                    )}
 
                     {/* 📎 Вкладення */}
-                    {task.attachments.length > 0 && (
+                    {task.attachments?.length > 0 && (
                         <div className={styles.section}>
                             <h3>Вкладення</h3>
                             <div className={styles.attachments}>
@@ -112,9 +171,9 @@ const TaskDetailsModal: React.FC<Props> = ({ task, onClose }) => {
                                         className={styles.attachment}
                                     >
                                         {att.type === "link" ? (
-                                            <LinkIcon size={16} />
+                                            <LinkIcon size={16}/>
                                         ) : (
-                                            <Paperclip size={16} />
+                                            <Paperclip size={16}/>
                                         )}
                                         <span>{att.name || att.url}</span>
                                     </a>
@@ -124,28 +183,33 @@ const TaskDetailsModal: React.FC<Props> = ({ task, onClose }) => {
                     )}
 
                     {/* 💬 Коментарі */}
-                    <div className={styles.section}>
-                        <h3>Коментарі</h3>
-                        <div className={styles.comments}>
-                            {task.comments.map((c) => (
-                                <div key={c.id} className={styles.comment}>
-                                    <img src={c.user.avatar_url} alt={c.user.name} />
-                                    <div>
-                                        <div className={styles.commentHeader}>
-                                            <strong>{c.user.name}</strong>
-                                            <span>
-                        {new Date(c.created_at).toLocaleString("uk-UA")}
-                      </span>
-                                        </div>
-                                        <div
-                                            className={styles.commentContent}
-                                            dangerouslySetInnerHTML={{ __html: c.content }}
+                    {task.comments?.length > 0 && (
+                        <div className={styles.section}>
+                            <h3>Коментарі</h3>
+                            <div className={styles.comments}>
+                                {task.comments.map((c) => (
+                                    <div key={c.id} className={styles.comment}>
+                                        <img
+                                            src={c.user.avatar_url || "/default-avatar.png"}
+                                            alt={c.user.first_name}
                                         />
+                                        <div>
+                                            <div className={styles.commentHeader}>
+                                                <strong>{c.user.first_name}</strong>
+                                                <span>
+                                                    {new Date(c.created_at).toLocaleString("uk-UA")}
+                                                </span>
+                                            </div>
+                                            <div
+                                                className={styles.commentContent}
+                                                dangerouslySetInnerHTML={{__html: c.content}}
+                                            />
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))}
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </div>
             </div>
             <div className={styles.backdrop} onClick={onClose}></div>

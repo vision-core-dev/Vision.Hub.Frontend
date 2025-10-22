@@ -9,7 +9,7 @@ import { api } from "../../../../../utils/api.ts";
 type ListProps = {
     list: List;
     onSelectTask: (task: Task) => void;
-    boardId: string | null; // 👈 додай у пропси ID дошки
+    boardId: string | null | undefined; // 👈 додай у пропси ID дошки
     refresh: () => Promise<void>; // 👈 опціонально, щоб оновити список після створення
 };
 
@@ -26,7 +26,7 @@ const ListItem = ({ list, onSelectTask, boardId, refresh }: ListProps) => {
         try {
             setLoading(true);
 
-            const res = await api.post(`/v1/Hub/Boards/${boardId}/Tasks/Create`, {
+            await api.post(`/v1/Hub/Boards/${boardId}/Tasks/Create`, {
                 list_id: list.id,
                 name: taskName,
                 description: "",

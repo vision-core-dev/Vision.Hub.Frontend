@@ -8,7 +8,7 @@ import LoaderDots from "../../../../basic/LoaderDots/LoaderDots.tsx";
 import {useDragScroll} from "../../../../../utils/useDragScroll.ts";
 import {Ellipsis} from "lucide-react";
 import BoardSettings from "./BoardSettings/BoardSettings.tsx";
-import TaskDetailsModal, {type TaskDetails} from "../TaskDetails/TaskDetailsModal.tsx";
+import TaskDetailsModal from "../TaskDetails/TaskDetailsModal.tsx";
 
 
 export type Task = {
@@ -54,34 +54,33 @@ const BoardPage = () => {
     const [loading, setLoading] = useState(true);
 
     const [showSettings, setShowSettings] = useState(false);
-    const [selectedTask, setSelectedTask] = useState<TaskDetails | null>(null);
+    const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
 
     const scrollRef = useRef<HTMLDivElement | null>(null);
     useDragScroll(scrollRef, { axis: "x", speed: 1.2 });
 
+    const fetchBoard = async (silent = false) => {
+        try {
+            if (!silent) setLoading(true);
+            const res = await api.get(`/v1/Hub/Boards/${id}/GetDetails`);
+            const data: BoardDetails = await res.json();
+
+            const listsWithTasks: List[] = data.lists.map((list) => ({
+                ...list,
+                tasks: data.tasks.filter((task) => task.list_id === list.id),
+            }));
+
+            setBoardDetails({ ...data, lists: listsWithTasks });
+        } catch (err) {
+            console.error("Помилка при оновленні дошки:", err);
+        } finally {
+            if (!silent) setLoading(false);
+        }
+    };
 
     // 🟦 Запит на бекенд
     useEffect(() => {
         let interval: ReturnType<typeof setInterval>;
-
-        const fetchBoard = async (silent = false) => {
-            try {
-                if (!silent) setLoading(true);
-                const res = await api.get(`/v1/Hub/Boards/${id}/GetDetails`);
-                const data: BoardDetails = await res.json();
-
-                const listsWithTasks: List[] = data.lists.map((list) => ({
-                    ...list,
-                    tasks: data.tasks.filter((task) => task.list_id === list.id),
-                }));
-
-                setBoardDetails({ ...data, lists: listsWithTasks });
-            } catch (err) {
-                console.error("Помилка при оновленні дошки:", err);
-            } finally {
-                if (!silent) setLoading(false);
-            }
-        };
 
         if (id) {
             fetchBoard();
@@ -109,10 +108,11 @@ const BoardPage = () => {
                 <div ref={scrollRef} className={styles.lists}>
                     {boardDetails.lists.map((list) => (
                         <ListItem
+                            refresh={() => fetchBoard(true)}
                             boardId={id}
                             key={list.id}
                             list={list}
-                            onSelectTask={(task) => setSelectedTask(task)}
+                            onSelectTask={(task) => setSelectedTaskId(task.id)}
                         />
                     ))}
                 </div>
@@ -123,21 +123,11 @@ const BoardPage = () => {
                     </div>
                 </div>
 
-                {selectedTask && (
+                {selectedTaskId && (
                     <TaskDetailsModal
-                        task={{
-                            id: selectedTask.id,
-                            name: selectedTask.name,
-                            description: "<p>Опис задачі тут...</p>",
-                            tags: boardDetails.tags.filter(t => selectedTask.tags?.includes(t.id)),
-                            assignees: boardDetails.members.filter(m => selectedTask.assignees.includes(m.id)),
-                            attachments: [],
-                            comments: [],
-                            banner_url: boardDetails.board.banner_url,
-                            created_by: { id: "u1", first_name: "Кирило" },
-                            created_at: new Date().toISOString(),
-                        }}
-                        onClose={() => setSelectedTask(null)}
+                        taskId={selectedTaskId}
+                        boardTags={boardDetails.tags}
+                        onClose={() => setSelectedTaskId(null)}
                     />
                 )}
 
