@@ -13,13 +13,14 @@ type ListProps = {
     list: {
         id: string;
         name: string;
+        color?: string;  // 👈 ось тут змінено
         tasks: Task[];
     };
 };
 
 const ListItem = ({ list }: ListProps) => {
     return (
-        <div className={styles.list}>
+        <div className={styles.list} style={{ backgroundColor: `${list.color || "#fff"}` }}>
             <div className={styles.header}>
                 <h2 className={styles.title}>{list.name}</h2>
                 <span className={styles.count}>{list.tasks.length}</span>

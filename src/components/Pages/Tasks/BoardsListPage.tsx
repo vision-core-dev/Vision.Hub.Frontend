@@ -5,6 +5,7 @@ import Table from "../../basic/Table/Table.tsx";
 import DefaultPage from "../../basic/DefaultPage/DefaultPage.tsx";
 import Button from "../../basic/Button/Button.tsx";
 import {Plus} from "lucide-react";
+import {api} from "../../../utils/api.ts";
 
 type BoardType = {
     id: string;
@@ -20,43 +21,26 @@ const BoardsListPage = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // емуляція завантаження
-        setTimeout(() => {
-            const dummyBoards: BoardType[] = [
-                {
-                    id: "1",
-                    name: "📊 Головна дошка проєкту",
-                    created_at: "2025-10-01T10:00:00Z",
-                    updated_at: "2025-10-15T18:30:00Z",
-                    tasks_count: 42,
-                },
-                {
-                    id: "2",
-                    name: "🚀 Розробка нової гри",
-                    created_at: "2025-09-20T14:15:00Z",
-                    updated_at: "2025-10-10T09:00:00Z",
-                    tasks_count: 18,
-                },
-                {
-                    id: "3",
-                    name: "🛠️ Тестування та QA",
-                    created_at: "2025-10-05T08:45:00Z",
-                    updated_at: "2025-10-17T12:00:00Z",
-                    tasks_count: 7,
-                },
-            ];
-            setBoards(dummyBoards);
-            setLoading(false);
-        }, 600);
+        const fetchBoards = async () => {
+            try {
+                setLoading(true);
+                const res = await api.get("/v1/Hub/Boards/List");
+                if (res.ok) {
+                    const data = await res.json();
+                    setBoards(data.list); // 🔹 очікується BoardsListResponse { total, list }
+                } else {
+                    console.error("Failed to load boards");
+                }
+            } catch (err) {
+                console.error("Error fetching boards:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchBoards();
     }, []);
 
-    // useEffect(() => {
-    //     api.get("/v1/Tasks/Boards/List").then(async (res) => {
-    //         const data = await res.json();
-    //         setBoards(data.list);
-    //         setLoading(false);
-    //     });
-    // }, []);
 
     return (
         <DefaultPage
@@ -93,7 +77,6 @@ const BoardsListPage = () => {
                     data={boards}
                     onRowClick={(row) => navigate(`/boards/b/${row.id}`)}
                 />
-
             )}
         </DefaultPage>
     );

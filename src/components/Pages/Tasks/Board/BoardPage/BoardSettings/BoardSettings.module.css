@@ -1,0 +1,86 @@
+.settings {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: #fff;
+    padding: 20px;
+    width: 400px;
+    max-width: 500px;
+    border-left: 1px solid #e5e7eb;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    height: 100%;
+}
+
+.tabs {
+    display: flex;
+    gap: 8px;
+}
+
+.tabs button {
+    flex: 1;
+    border: none;
+    padding: 10px 0;
+    border-radius: 8px;
+    cursor: pointer;
+    background: #f3f4f6;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.tabs button:hover {
+    background: #e5e7eb;
+}
+
+.tabs .active {
+    background: #2563eb;
+    color: white;
+}
+
+.tabContent {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.createRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.createRow input[type="text"] {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+}
+
+.createRow input[type="color"] {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.tagItem, .listItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    border-radius: 6px;
+    background: #f9fafb;
+}
+
+.colorPreview {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    margin-right: 8px;
+}

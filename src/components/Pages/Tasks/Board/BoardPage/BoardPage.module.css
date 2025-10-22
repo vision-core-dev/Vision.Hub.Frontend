@@ -1,10 +1,8 @@
 .page {
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    /*min-height: 100vh;*/
     height: 100%;
-
-    background-image: url('https://trello-backgrounds.s3.amazonaws.com/60a6a55d8b5def7ed6b846f2/2560x1369/62de1fc7d1268fb9e985a8d4e6af9fc3/521983310_137476020893768_1740424275863.webp');
     background-size: cover;
     background-position: center center;
 }
@@ -21,19 +19,25 @@
 .content {
     flex: 1;
     display: flex;
+    justify-content: space-between;
+    user-select: none;
 }
 
 .lists {
     display: flex;
     gap: 20px;
     align-items: flex-start;
-    overflow-x: auto;
     overflow-y: hidden;
-    height: calc(100vh - 80px);
     padding: 20px;
     box-sizing: border-box;
+
+    overflow-x: auto;
     cursor: grab;
     user-select: none;
+    touch-action: pan-y;
+}
+.lists.dragging, .lists.active {
+    cursor: grabbing;
 }
 
 .lists.active {
@@ -63,6 +67,9 @@
 }
 
 .extraActions button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: rgba(255, 255, 255, 0.3);
     border: none;
     border-radius: 6px;
@@ -70,12 +77,13 @@
     cursor: pointer;
     font-size: 14px;
     padding: 6px 12px;
-    height: 100%;
     transition: background 0.2s;
+}
+.extraActions button:hover {
+    background: rgba(255, 255, 255, 0.2);
 }
 
 .title {
-    height: 100%;
     overflow: hidden;
     background: transparent;
     color: #FFFFFF;
@@ -85,4 +93,22 @@
     text-decoration: none;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.settingsWrapper {
+    position: relative;
+}
+
+.slideIn {
+    position: absolute;
+    right: 0;
+    top: 0;
+    /*height: 100%;*/
+    transform: translateX(100%);
+    opacity: 1;
+    transition: transform 0.4s ease;
+}
+
+.slideIn.active {
+    transform: translateX(0);
 }

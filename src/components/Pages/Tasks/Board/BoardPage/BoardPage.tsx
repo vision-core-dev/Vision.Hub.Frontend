@@ -2,181 +2,122 @@ import { useEffect, useRef, useState } from "react";
 import styles from "./BoardPage.module.css";
 import ListItem from "../ListItem/ListItem";
 import { useParams } from "react-router-dom";
+import type {UserType} from "../../../../../types/Users.ts";
+import {api} from "../../../../../utils/api.ts";
+import LoaderDots from "../../../../basic/LoaderDots/LoaderDots.tsx";
+import {useDragScroll} from "../../../../../utils/useDragScroll.ts";
+import {Ellipsis} from "lucide-react";
+import BoardSettings from "./BoardSettings/BoardSettings.tsx";
 
 type Task = {
     id: string;
     title: string;
-    description?: string;
-    done: boolean;
+    list_id: string;
+    status: string;
+    priority: string;
+    deadline_at?: string;
+    assignees: string[];
 };
 
 type List = {
     id: string;
     name: string;
+    color?: string;
+    order?: number;
     tasks: Task[];
 };
 
+type TaskTag = {
+    id: string;
+    name: string;
+    color: string;
+}
+
+type BoardDetails = {
+    board: {
+        id: string;
+        name: string;
+        description?: string;
+        banner_url?: string;
+    };
+    lists: List[];
+    tasks: Task[];
+    members: UserType[];
+    tags: TaskTag[];
+};
+
 const BoardPage = () => {
-    const { boardId } = useParams();
-    const [lists, setLists] = useState<List[]>([]);
-    const scrollRef = useRef<HTMLDivElement | null>(null); // 👈 ref для контейнера
+    const { id } = useParams();
+    const [boardDetails, setBoardDetails] = useState<BoardDetails | null>(null);
+    const [loading, setLoading] = useState(true);
 
+    const [showSettings, setShowSettings] = useState(false);
+
+    const scrollRef = useRef<HTMLDivElement | null>(null);
+    useDragScroll(scrollRef, { axis: "x", speed: 1.2 });
+
+
+    // 🟦 Запит на бекенд
     useEffect(() => {
-        setLists([
-            {
-                id: "todo",
-                name: "📌 To Do",
-                tasks: [
-                    { id: "t1", title: "Створити дизайн інтерфейсу", done: false },
-                    { id: "t2", title: "Підключити бекенд", done: false },
-                ],
-            },
-            {
-                id: "inprogress",
-                name: "🚧 В процесі",
-                tasks: [
-                    { id: "t3", title: "Розробити авторизацію", done: false },
-                ],
-            },
-            {
-                id: "done",
-                name: "✅ Готово",
-                tasks: [
-                    { id: "t4", title: "Створити базу даних", done: true },
-                ],
-            },
-            {
-                id: "todo",
-                name: "📌 To Do",
-                tasks: [
-                    { id: "t1", title: "Створити дизайн інтерфейсу", done: false },
-                    { id: "t2", title: "Підключити бекенд", done: false },
-                ],
-            },
-            {
-                id: "inprogress",
-                name: "🚧 В процесі",
-                tasks: [
-                    { id: "t3", title: "Розробити авторизацію", done: false },
-                ],
-            },
-            {
-                id: "done",
-                name: "✅ Готово",
-                tasks: [
-                    { id: "t4", title: "Створити базу даних", done: true },
-                ],
-            },
-            {
-                id: "todo",
-                name: "📌 To Do",
-                tasks: [
-                    { id: "t1", title: "Створити дизайн інтерфейсу", done: false },
-                    { id: "t2", title: "Підключити бекенд", done: false },
-                ],
-            },
-            {
-                id: "inprogress",
-                name: "🚧 В процесі",
-                tasks: [
-                    { id: "t3", title: "Розробити авторизацію", done: false },
-                ],
-            },
-            {
-                id: "done",
-                name: "✅ Готово",
-                tasks: [
-                    { id: "t4", title: "Створити базу даних", done: true },
-                ],
-            },
-            {
-                id: "todo",
-                name: "📌 To Do",
-                tasks: [
-                    { id: "t1", title: "Створити дизайн інтерфейсу", done: false },
-                    { id: "t2", title: "Підключити бекенд", done: false },
-                ],
-            },
-            {
-                id: "inprogress",
-                name: "🚧 В процесі",
-                tasks: [
-                    { id: "t3", title: "Розробити авторизацію", done: false },
-                ],
-            },
-            {
-                id: "done",
-                name: "✅ Готово",
-                tasks: [
-                    { id: "t4", title: "Створити базу даних", done: true },
-                ],
-            },
-        ]);
-    }, [boardId]);
+        let interval: ReturnType<typeof setInterval>;
 
-    // 👇 додай ефект для drag-scroll
-    useEffect(() => {
-        const container = scrollRef.current;
-        if (!container) return;
+        const fetchBoard = async (silent = false) => {
+            try {
+                if (!silent) setLoading(true);
+                const res = await api.get(`/v1/Hub/Boards/${id}/GetDetails`);
+                const data: BoardDetails = await res.json();
 
-        let isDown = false;
-        let startX: number;
-        let scrollLeft: number;
+                const listsWithTasks: List[] = data.lists.map((list) => ({
+                    ...list,
+                    tasks: data.tasks.filter((task) => task.list_id === list.id),
+                }));
 
-        const handleMouseDown = (e: MouseEvent) => {
-            isDown = true;
-            container.classList.add(styles.active);
-            startX = e.pageX - container.offsetLeft;
-            scrollLeft = container.scrollLeft;
+                setBoardDetails({ ...data, lists: listsWithTasks });
+            } catch (err) {
+                console.error("Помилка при оновленні дошки:", err);
+            } finally {
+                if (!silent) setLoading(false);
+            }
         };
 
-        const handleMouseLeave = () => {
-            isDown = false;
-            container.classList.remove(styles.active);
-        };
+        if (id) {
+            fetchBoard();
+            interval = setInterval(() => {
+                fetchBoard(true);
+            }, 5000);
+        }
 
-        const handleMouseUp = () => {
-            isDown = false;
-            container.classList.remove(styles.active);
-        };
+        return () => clearInterval(interval);
+    }, [id]);
 
-        const handleMouseMove = (e: MouseEvent) => {
-            if (!isDown) return;
-            e.preventDefault();
-            const x = e.pageX - container.offsetLeft;
-            const walk = (x - startX) * 1.2; // швидкість
-            container.scrollLeft = scrollLeft - walk;
-        };
-
-        container.addEventListener("mousedown", handleMouseDown);
-        container.addEventListener("mouseleave", handleMouseLeave);
-        container.addEventListener("mouseup", handleMouseUp);
-        container.addEventListener("mousemove", handleMouseMove);
-
-        return () => {
-            container.removeEventListener("mousedown", handleMouseDown);
-            container.removeEventListener("mouseleave", handleMouseLeave);
-            container.removeEventListener("mouseup", handleMouseUp);
-            container.removeEventListener("mousemove", handleMouseMove);
-        };
-    }, []);
+    if (loading) return <LoaderDots />;
+    if (!boardDetails) return <div className={styles.error}>Дошку не знайдено 😔</div>;
 
     return (
-        <div className={styles.page}>
+        <div className={styles.page} style={{backgroundImage: `url(${boardDetails.board.banner_url || ""})`}}>
             <div className={styles.header}>
-                <h1 className={styles.title}>📋 Канбан дошка</h1>
+                <h1 className={styles.title}>📋 {boardDetails.board.name}</h1>
                 <div className={styles.extraActions}>
-                    <button>Додати список</button>
+                    <button onClick={() => setShowSettings(!showSettings)}><Ellipsis /></button>
                 </div>
             </div>
 
             <div className={styles.content}>
                 <div ref={scrollRef} className={styles.lists}>
-                    {lists.map((list) => (
+                    {boardDetails.lists.map((list) => (
                         <ListItem key={list.id} list={list} />
                     ))}
                 </div>
+
+                <div className={styles.settingsWrapper}>
+                    <div className={`${styles.slideIn} ${showSettings ? styles.active : ""}`}>
+                        <BoardSettings boardId={boardDetails.board.id} />
+                    </div>
+                </div>
+
+
             </div>
+
         </div>
     );
 };
