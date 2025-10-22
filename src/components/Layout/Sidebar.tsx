@@ -58,7 +58,11 @@ const Sidebar: React.FC = () => {
                                 className={`${styles.navItem} ${
                                     isActive ? styles.activeNavItem : ""
                                 }`}
-                                onClick={() => navigate(path)}
+                                onClick={() => {
+                                    navigate(path)
+                                    const main = document.querySelector(".main");
+                                    if (main) main.scrollTo({ top: 0, behavior: "smooth" });
+                                }}
                             >
                                 {icons[item] || <ClipboardList size={20} />}
                                 {!collapsed && (

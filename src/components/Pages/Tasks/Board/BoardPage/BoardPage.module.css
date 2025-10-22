@@ -32,6 +32,12 @@
     height: calc(100vh - 80px);
     padding: 20px;
     box-sizing: border-box;
+    cursor: grab;
+    user-select: none;
+}
+
+.lists.active {
+    cursor: grabbing;
 }
 
 .lists::-webkit-scrollbar {
