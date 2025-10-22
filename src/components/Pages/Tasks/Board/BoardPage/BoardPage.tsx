@@ -9,7 +9,7 @@ import {useDragScroll} from "../../../../../utils/useDragScroll.ts";
 import {Ellipsis} from "lucide-react";
 import BoardSettings from "./BoardSettings/BoardSettings.tsx";
 
-type Task = {
+export type Task = {
     id: string;
     title: string;
     list_id: string;
@@ -19,7 +19,7 @@ type Task = {
     assignees: string[];
 };
 
-type List = {
+export type List = {
     id: string;
     name: string;
     color?: string;

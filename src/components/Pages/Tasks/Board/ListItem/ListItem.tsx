@@ -1,21 +1,10 @@
 import styles from "./ListItem.module.css";
 import TaskItem from "../TaskItem/TaskItem";
 import {Plus} from "lucide-react";
-
-type Task = {
-    id: string;
-    title: string;
-    description?: string;
-    done: boolean;
-};
+import type {List} from "../BoardPage/BoardPage.tsx";
 
 type ListProps = {
-    list: {
-        id: string;
-        name: string;
-        color?: string;  // 👈 ось тут змінено
-        tasks: Task[];
-    };
+    list: List;
 };
 
 const ListItem = ({ list }: ListProps) => {
