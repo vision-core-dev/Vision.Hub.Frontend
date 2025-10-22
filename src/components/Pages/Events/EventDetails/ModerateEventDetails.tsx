@@ -16,8 +16,7 @@ import {
     ArrowLeft,
     Link,
     UserCheck,
-    UserX,
-    Loader2
+    UserX
 } from "lucide-react";
 import Table from "../../../basic/Table/Table.tsx";
 import UserLabel from "../../../basic/User/UserLabel.tsx";
@@ -103,7 +102,7 @@ const ModerateEventDetails = () => {
         {
             key: "user",
             label: "Користувач",
-            render: (_: never, row: InviteeWithUser) =>
+            render: (_value: any, row: InviteeWithUser) =>
                 row.user && (
                     <UserLabel
                         avatar_url={row.user.avatar_url}
@@ -141,7 +140,7 @@ const ModerateEventDetails = () => {
         {
             key: "actions",
             label: "",
-            render: (_: never, row: InviteeWithUser) => (
+            render: (_value: any, row: InviteeWithUser) => (
                 <div className={styles.actionsCell}>
                     {/* ✅ Відмітити присутність */}
                     {(actions.includes("mark_attended") && row.status !== "attended") && (

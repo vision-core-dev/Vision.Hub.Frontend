@@ -4,7 +4,7 @@
     max-width: 100%;
     overflow: auto;
     border-radius: 12px;
-    background-color: #f8f8fa;
+    background-color: #ffffff;
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
@@ -19,7 +19,7 @@
 .table th {
     text-align: left;
     padding: 1rem;
-    background: #f0f0f0;
+    background: #f2f2f2;
     font-weight: 600;
     color: #374151;
 }
@@ -28,7 +28,7 @@
     transition: background 0.1s;
 }
 .table > tbody > tr:hover {
-    background: #f2f2f2;
+    background: rgb(250, 250, 250);
 }
 
 .table td {
