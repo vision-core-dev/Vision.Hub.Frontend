@@ -32,16 +32,16 @@
     box-sizing: border-box;
 
     overflow-x: auto;
-    cursor: grab;
+    /*cursor: grab;*/
     user-select: none;
     touch-action: pan-y;
 }
 .lists.dragging, .lists.active {
-    cursor: grabbing;
+    /*cursor: grabbing;*/
 }
 
 .lists.active {
-    cursor: grabbing;
+    /*cursor: grabbing;*/
 }
 
 .lists::-webkit-scrollbar {

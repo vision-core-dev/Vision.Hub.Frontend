@@ -138,19 +138,19 @@ const BoardSettings: React.FC<Props> = ({ boardId }) => {
                     variant={activeTab === "tags" ? "primary" : "secondary"}
                     onClick={() => setActiveTab("tags")}
                 >
-                    🏷️ Теги
+                    Теги
                 </Button>
                 <Button
                     variant={activeTab === "lists" ? "primary" : "secondary"}
                     onClick={() => setActiveTab("lists")}
                 >
-                    📋 Списки
+                    Списки
                 </Button>
                 <Button
                     variant={activeTab === "banner" ? "primary" : "secondary"}
                     onClick={() => setActiveTab("banner")}
                 >
-                    🖼️ Банер
+                    Банер
                 </Button>
             </div>
 

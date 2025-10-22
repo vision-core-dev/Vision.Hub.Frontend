@@ -51,6 +51,7 @@
     cursor: pointer;
     gap: 4px;
     transition: 0.2s;
+    color: #505258;
 }
 
 .addTask:hover {
@@ -81,3 +82,31 @@
 }
 
 
+
+
+.createTask {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 10px;
+}
+.createTask textarea {
+    width: 100%;
+    min-height: 60px;
+    resize: vertical;
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #dfe1e6;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+.createTask textarea:focus {
+    outline: none;
+    border-color: #00a86b;
+}
+.createTask div {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
