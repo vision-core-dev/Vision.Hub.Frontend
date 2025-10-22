@@ -14,7 +14,7 @@ const TaskItem = ({ task }: TaskProps) => {
                 {task.status === "done" && (
                     <div className={styles.done}><Check strokeWidth={3} /></div>
                 )}
-                <h3 className={styles.title}>{task.title}</h3>
+                <h3 className={styles.title}>{task.name}</h3>
             </div>
             {/*{task.description && (*/}
             {/*    <p className={styles.description}>{task.description}</p>*/}

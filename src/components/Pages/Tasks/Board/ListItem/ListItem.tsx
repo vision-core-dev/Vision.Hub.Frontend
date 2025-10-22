@@ -1,30 +1,63 @@
 import styles from "./ListItem.module.css";
 import TaskItem from "../TaskItem/TaskItem";
 import { Plus, X } from "lucide-react";
-import type { List } from "../BoardPage/BoardPage.tsx";
+import type { List, Task } from "../BoardPage/BoardPage.tsx";
 import Button from "../../../../basic/Button/Button.tsx";
 import { useEffect, useRef, useState } from "react";
+import { api } from "../../../../../utils/api.ts";
 
 type ListProps = {
     list: List;
+    onSelectTask: (task: Task) => void;
+    boardId: string | null; // 👈 додай у пропси ID дошки
+    refresh: () => Promise<void>; // 👈 опціонально, щоб оновити список після створення
 };
 
-const ListItem = ({ list }: ListProps) => {
+const ListItem = ({ list, onSelectTask, boardId, refresh }: ListProps) => {
     const [showCreateTask, setShowCreateTask] = useState(false);
+    const [taskName, setTaskName] = useState("");
+    const [loading, setLoading] = useState(false);
     const listRef = useRef<HTMLDivElement>(null);
 
+    // 🧠 Створення задачі
     const createTask = async () => {
-        // todo: логіка створення задачі
+        if (!taskName.trim()) return;
+        if (!boardId) return;
+        try {
+            setLoading(true);
+
+            const res = await api.post(`/v1/Hub/Boards/${boardId}/Tasks/Create`, {
+                list_id: list.id,
+                name: taskName,
+                description: "",
+                assignee_ids: [],
+                priority: "low",
+                deadline_at: null,
+                value_uah: 0,
+            });
+
+            // console.log("✅ Task created:", res.data);
+
+            // Очищаємо поле
+            setTaskName("");
+            setShowCreateTask(false);
+
+            // 🔄 Оновлення (якщо передано refresh)
+            if (refresh) await refresh();
+        } catch (err) {
+            console.error("❌ Error creating task:", err);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    // 🧠 Обробка кліку поза елементом
+    // 🧠 Закриття блоку створення при кліку поза ним
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
             if (showCreateTask && listRef.current && !listRef.current.contains(e.target as Node)) {
                 setShowCreateTask(false);
             }
         };
-
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, [showCreateTask]);
@@ -40,22 +73,24 @@ const ListItem = ({ list }: ListProps) => {
                 <span className={styles.count}>{list.tasks.length}</span>
             </div>
 
-            <div className={styles.tasks}>
-                {list.tasks.map((task) => (
-                    <TaskItem key={task.id} task={task} />
-                ))}
-            </div>
+            {list.tasks.map((task) => (
+                <div key={task.id} onClick={() => onSelectTask(task)}>
+                    <TaskItem task={task} />
+                </div>
+            ))}
 
             {showCreateTask ? (
                 <div className={styles.createTask}>
                     <textarea
                         autoFocus
                         placeholder="Введіть назву задачі..."
-                        onClick={(e) => e.stopPropagation()} // 👈 щоб клік усередині не закривав
-                    ></textarea>
-                    <div>
-                        <Button variant="primary" onClick={createTask}>
-                            Додати задачу
+                        value={taskName}
+                        onChange={(e) => setTaskName(e.target.value)}
+                        onClick={(e) => e.stopPropagation()}
+                    />
+                    <div className={styles.actions}>
+                        <Button variant="primary" onClick={createTask} disabled={loading}>
+                            {loading ? "Створюється..." : "Додати задачу"}
                         </Button>
                         <Button variant="secondary" onClick={() => setShowCreateTask(false)}>
                             <X />

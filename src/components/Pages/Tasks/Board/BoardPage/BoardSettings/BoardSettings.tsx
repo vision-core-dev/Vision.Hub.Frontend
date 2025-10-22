@@ -112,10 +112,8 @@ const BoardSettings: React.FC<Props> = ({ boardId }) => {
             const res = await api.post(`/v1/Hub/Boards/${boardId}/UploadBanner`, formData);
             const data = await res.json();
 
-            if (!res.ok) throw new Error(data.detail || "Upload failed");
+            if (!res.ok) setError(data.detail || "unknown_error");
             setBannerUrl(data.banner_url);
-        } catch (err: any) {
-            setError(err.message || "Помилка завантаження");
         } finally {
             setUploading(false);
         }
@@ -181,7 +179,7 @@ const BoardSettings: React.FC<Props> = ({ boardId }) => {
                                     style={{ backgroundColor: tag.color }}
                                 />
                                 <span>{tag.name}</span>
-                                <button onClick={() => deleteTag(tag.id)}>🗑</button>
+                                <Button onClick={() => deleteTag(tag.id)}><Trash /></Button>
                             </div>
                         ))}
                     </div>

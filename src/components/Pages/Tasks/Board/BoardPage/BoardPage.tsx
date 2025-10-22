@@ -8,10 +8,12 @@ import LoaderDots from "../../../../basic/LoaderDots/LoaderDots.tsx";
 import {useDragScroll} from "../../../../../utils/useDragScroll.ts";
 import {Ellipsis} from "lucide-react";
 import BoardSettings from "./BoardSettings/BoardSettings.tsx";
+import TaskDetailsModal, {type TaskDetails} from "../TaskDetails/TaskDetailsModal.tsx";
+
 
 export type Task = {
     id: string;
-    title: string;
+    name: string;
     list_id: string;
     status: string;
     priority: string;
@@ -52,6 +54,7 @@ const BoardPage = () => {
     const [loading, setLoading] = useState(true);
 
     const [showSettings, setShowSettings] = useState(false);
+    const [selectedTask, setSelectedTask] = useState<TaskDetails | null>(null);
 
     const scrollRef = useRef<HTMLDivElement | null>(null);
     useDragScroll(scrollRef, { axis: "x", speed: 1.2 });
@@ -105,7 +108,12 @@ const BoardPage = () => {
             <div className={styles.content}>
                 <div ref={scrollRef} className={styles.lists}>
                     {boardDetails.lists.map((list) => (
-                        <ListItem key={list.id} list={list} />
+                        <ListItem
+                            boardId={id}
+                            key={list.id}
+                            list={list}
+                            onSelectTask={(task) => setSelectedTask(task)}
+                        />
                     ))}
                 </div>
 
@@ -115,6 +123,23 @@ const BoardPage = () => {
                     </div>
                 </div>
 
+                {selectedTask && (
+                    <TaskDetailsModal
+                        task={{
+                            id: selectedTask.id,
+                            name: selectedTask.name,
+                            description: "<p>Опис задачі тут...</p>",
+                            tags: boardDetails.tags.filter(t => selectedTask.tags?.includes(t.id)),
+                            assignees: boardDetails.members.filter(m => selectedTask.assignees.includes(m.id)),
+                            attachments: [],
+                            comments: [],
+                            banner_url: boardDetails.board.banner_url,
+                            created_by: { id: "u1", first_name: "Кирило" },
+                            created_at: new Date().toISOString(),
+                        }}
+                        onClose={() => setSelectedTask(null)}
+                    />
+                )}
 
             </div>
 
