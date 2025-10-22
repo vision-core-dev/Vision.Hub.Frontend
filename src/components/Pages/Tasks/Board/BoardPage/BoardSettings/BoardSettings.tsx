@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import styles from "./BoardSettings.module.css";
-import {api} from "../../../../../../utils/api.ts";
+import { api } from "../../../../../../utils/api.ts";
 import Button from "../../../../../basic/Button/Button.tsx";
 import LoaderDots from "../../../../../basic/LoaderDots/LoaderDots.tsx";
-import {Trash} from "lucide-react";
+import { Trash, Image, Upload } from "lucide-react";
 
 type Tag = {
     id: string;
@@ -23,11 +23,13 @@ interface Props {
 }
 
 const BoardSettings: React.FC<Props> = ({ boardId }) => {
-    const [activeTab, setActiveTab] = useState<"tags" | "lists">("tags");
+    const [activeTab, setActiveTab] = useState<"tags" | "lists" | "banner">("tags");
     const [tags, setTags] = useState<Tag[]>([]);
     const [lists, setLists] = useState<List[]>([]);
+    const [bannerUrl, setBannerUrl] = useState<string>("");
 
     const [loading, setLoading] = useState(true);
+    const [uploading, setUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     const [newTag, setNewTag] = useState({ name: "", color: "#5a8dee" });
@@ -46,8 +48,9 @@ const BoardSettings: React.FC<Props> = ({ boardId }) => {
             if (res.ok) {
                 setTags(data.tags);
                 setLists(data.lists);
+                setBannerUrl(data.board.banner_url || "");
             } else {
-                setError(data.detail)
+                setError(data.detail);
             }
         } finally {
             setLoading(false);
@@ -57,15 +60,15 @@ const BoardSettings: React.FC<Props> = ({ boardId }) => {
     const refresh = async (res: Response) => {
         setError(null);
         if (res.ok) {
-            fetchSettings()
+            fetchSettings();
         } else {
             const data = await res.json();
-            setError(data.detail)
+            setError(data.detail);
         }
 
         setNewList({ name: "", color: "#f1f2f4" });
         setNewTag({ name: "", color: "#5a8dee" });
-    }
+    };
 
     const createTag = async () => {
         if (!newTag.name.trim()) return;
@@ -89,6 +92,37 @@ const BoardSettings: React.FC<Props> = ({ boardId }) => {
         await refresh(res);
     };
 
+    const updateBanner = async () => {
+        if (!bannerUrl.trim()) return;
+        const res = await api.post(`/v1/Hub/Boards/${boardId}/SetBanner`, { banner_url: bannerUrl });
+        await refresh(res);
+    };
+
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setUploading(true);
+        setError(null);
+
+        try {
+            const formData = new FormData();
+            formData.append("file", file);
+
+            const res = await api.post(`/v1/Hub/Boards/${boardId}/UploadBanner`, formData);
+            const data = await res.json();
+
+            if (!res.ok) throw new Error(data.detail || "Upload failed");
+            setBannerUrl(data.banner_url);
+        } catch (err: any) {
+            setError(err.message || "Помилка завантаження");
+        } finally {
+            setUploading(false);
+        }
+    };
+
+
+
     if (loading) {
         return (
             <div className={styles.settings}>
@@ -100,22 +134,27 @@ const BoardSettings: React.FC<Props> = ({ boardId }) => {
     return (
         <div className={styles.settings}>
             <div className={styles.tabs}>
-                <button
-                    className={activeTab === "tags" ? styles.active : ""}
+                <Button
+                    variant={activeTab === "tags" ? "primary" : "secondary"}
                     onClick={() => setActiveTab("tags")}
                 >
                     🏷️ Теги
-                </button>
-                <button
-                    className={activeTab === "lists" ? styles.active : ""}
+                </Button>
+                <Button
+                    variant={activeTab === "lists" ? "primary" : "secondary"}
                     onClick={() => setActiveTab("lists")}
                 >
                     📋 Списки
-                </button>
+                </Button>
+                <Button
+                    variant={activeTab === "banner" ? "primary" : "secondary"}
+                    onClick={() => setActiveTab("banner")}
+                >
+                    🖼️ Банер
+                </Button>
             </div>
 
-            {error}
-
+            {error && <div className={styles.error}>{error}</div>}
 
             {activeTab === "tags" && (
                 <div className={styles.tabContent}>
@@ -174,9 +213,49 @@ const BoardSettings: React.FC<Props> = ({ boardId }) => {
                                     style={{ backgroundColor: list.color }}
                                 />
                                 <span>{list.name}</span>
-                                <Button variant="danger" onClick={() => deleteList(list.id)}><Trash /></Button>
+                                <Button variant="danger" onClick={() => deleteList(list.id)}>
+                                    <Trash />
+                                </Button>
                             </div>
                         ))}
+                    </div>
+                </div>
+            )}
+
+            {activeTab === "banner" && (
+                <div className={styles.tabContent}>
+                    <div className={styles.bannerPreview}>
+                        {bannerUrl ? (
+                            <img src={bannerUrl} alt="Banner preview" />
+                        ) : (
+                            <div className={styles.placeholder}>Банер не встановлено</div>
+                        )}
+                    </div>
+
+                    <div className={styles.createRow}>
+                        <input
+                            type="text"
+                            placeholder="URL зображення банера"
+                            value={bannerUrl}
+                            onChange={(e) => setBannerUrl(e.target.value)}
+                        />
+                        <Button onClick={updateBanner} disabled={uploading}>
+                            <Image strokeWidth={2} /> {uploading ? "..." : "Оновити"}
+                        </Button>
+                    </div>
+
+                    <div className={styles.uploadRow}>
+                        <label className={styles.uploadButton}>
+                            <Upload strokeWidth={2} />
+                            Завантажити файл
+                            <input
+                                type="file"
+                                accept="image/*"
+                                style={{ display: "none" }}
+                                onChange={handleFileUpload}
+                                disabled={uploading}
+                            />
+                        </label>
                     </div>
                 </div>
             )}
