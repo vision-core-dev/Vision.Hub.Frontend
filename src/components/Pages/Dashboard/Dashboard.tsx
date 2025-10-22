@@ -1,6 +1,6 @@
 import React from "react";
 import styles from "./Dashboard.module.css";
-import { Award, FileWarning, Wallet, Calendar, CheckCircle2, TrendingUp } from "lucide-react";
+import { Award, FileWarning, Wallet, Calendar, CheckCircle2 } from "lucide-react";
 
 const DashboardPage: React.FC = () => {
     return (
