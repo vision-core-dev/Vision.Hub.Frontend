@@ -7,7 +7,7 @@
     background: #f9fafb;
     padding: 2rem;
     animation: fadeIn 0.3s ease;
-    /*overflow: scroll;*/
+    /*overflow: auto;*/
 }
 
 .pageHeader {

@@ -1,5 +1,7 @@
+/* 🧭 Sidebar */
 .sidebar {
     width: 280px;
+    flex-shrink: 0;
     border-right: 1px solid #e5e7eb;
     background: #fff;
     height: 100%;
@@ -8,6 +10,18 @@
     display: flex;
     flex-direction: column;
     gap: 0.6rem;
+    transition: all 0.35s ease;
+}
+
+/* 🔥 Коли sidebar приховано — прибираємо з потоку повністю */
+.sidebar.collapsed {
+    width: 0;
+    min-width: 0;
+    padding: 0;
+    margin: 0;
+    opacity: 0;
+    overflow: hidden;
+    border: none;
 }
 
 .folder {

@@ -5,6 +5,7 @@ import styles from "./Header.module.css";
 import { useNavigate } from "react-router-dom";
 import Notifs from "../Notifications/Notifs.tsx";
 import {api} from "../../../utils/api.ts";
+import Halloween from "./Halloween/Halloween.tsx";
 
 const Header: React.FC = () => {
     const { user } = useAuth();
@@ -37,6 +38,7 @@ const Header: React.FC = () => {
             const status = window.innerWidth < 700;
             setSidebarCollapsed(status);
         };
+        handleResize()
         window.addEventListener("resize", handleResize);
         return () => window.removeEventListener("resize", handleResize);
     }, []);
@@ -61,7 +63,7 @@ const Header: React.FC = () => {
                 {!sidebarCollapsed && (
                     <>
                         <h1 className={styles.greeting}>
-                            👋 Привіт, <span>{user?.first_name || "користувач"}</span>
+                            👋 Привіт, <span>{user?.first_name || "користувач"}</span> <Halloween />
                         </h1>
                         <p className={styles.subtext}>{randomGreeting}</p>
                     </>

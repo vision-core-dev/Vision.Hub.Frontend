@@ -1,10 +1,15 @@
 .content {
     flex: 1;
     padding: 2rem 3rem;
-    background: #ffffff;
     color: #111827;
     font-family: "Inter", system-ui, sans-serif;
     line-height: 1.7;
+}
+
+@media (max-width: 768px) {
+    .content {
+        padding: 1.5rem 1.8rem;
+    }
 }
 
 /* Заголовок документа */
@@ -30,7 +35,6 @@
 
 /* Основний текст */
 .body {
-    color: #1f2937;
     line-height: 1.75;
     font-size: 1rem;
 }
@@ -41,7 +45,7 @@
 }
 
 .body .section h2 {
-    font-size: 1.35rem;
+    font-size: .8rem;
     font-weight: 600;
     color: #0f172a;
     margin-bottom: 0.8rem;
@@ -67,6 +71,11 @@
     margin-left: 1.3rem;
     list-style-type: disc;
 }
+@media (max-width: 600px) {
+    .body ul {
+        margin-left: 0;
+    }
+}
 
 .body li {
     margin-bottom: 0.35rem;
@@ -80,7 +89,6 @@
 
 /* Порожній стан */
 .empty {
-    padding: 2rem;
     text-align: center;
     color: #9ca3af;
     font-size: 1rem;

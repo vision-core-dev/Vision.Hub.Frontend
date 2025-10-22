@@ -1,7 +1,92 @@
-/* KnowledgeLayout.module.css */
 .layout {
     display: flex;
-    height: 100%;
-    /*height: 100vh;*/
-    /*background: #fff;*/
+    height: 100vh;
+    transition: all 0.3s ease;
+}
+
+/* 🧭 Sidebar */
+.sidebarWrapper {
+    width: 280px;
+    flex-shrink: 0;
+    border-right: 1px solid #e5e7eb;
+    background: #fff;
+    /*overflow-y: auto;*/
+    transition: width 0.3s ease;
+}
+
+/* 📄 Контент */
+.contentWrapper {
+    flex: 1;
+    background: #f9fafb;
+    overflow-y: auto;
+    transition: margin-left 0.3s ease;
+}
+
+
+.sidebar.hidden {
+    transform: translateX(-100%);
+    width: 0;
+}
+
+.sidebar.visible {
+    transform: translateX(0);
+}
+
+/* 🔘 Кнопка меню */
+.menuButton {
+    display: none;
+    position: absolute;
+    top: 80px;
+    left: 16px;
+    z-index: 10;
+    background: #00a86b;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 0.6rem;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: background 0.25s;
+}
+
+.menuButton:hover {
+    background: #00935f;
+}
+
+/* 📱 Мобільна адаптація */
+@media (max-width: 900px) {
+    .layout {
+        position: relative;
+    }
+
+    .sidebarWrapper {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        background: #fff;
+        width: 280px;
+        border-right: 1px solid #e5e7eb;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        z-index: 20;
+    }
+
+    .withSidebar .sidebarWrapper {
+        transform: translateX(0);
+    }
+
+    .menuButton {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .noSidebar .sidebarWrapper {
+        transform: translateX(-100%);
+    }
+
+    .contentWrapper {
+        width: 100%;
+    }
 }

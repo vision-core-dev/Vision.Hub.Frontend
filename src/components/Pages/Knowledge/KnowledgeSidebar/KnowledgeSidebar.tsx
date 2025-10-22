@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import styles from "./KnowledgeSidebar.module.css";
-import { Folder, FileText, ChevronRight, ChevronDown } from "lucide-react";
+import {Folder, ChevronRight, ChevronDown, File, FolderOpen} from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import {api} from "../../../../utils/api.ts";
+import LoaderDots from "../../../basic/LoaderDots/LoaderDots.tsx";
 
 interface FolderType {
     id: string;
@@ -13,9 +14,10 @@ interface FolderType {
 
 interface Props {
     onSelectDocument: (id: string) => void;
+    sidebarOpened: boolean;
 }
 
-const KnowledgeSidebar: React.FC<Props> = ({ onSelectDocument }) => {
+const KnowledgeSidebar: React.FC<Props> = ({ onSelectDocument, sidebarOpened }) => {
     const { id: activeDocId } = useParams(); // 👈 ID документа з URL
     const navigate = useNavigate();
     const [folders, setFolders] = useState<FolderType[]>([]);
@@ -91,7 +93,7 @@ const KnowledgeSidebar: React.FC<Props> = ({ onSelectDocument }) => {
                     onClick={() => toggleFolder(folder.id)}
                 >
                     {isOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                    <Folder size={18} />
+                    {isOpen ? <FolderOpen size={18} /> :  <Folder size={18} /> }
                     <span>{folder.name}</span>
                 </div>
 
@@ -105,7 +107,7 @@ const KnowledgeSidebar: React.FC<Props> = ({ onSelectDocument }) => {
                                 }`}
                                 onClick={() => handleSelectDoc(doc.id)}
                             >
-                                <FileText size={16} />
+                                <File size={16} />
                                 <span>{doc.title}</span>
                             </div>
                         ))}
@@ -116,9 +118,13 @@ const KnowledgeSidebar: React.FC<Props> = ({ onSelectDocument }) => {
         );
     };
 
-    if (loading) return <div className={styles.loading}>Завантаження...</div>;
+    if (loading) return (
+        <div className={`${styles.sidebar} ${!sidebarOpened && styles.collapsed}`}>
+            <LoaderDots />
+        </div>
+    );
 
-    return <div className={styles.sidebar}>{folders.map(renderFolder)}</div>;
+    return <div className={`${styles.sidebar} ${!sidebarOpened && styles.collapsed}`}>{folders.map(renderFolder)}</div>;
 };
 
 export default KnowledgeSidebar;

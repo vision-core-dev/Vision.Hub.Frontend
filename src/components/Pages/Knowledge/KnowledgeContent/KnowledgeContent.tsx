@@ -15,9 +15,11 @@ interface DocumentData {
 
 interface Props {
     documentId?: string;
+    sidebarButton?: React.ReactNode;
+    sidebarClose?: () => void;
 }
 
-const KnowledgeContent: React.FC<Props> = ({ documentId }) => {
+const KnowledgeContent: React.FC<Props> = ({ documentId, sidebarButton, sidebarClose }) => {
     const [doc, setDoc] = useState<DocumentData | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
 
@@ -51,18 +53,27 @@ const KnowledgeContent: React.FC<Props> = ({ documentId }) => {
     }, [documentId]);
 
     if (loading)
-        return <LoaderDots />;
+        return <div className={styles.content}><LoaderDots /></div>;
 
     if (!doc)
-        return <div className={styles.empty}>📄 Виберіть документ у меню</div>;
+        return <div className={styles.content}><div className={styles.empty}>📄 Виберіть документ у меню</div></div>;
 
     return (
-        <div className={styles.content}>
-            <h1 className={styles.title}>{doc.title}</h1>
+        <div className={styles.content}
+            onClick={() => {
+                if (sidebarClose && window.innerWidth < 900) sidebarClose();
+            }}
+        >
+            <div className={styles.info}>
+                {sidebarButton}
+                <div>
+                    <h1 className={styles.title}>{doc.title}</h1>
 
-            <div className={styles.meta}>
-                <span><User size={16} /> {doc.author}</span>
-                <span><Calendar size={16} /> {safeDatetime(doc.updated_at)}</span>
+                    <div className={styles.meta}>
+                        <span><User size={16} /> {doc.author}</span>
+                        <span><Calendar size={16} /> {safeDatetime(doc.updated_at)}</span>
+                    </div>
+                </div>
             </div>
 
             <div
