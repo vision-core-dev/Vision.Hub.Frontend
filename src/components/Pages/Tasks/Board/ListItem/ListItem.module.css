@@ -55,7 +55,8 @@
 }
 
 .addTask:hover {
-    background: #dfe1e6;
+    /*background: #dfe1e6;*/
+    background: rgba(255, 255, 255, 0.55);
 }
 
 
@@ -93,13 +94,13 @@
 .createTask textarea {
     width: 100%;
     min-height: 60px;
-    resize: vertical;
     padding: 8px;
     font-size: 14px;
     border: 1px solid #dfe1e6;
     border-radius: 6px;
     box-sizing: border-box;
     font-family: inherit;
+    resize: none;
 }
 .createTask textarea:focus {
     outline: none;
