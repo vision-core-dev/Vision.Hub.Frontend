@@ -61,14 +61,14 @@
     gap: 1rem;
 }
 
-label {
+.section label {
     font-size: 0.95rem;
     display: flex;
     flex-direction: column;
     gap: 0.4rem;
 }
 
-input, select {
+.section input, .section select {
     padding: 0.7rem;
     border-radius: 8px;
     border: 1px solid #d1d5db;

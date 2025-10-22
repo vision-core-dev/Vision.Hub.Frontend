@@ -26,6 +26,8 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
 
+    const path = window.location.pathname;
+
     const logout = (): void => {
         localStorage.removeItem("token");
         setUser(null);
@@ -54,6 +56,9 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
                     setUser(data.user);
                     setRole(data.role);
                     chooseGreeting()
+                    if (path === "/login" || path === "/") {
+                        navigate("/dashboard");
+                    }
                 } else {
                     if (data.detail === "user_is_deactivated") {
                         navigate("/deactivated")
