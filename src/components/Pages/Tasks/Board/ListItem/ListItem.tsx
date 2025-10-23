@@ -76,11 +76,13 @@ const ListItem = ({ list, onSelectTask, boardId, refresh, boardTags, users }: Li
                 <span className={styles.count}>{list.tasks.length}</span>
             </div>
 
-            {list.tasks.map((task) => (
-                <div key={task.id} onClick={() => onSelectTask(task)}>
-                    <TaskItem boardTags={boardTags} users={users} task={task} />
-                </div>
-            ))}
+            <div className={styles.tasks}>
+                {list.tasks.map((task) => (
+                    <div key={task.id} onClick={() => onSelectTask(task)}>
+                        <TaskItem boardTags={boardTags} users={users} task={task} />
+                    </div>
+                ))}
+            </div>
 
             {showCreateTask ? (
                 <div className={styles.createTask}>
