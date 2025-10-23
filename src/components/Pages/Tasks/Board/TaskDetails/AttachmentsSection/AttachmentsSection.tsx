@@ -5,7 +5,7 @@ import Button from "../../../../../basic/Button/Button.tsx";
 import {api} from "../../../../../../utils/api.ts";
 import {safeDatetime} from "../../../../../../utils/safeDate.ts";
 
-interface Attachment {
+export interface Attachment {
     id: string;
     name: string;
     url: string;

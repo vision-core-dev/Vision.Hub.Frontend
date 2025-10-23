@@ -9,7 +9,7 @@ import AssigneeSelector from "./AssigneeSelector/AssigneeSelector.tsx";
 import TaskNameInput from "./TaskNameInput/TaskNameInput.tsx";
 import TagSelector from "./TagSelector/TagSelector.tsx";
 import TextEditor from "../../../../basic/TextEditor/TextEditor.tsx";
-import AttachmentsSection from "./AttachmentsSection/AttachmentsSection.tsx";
+import AttachmentsSection, {type Attachment} from "./AttachmentsSection/AttachmentsSection.tsx";
 
 interface User {
     id: string;
@@ -22,13 +22,6 @@ interface Tag {
     id: string;
     name: string;
     color: string;
-}
-
-interface Attachment {
-    id: string;
-    type: "file" | "link";
-    url: string;
-    name?: string;
 }
 
 interface Comment {
@@ -303,10 +296,7 @@ const TaskDetailsModal: React.FC<Props> = ({ taskId, onClose, boardLists, boardT
                         <AttachmentsSection
                             attachments={task.attachments || []}
                             onChange={(newList) => {
-                                // 🔄 Оновлюємо у стані
-                                setTask((prev) => ({ ...prev, attachments: newList }));
-
-                                // 💾 Зберігаємо на бекенд
+                                setTask((prev) => (prev ? { ...prev, attachments: newList } : prev));
                                 api.post(`/v1/Hub/Tasks/${task.id}/UpdateAttachments`, { attachments: newList });
                             }}
                         />
