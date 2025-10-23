@@ -111,3 +111,26 @@
     gap: 8px;
     align-items: center;
 }
+
+
+
+
+
+.taskWrapper {
+    transition: transform 0.15s ease, background 0.2s ease;
+    border-radius: 8px;
+    cursor: grab;
+}
+
+.taskWrapper.dragging {
+    opacity: 0.5;
+    transform: scale(0.96);
+}
+
+.insertLine {
+    height: 4px;
+    background: #007aff;
+    border-radius: 2px;
+    margin: 4px 0;
+    box-shadow: 0 0 0 1px rgba(0,0,0,.06);
+}

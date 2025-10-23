@@ -99,6 +99,40 @@ const BoardPage = () => {
         return () => clearInterval(interval);
     }, [id]);
 
+    const handleTaskMove = async (taskId: string, toListId: string, newIndex: number) => {
+        setBoardLists(prev =>
+            prev.map(list => {
+                const oldTasks = list.tasks || [];
+                const newTasks = oldTasks.filter(t => t.id !== taskId);
+
+                return { ...list, tasks: newTasks };
+            }).map(list => {
+                if (list.id === toListId) {
+                    const safeTasks = list.tasks || [];
+                    return {
+                        ...list,
+                        tasks: [
+                            ...safeTasks.slice(0, newIndex),
+                            { id: taskId, name: "…" } as Task,
+                            ...safeTasks.slice(newIndex),
+                        ],
+                    };
+                }
+                return list;
+            })
+        );
+
+        try {
+            await api.post(`/v1/Hub/Tasks/${taskId}/SetTaskOrder`, {
+                order: newIndex,
+                list_id: toListId,
+            });
+        } catch (err) {
+            console.error("Помилка при оновленні порядку:", err);
+        }
+    };
+
+
     if (loading) return <LoaderDots />;
     if (!boardDetails) return <div className={styles.error}>Дошку не знайдено 😔</div>;
 
@@ -115,13 +149,14 @@ const BoardPage = () => {
                 <div ref={scrollRef} className={styles.lists}>
                     {boardDetails.lists.map((list) => (
                         <ListItem
-                            refresh={() => fetchBoard(true)}
+                            // refresh={() => fetchBoard(true)}
                             boardId={id}
                             boardTags={boardDetails.tags}
                             users={boardDetails.users}
                             key={list.id}
                             list={list}
                             onSelectTask={(task) => setSelectedTaskId(task.id)}
+                            onTaskMove={handleTaskMove}
                         />
                     ))}
                 </div>
