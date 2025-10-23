@@ -320,3 +320,48 @@ main > section h3 {
     border-color: #00a86b;
     outline: none;
 }
+
+
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+}
+
+/* Контейнер для меню */
+.menuWrapper {
+    position: relative;
+}
+
+/* Меню */
+.dropdownMenu {
+    position: absolute;
+    top: 40px;
+    right: 0;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+    padding: 6px;
+    min-width: 180px;
+    z-index: 50;
+    animation: fadeIn 0.15s ease-out;
+}
+
+.dropdownItem {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #111827;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.dropdownItem:hover {
+    background-color: #f3f4f6;
+}

@@ -1,6 +1,6 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import styles from "./TaskDetailsModal.module.css";
-import {X, Paperclip, Ellipsis} from "lucide-react";
+import {X, Paperclip, Ellipsis, Archive} from "lucide-react";
 import Button from "../../../../basic/Button/Button.tsx";
 import {api} from "../../../../../utils/api.ts";
 import type {List} from "../BoardPage/BoardPage.tsx";
@@ -58,10 +58,13 @@ interface Props {
     onClose: () => void,
 }
 
-const TaskDetailsModal: React.FC<Props> = ({taskId, onClose, boardLists, boardTags}) => {
+
+const TaskDetailsModal: React.FC<Props> = ({ taskId, onClose, boardLists, boardTags }) => {
     const [task, setTask] = useState<TaskDetails | null>(null);
     const [loading, setLoading] = useState(true);
     const [error] = useState<string | null>(null);
+    const [showMenu, setShowMenu] = useState(false);
+    const menuRef = useRef<HTMLDivElement | null>(null);
 
     // 🧠 Фетч деталей задачі
     const fetchTaskDetails = async () => {
@@ -69,39 +72,42 @@ const TaskDetailsModal: React.FC<Props> = ({taskId, onClose, boardLists, boardTa
             setLoading(true);
             const res = await api.get(`/v1/Hub/Tasks/${taskId}/GetDetails`);
             const data = await res.json();
-            if (!res.ok) {
-                throw new Error(data.detail || "Failed to fetch task details");
-            }
-            setTask(data.task || data); // залежно від формату
+            if (!res.ok) throw new Error(data.detail || "Failed to fetch task details");
+            setTask(data.task || data);
         } finally {
             setLoading(false);
         }
     };
 
-    const handleDateChange = (field: "started_at" | "deadline_at", value: string) => {
-        // лише оновлюємо локально
-        const isoValue = value ? new Date(value).toISOString() : null;
-        setTask((prev) => (prev ? { ...prev, [field]: isoValue } : prev));
-    };
+    // 🧹 Клік поза меню закриває його
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+                setShowMenu(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
-    const handleDateBlur = async () => {
+    // 📦 Архівування задачі
+    const handleArchive = async () => {
         try {
-            await api.post(`/v1/Hub/Tasks/${taskId}/UpdateDates`, {
-                started_at: task?.started_at,
-                deadline_at: task?.deadline_at,
-            });
-        } catch (e) {
-            console.error("Failed to update date", e);
+            const res = await api.post(`/v1/Hub/Tasks/${taskId}/Archive`);
+            if (res.ok) {
+                onClose();
+            } else {
+                console.error("Не вдалося архівувати задачу");
+            }
+        } catch (err) {
+            console.error("Помилка при архівуванні:", err);
         }
     };
-
-
 
     useEffect(() => {
         if (taskId) fetchTaskDetails();
     }, [taskId]);
 
-    // 🌀 Стан завантаження
     if (loading) {
         return (
             <div className={styles.overlay}>
@@ -112,7 +118,6 @@ const TaskDetailsModal: React.FC<Props> = ({taskId, onClose, boardLists, boardTa
         );
     }
 
-    // ⚠️ Помилка
     if (error || !task) {
         return (
             <div className={styles.overlay}>
@@ -138,12 +143,27 @@ const TaskDetailsModal: React.FC<Props> = ({taskId, onClose, boardLists, boardTa
                         ))}
                     </select>
 
-                    <div>
+                    <div className={styles.actions}>
+                        {/* ⋯ Меню дій */}
+                        <div className={styles.menuWrapper} ref={menuRef}>
+                            <Button variant="secondary" onClick={() => setShowMenu((s) => !s)}>
+                                <Ellipsis size={18} />
+                            </Button>
+                            {showMenu && (
+                                <div className={styles.dropdownMenu}>
+                                    <div
+                                        className={styles.dropdownItem}
+                                        onClick={handleArchive}
+                                    >
+                                        <Archive size={16} />
+                                        Архівувати задачу
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
                         <Button variant="secondary" onClick={onClose}>
-                            <Ellipsis size={18} />
-                        </Button>
-                        <Button variant="secondary" onClick={onClose}>
-                            <X size={18}/>
+                            <X size={18} />
                         </Button>
                     </div>
                 </div>
@@ -176,27 +196,27 @@ const TaskDetailsModal: React.FC<Props> = ({taskId, onClose, boardLists, boardTa
                                 />
                             </div>
 
-                            <div>
-                                <h3>Дата початку</h3>
-                                <input
-                                    type="datetime-local"
-                                    className={styles.dateInput}
-                                    value={task.started_at ? task.started_at.split("T")[0] : ""}
-                                    onChange={(e) => handleDateChange("started_at", e.target.value)}
-                                    onBlur={handleDateBlur}
-                                />
-                            </div>
+                            {/*<div>*/}
+                            {/*    <h3>Дата початку</h3>*/}
+                            {/*    <input*/}
+                            {/*        type="datetime-local"*/}
+                            {/*        className={styles.dateInput}*/}
+                            {/*        value={task.started_at ? task.started_at.split("T")[0] : ""}*/}
+                            {/*        onChange={(e) => handleDateChange("started_at", e.target.value)}*/}
+                            {/*        onBlur={handleDateBlur}*/}
+                            {/*    />*/}
+                            {/*</div>*/}
 
-                            <div>
-                                <h3>Дедлайн</h3>
-                                <input
-                                    type="datetime-local"
-                                    className={styles.dateInput}
-                                    value={task.deadline_at ? task.deadline_at.split("T")[0] : ""}
-                                    onChange={(e) => handleDateChange("deadline_at", e.target.value)}
-                                    onBlur={handleDateBlur}
-                                />
-                            </div>
+                            {/*<div>*/}
+                            {/*    <h3>Дедлайн</h3>*/}
+                            {/*    <input*/}
+                            {/*        type="datetime-local"*/}
+                            {/*        className={styles.dateInput}*/}
+                            {/*        value={task.deadline_at ? task.deadline_at.split("T")[0] : ""}*/}
+                            {/*        onChange={(e) => handleDateChange("deadline_at", e.target.value)}*/}
+                            {/*        onBlur={handleDateBlur}*/}
+                            {/*    />*/}
+                            {/*</div>*/}
 
 
                         </section>
