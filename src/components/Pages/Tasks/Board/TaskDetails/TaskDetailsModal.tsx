@@ -36,6 +36,7 @@ export interface TaskDetails {
     name: string;
     description: string;
     banner_url?: string;
+    list_id: string;
     tags: Tag[];
     assignees: User[];
     attachments: Attachment[];
@@ -199,11 +200,36 @@ const TaskDetailsModal: React.FC<Props> = ({ taskId, onClose, boardLists, boardT
                     className={`${styles.header} ${task.banner_url ? styles.banner : ""}`}
                     style={{backgroundImage: task.banner_url ? `url(${task.banner_url})` : "none"}}
                 >
-                    <select className={styles.taskListSelect} defaultValue={boardLists.find(l => l.tasks?.some(t => t.id === task.id))?.id}>
+                    <select
+                        className={styles.taskListSelect}
+                        value={task.list_id || boardLists.find(l => l.tasks?.some(t => t.id === task.id))?.id || ""}
+                        onChange={async (e) => {
+                            const newListId = e.target.value;
+                            if (!newListId || newListId === task.list_id) return;
+
+                            try {
+                                const res = await api.post(`/v1/Hub/Tasks/${task.id}/MoveToList`, {
+                                    list_id: newListId,
+                                });
+                                if (!res.ok) throw new Error("Не вдалося перемістити задачу");
+
+                                // 🔄 Оновлення локального стану
+                                setTask((prev) => (prev ? { ...prev, list_id: newListId } : prev));
+                            } catch (err) {
+                                console.error("Помилка при зміні списку:", err);
+                            }
+                        }}
+                    >
+                        <option value="" disabled>— Обери список —</option>
                         {boardLists.map((list) => (
-                            <option key={list.id} value={list.id}>{list.name}</option>
+                            <option key={list.id} value={list.id}>
+                                {list.name}
+                            </option>
                         ))}
                     </select>
+
+
+
 
                     <div className={styles.actions}>
                         <div className={styles.menuWrapper} ref={menuRef}>

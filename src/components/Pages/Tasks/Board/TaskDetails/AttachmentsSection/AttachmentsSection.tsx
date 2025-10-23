@@ -158,21 +158,20 @@ const AttachmentsSection: React.FC<Props> = ({ attachments, taskId, onChange }) 
 
                 <div className={styles.items}>
                     {[...links, ...files].map((att) => (
-                        <div key={att.id} className={styles.item}
-                             style={{ cursor: photoExtensions.some(ext => att.url.endsWith(ext)) ? "zoom-in" : "pointer" }}
-                             onClick={() => {
-                                 if (att.type === "file" && photoExtensions.some(ext => att.url.endsWith(ext))) {
-                                    setPreviewUrl(att.url);
-                                    return
-                                 }
-                                 window.open(att.url, "_blank");
-                             }}
-                        >
+                        <div key={att.id} className={styles.item}>
                             {att.type === "file" ? (
                                 <img
+                                    style={{ cursor: photoExtensions.some(ext => att.url.endsWith(ext)) ? "zoom-in" : "pointer" }}
                                     src={att.url}
                                     alt={att.name}
                                     className={styles.thumb}
+                                    onClick={() => {
+                                        if (att.type === "file" && photoExtensions.some(ext => att.url.endsWith(ext))) {
+                                            setPreviewUrl(att.url);
+                                            return
+                                        }
+                                        window.open(att.url, "_blank");
+                                    }}
                                 />
                             ) : (
                                 <div className={styles.icon}>
@@ -182,11 +181,13 @@ const AttachmentsSection: React.FC<Props> = ({ attachments, taskId, onChange }) 
 
                             <div className={styles.details}>
                                 {att.type === "link" ? (
-                                    <a href={att.url} target="_blank" rel="noopener noreferrer">
+                                    <a href={att.url} target="_blank" rel="noopener noreferrer"
+                                        className={styles.itemName}
+                                    >
                                         {att.name || att.url}
                                     </a>
                                 ) : (
-                                    <span>{att.name}</span>
+                                    <span className={styles.itemName}>{att.name}</span>
                                 )}
                                 <span>{safeDatetime(att.created_at)}</span>
                             </div>
