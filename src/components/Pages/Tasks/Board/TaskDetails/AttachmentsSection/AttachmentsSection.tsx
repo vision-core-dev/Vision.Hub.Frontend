@@ -1,8 +1,9 @@
 import React, { useRef, useState } from "react";
 import styles from "./AttachmentsSection.module.css";
-import {File, Link as LinkIcon, MoreHorizontal, ExternalLink, Link} from "lucide-react";
+import {File, Link as LinkIcon, Link, SquarePen, Trash} from "lucide-react";
 import Button from "../../../../../basic/Button/Button.tsx";
 import {api} from "../../../../../../utils/api.ts";
+import {safeDatetime} from "../../../../../../utils/safeDate.ts";
 
 interface Attachment {
     id: string;
@@ -87,72 +88,42 @@ const AttachmentsSection: React.FC<Props> = ({ attachments, onChange }) => {
                 </div>
             </header>
 
-            <div className={styles.groups}>
-                {links.length > 0 && (
-                    <div className={styles.group}>
-                        <h4>Посилання</h4>
-                        <div className={styles.items}>
-                            {links.map((link) => (
-                                <div key={link.id} className={styles.item}>
-                                    <div className={styles.icon}>
-                                        <LinkIcon size={18} />
-                                    </div>
-                                    <div className={styles.details}>
-                                        <a href={link.url} target="_blank" rel="noopener noreferrer">
-                                            {link.name}
-                                        </a>
-                                        <span>
-                                            {new Date(link.created_at || "").toLocaleString("uk-UA", {
-                                                day: "2-digit",
-                                                month: "short",
-                                                year: "numeric",
-                                                hour: "2-digit",
-                                                minute: "2-digit",
-                                            })}
-                                        </span>
-                                    </div>
-                                    <button className={styles.more}>
-                                        <MoreHorizontal size={16} />
-                                    </button>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
 
-                {files.length > 0 && (
-                    <div className={styles.group}>
-                        <h4>Файли</h4>
-                        <div className={styles.items}>
-                            {files.map((file) => (
-                                <div key={file.id} className={styles.item}>
-                                    <img src={file.url} alt={file.name} className={styles.thumb} />
-                                    <div className={styles.details}>
-                                        <span>{file.name}</span>
-                                        <span>
-                                            {new Date(file.created_at || "").toLocaleString("uk-UA", {
-                                                day: "2-digit",
-                                                month: "short",
-                                                year: "numeric",
-                                                hour: "2-digit",
-                                                minute: "2-digit",
-                                            })}
-                                        </span>
-                                    </div>
-                                    <div className={styles.actionsRight}>
-                                        <a href={file.url} target="_blank" rel="noopener noreferrer">
-                                            <ExternalLink size={15} />
-                                        </a>
-                                        <button className={styles.more}>
-                                            <MoreHorizontal size={16} />
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
+            <div className={styles.items}>
+                {[...links, ...files].map((att) => (
+                    <div key={att.id} className={styles.item}>
+                        {att.type === "file" ? (
+                            <img src={att.url} alt={att.name} className={styles.thumb} />
+                        ) : (
+                            <div className={styles.icon}>
+                                <LinkIcon size={18} />
+                            </div>
+                        )}
+
+                        <div className={styles.details}>
+                            {att.type === "link" ? (
+                                <a href={att.url} target="_blank" rel="noopener noreferrer">
+                                    {att.name}
+                                </a>
+                            ) : (
+                                <span>{att.name}</span>
+                            )}
+                            <span>{safeDatetime(att.created_at)}</span>
+                        </div>
+
+                        <div className={styles.actionsRight}>
+                            <button>
+                                <SquarePen size={18} />
+                            </button>
+                            <button className={styles.destructive}>
+                                <Trash size={18} />
+                            </button>
                         </div>
                     </div>
-                )}
+                ))}
             </div>
+
+
         </section>
     );
 };

@@ -22,7 +22,7 @@
     justify-content: space-between;
     user-select: none;
     overflow: hidden; /* 👈 щоб нічого не вилазило за межі */
-
+    backdrop-filter: blur(10px);
 }
 
 .lists {

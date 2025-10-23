@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from "react";
 import styles from "./TaskDetailsModal.module.css";
-import {X, Paperclip, Ellipsis, Archive} from "lucide-react";
+import {X, Image, Ellipsis, Archive} from "lucide-react";
 import Button from "../../../../basic/Button/Button.tsx";
 import {api} from "../../../../../utils/api.ts";
 import type {List} from "../BoardPage/BoardPage.tsx";
@@ -117,6 +117,40 @@ const TaskDetailsModal: React.FC<Props> = ({ taskId, onClose, boardLists, boardT
         }
     }
 
+    // 🖼️ Завантаження або зміна банеру
+    const handleBannerChange = async () => {
+        try {
+            const input = document.createElement("input");
+            input.type = "file";
+            input.accept = "image/*";
+
+            input.onchange = async () => {
+                const file = input.files?.[0];
+                if (!file) return;
+
+                const formData = new FormData();
+                formData.append("file", file);
+
+                const res = await api.post(`/v1/Hub/Tasks/${taskId}/UploadBanner`, formData);
+                const data = await res.json();
+
+                if (res.ok && data.url) {
+                    // 🔄 оновлюємо локальний стан
+                    setTask((prev) => prev ? { ...prev, banner_url: data.url } : prev);
+                } else {
+                    console.error("Не вдалося завантажити банер:", data.detail || data);
+                }
+            };
+
+            input.click();
+        } catch (err) {
+            console.error("Помилка при зміні банеру:", err);
+        } finally {
+            setShowMenu(false);
+        }
+    };
+
+
     useEffect(() => {
         if (taskId) fetchTaskDetails();
     }, [taskId]);
@@ -163,10 +197,11 @@ const TaskDetailsModal: React.FC<Props> = ({ taskId, onClose, boardLists, boardT
                             </Button>
                             {showMenu && (
                                 <div className={styles.dropdownMenu}>
-                                    <div
-                                        className={styles.dropdownItem}
-                                        onClick={handleArchive}
-                                    >
+                                    <div className={styles.dropdownItem} onClick={handleBannerChange}>
+                                        <Image size={16} />
+                                        {task.banner_url ? "Змінити банер" : "Додати банер"}
+                                    </div>
+                                    <div className={styles.dropdownItem} onClick={handleArchive}>
                                         <Archive size={16} />
                                         Архівувати задачу
                                     </div>
@@ -207,28 +242,35 @@ const TaskDetailsModal: React.FC<Props> = ({ taskId, onClose, boardLists, boardT
                             />
                         </section>
 
-                            {/*<div>*/}
-                            {/*    <h3>Дата початку</h3>*/}
-                            {/*    <input*/}
-                            {/*        type="datetime-local"*/}
-                            {/*        className={styles.dateInput}*/}
-                            {/*        value={task.started_at ? task.started_at.split("T")[0] : ""}*/}
-                            {/*        onChange={(e) => handleDateChange("started_at", e.target.value)}*/}
-                            {/*        onBlur={handleDateBlur}*/}
-                            {/*    />*/}
-                            {/*</div>*/}
+                        {(task.started_at || task.deadline_at) && (
+                            <section>
+                                <div>
+                                    <h3>Дата початку</h3>
+                                    <input
+                                        type="datetime-local"
+                                        className={styles.dateInput}
+                                        value={task.started_at ? task.started_at.split("T")[0] : ""}
+                                        // onChange={(e) => handleDateChange("started_at", e.target.value)}
+                                        // onBlur={handleDateBlur}
+                                    />
+                                </div>
 
-                            {/*<div>*/}
-                            {/*    <h3>Дедлайн</h3>*/}
-                            {/*    <input*/}
-                            {/*        type="datetime-local"*/}
-                            {/*        className={styles.dateInput}*/}
-                            {/*        value={task.deadline_at ? task.deadline_at.split("T")[0] : ""}*/}
-                            {/*        onChange={(e) => handleDateChange("deadline_at", e.target.value)}*/}
-                            {/*        onBlur={handleDateBlur}*/}
-                            {/*    />*/}
-                            {/*</div>*/}
+                                {(task.started_at && task.deadline_at) && (
+                                    "—"
+                                )}
 
+                                <div>
+                                    <h3>Дедлайн</h3>
+                                    <input
+                                        type="datetime-local"
+                                        className={styles.dateInput}
+                                        value={task.deadline_at ? task.deadline_at.split("T")[0] : ""}
+                                        // onChange={(e) => handleDateChange("deadline_at", e.target.value)}
+                                        // onBlur={handleDateBlur}
+                                    />
+                                </div>
+                            </section>
+                        )}
 
                         <section className={styles.descriptionSection}>
                             <h3>Опис</h3>
