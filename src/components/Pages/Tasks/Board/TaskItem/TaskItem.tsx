@@ -1,18 +1,26 @@
 import styles from "./TaskItem.module.css";
-import {Check} from "lucide-react";
-import type {Task, TaskTag} from "../BoardPage/BoardPage.tsx";
-import {getTextColor} from "../../../../../utils/colors.ts";
-
+import { Check } from "lucide-react";
+import type { Task, TaskTag } from "../BoardPage/BoardPage.tsx";
+import { getTextColor } from "../../../../../utils/colors.ts";
+import type { UserType } from "../../../../../types/Users.ts";
 
 type TaskProps = {
     task: Task;
     boardTags: TaskTag[];
+    users: UserType[];
 };
 
-const TaskItem = ({ task, boardTags }: TaskProps) => {
+const TaskItem = ({ task, boardTags, users }: TaskProps) => {
+    // 🎯 Отримати повні теги
     const taskTags =
         task.tags && task.tags.length > 0
             ? boardTags.filter((t) => task.tags.includes(t.id))
+            : [];
+
+    // 👥 Отримати користувачів-асайнів
+    const taskAssignees =
+        task.assignees && task.assignees.length > 0
+            ? users.filter((u) => task.assignees.includes(u.id))
             : [];
 
     return (
@@ -32,7 +40,10 @@ const TaskItem = ({ task, boardTags }: TaskProps) => {
                             <span
                                 key={tag.id}
                                 className={styles.tag}
-                                style={{ backgroundColor: tag.color, color: getTextColor(tag.color) }}
+                                style={{
+                                    backgroundColor: tag.color,
+                                    color: getTextColor(tag.color),
+                                }}
                             >
                                 {tag.name}
                             </span>
@@ -51,19 +62,22 @@ const TaskItem = ({ task, boardTags }: TaskProps) => {
                 </div>
 
                 {/* 👥 Виконавці */}
-                {/*{task.assignees && task.assignees.length > 0 && (*/}
-                {/*    <div className={styles.assignees}>*/}
-                {/*        /!*{task.assignees.map((a) => (*!/*/}
-                {/*        /!*    // <div key={a.id} className={styles.avatar}>*!/*/}
-                {/*        /!*    //     {a.avatar_url ? (*!/*/}
-                {/*        /!*    //         <img src={a.avatar_url} alt={a.first_name} />*!/*/}
-                {/*        /!*    //     ) : (*!/*/}
-                {/*        /!*    //         <span>{a.first_name[0]}</span>*!/*/}
-                {/*        /!*    //     )}*!/*/}
-                {/*        /!*    // </div>*!/*/}
-                {/*        /!*))}*!/*/}
-                {/*    </div>*/}
-                {/*)}*/}
+                {taskAssignees.length > 0 && (
+                    <div className={styles.assignees}>
+                        {taskAssignees.map((a) => (
+                            <div key={a.id} className={styles.avatar}>
+                                {a.avatar_url ? (
+                                    <img src={a.avatar_url} alt={a.first_name} />
+                                ) : (
+                                    <span>
+                                        {a.first_name[0]}
+                                        {a.last_name ? a.last_name[0] : ""}
+                                    </span>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );

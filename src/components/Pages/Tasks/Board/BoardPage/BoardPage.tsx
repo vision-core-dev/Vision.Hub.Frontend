@@ -46,7 +46,8 @@ type BoardDetails = {
     };
     lists: List[];
     tasks: Task[];
-    members: UserType[];
+    users: UserType[];
+    // members: UserType[];
     tags: TaskTag[];
 };
 
@@ -117,6 +118,7 @@ const BoardPage = () => {
                             refresh={() => fetchBoard(true)}
                             boardId={id}
                             boardTags={boardDetails.tags}
+                            users={boardDetails.users}
                             key={list.id}
                             list={list}
                             onSelectTask={(task) => setSelectedTaskId(task.id)}

@@ -5,6 +5,7 @@ import type {List, Task, TaskTag} from "../BoardPage/BoardPage.tsx";
 import Button from "../../../../basic/Button/Button.tsx";
 import { useEffect, useRef, useState } from "react";
 import { api } from "../../../../../utils/api.ts";
+import type {UserType} from "../../../../../types/Users.ts";
 
 type ListProps = {
     list: List;
@@ -12,9 +13,10 @@ type ListProps = {
     boardTags: TaskTag[]; // 👈 опціонально, якщо потрібні теги дошки
     boardId: string | null | undefined; // 👈 додай у пропси ID дошки
     refresh: () => Promise<void>; // 👈 опціонально, щоб оновити список після створення
+    users: UserType[];
 };
 
-const ListItem = ({ list, onSelectTask, boardId, refresh, boardTags }: ListProps) => {
+const ListItem = ({ list, onSelectTask, boardId, refresh, boardTags, users }: ListProps) => {
     const [showCreateTask, setShowCreateTask] = useState(false);
     const [taskName, setTaskName] = useState("");
     const [loading, setLoading] = useState(false);
@@ -76,7 +78,7 @@ const ListItem = ({ list, onSelectTask, boardId, refresh, boardTags }: ListProps
 
             {list.tasks.map((task) => (
                 <div key={task.id} onClick={() => onSelectTask(task)}>
-                    <TaskItem boardTags={boardTags} task={task} />
+                    <TaskItem boardTags={boardTags} users={users} task={task} />
                 </div>
             ))}
 
