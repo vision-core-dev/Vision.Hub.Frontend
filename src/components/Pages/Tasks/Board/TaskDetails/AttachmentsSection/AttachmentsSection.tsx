@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import styles from "./AttachmentsSection.module.css";
-import { File, Link as LinkIcon, Link, SquarePen, Trash } from "lucide-react";
+import { File, Link as LinkIcon, Link, SquarePen, Trash, X } from "lucide-react";
 import Button from "../../../../../basic/Button/Button.tsx";
 import { api } from "../../../../../../utils/api.ts";
 import { safeDatetime } from "../../../../../../utils/safeDate.ts";
@@ -23,6 +23,7 @@ const AttachmentsSection: React.FC<Props> = ({ attachments, taskId, onChange }) 
     const [list, setList] = useState<Attachment[]>(attachments || []);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [loading, setLoading] = useState(false);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null); // 🖼️ full-screen preview
 
     // 🔄 Оновлення локального і глобального стану
     const updateList = (updated: Attachment[]) => {
@@ -61,20 +62,30 @@ const AttachmentsSection: React.FC<Props> = ({ attachments, taskId, onChange }) 
         }
     };
 
-    // 🔗 Додавання лінку (поки що локально)
-    const handleAddLink = () => {
+    // 🔗 Додавання лінку
+    const handleAddLink = async () => {
         const url = prompt("Введіть посилання:");
         if (!url) return;
 
-        const newItem: Attachment = {
-            id: crypto.randomUUID(),
-            name: url.replace(/^https?:\/\//, "").split("/")[0],
-            url,
-            type: "link",
-            created_at: new Date().toISOString(),
-        };
+        try {
+            const res = await api.post(`/v1/Hub/Tasks/${taskId}/Attachments/AddLink`, { url: url });
+            if (!res.ok) throw new Error("Не вдалося додати лінк");
 
-        updateList([...list, newItem]);
+            const data = await res.json();
+
+            const newItem: Attachment = {
+                id: data.id,
+                name: data.name,
+                url: data.url,
+                type: "link",
+                created_at: new Date().toISOString(),
+            };
+
+            updateList([...list, newItem]);
+        } catch (err) {
+            console.error("Помилка при додаванні лінку:", err);
+            return;
+        }
     };
 
     // ✏️ Перейменування
@@ -118,67 +129,100 @@ const AttachmentsSection: React.FC<Props> = ({ attachments, taskId, onChange }) 
     const files = list.filter((a) => a.type === "file");
     const links = list.filter((a) => a.type === "link");
 
+    const photoExtensions = [".jpg", ".jpeg", ".png", ".gif"];
+
     return (
-        <section className={styles.attachments}>
-            <header>
-                <div className={styles.titleWrap}>
-                    <h3>Вкладення</h3>
-                    {loading && <span className={styles.loading}>Завантаження...</span>}
-                </div>
-                <div className={styles.actions}>
-                    <Button variant="secondary" onClick={handleAddLink}>
-                        <Link />
-                    </Button>
-                    <Button variant="secondary" onClick={() => fileInputRef.current?.click()}>
-                        <File />
-                    </Button>
-                    <input
-                        type="file"
-                        ref={fileInputRef}
-                        hidden
-                        onChange={handleUpload}
-                        accept="image/*,.pdf,.doc,.docx,.zip"
-                    />
-                </div>
-            </header>
-
-            <div className={styles.items}>
-                {[...links, ...files].map((att) => (
-                    <div key={att.id} className={styles.item}>
-                        {att.type === "file" ? (
-                            <img src={att.url} alt={att.name} className={styles.thumb} />
-                        ) : (
-                            <div className={styles.icon}>
-                                <LinkIcon size={18} />
-                            </div>
-                        )}
-
-                        <div className={styles.details}>
-                            {att.type === "link" ? (
-                                <a href={att.url} target="_blank" rel="noopener noreferrer">
-                                    {att.name}
-                                </a>
-                            ) : (
-                                <span>{att.name}</span>
-                            )}
-                            <span>{safeDatetime(att.created_at)}</span>
-                        </div>
-
-                        <div className={styles.actionsRight}>
-                            <button onClick={() => handleRename(att)}>
-                                <SquarePen size={18} />
-                            </button>
-                            <button
-                                onClick={() => handleRemove(att)}
-                                className={styles.destructive}
-                            >
-                                <Trash size={18} />
-                            </button>
-                        </div>
+        <>
+            <section className={styles.attachments}>
+                <header>
+                    <div className={styles.titleWrap}>
+                        <h3>Вкладення</h3>
+                        {loading && <span className={styles.loading}>Завантаження...</span>}
                     </div>
-                ))}
-            </div>
-        </section>
+                    <div className={styles.actions}>
+                        <Button variant="secondary" onClick={handleAddLink}>
+                            <Link />
+                        </Button>
+                        <Button variant="secondary" onClick={() => fileInputRef.current?.click()}>
+                            <File />
+                        </Button>
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            hidden
+                            onChange={handleUpload}
+                            accept="image/*,.pdf,.doc,.docx,.zip"
+                        />
+                    </div>
+                </header>
+
+                <div className={styles.items}>
+                    {[...links, ...files].map((att) => (
+                        <div key={att.id} className={styles.item}
+                             style={{ cursor: photoExtensions.some(ext => att.url.endsWith(ext)) ? "zoom-in" : "pointer" }}
+                             onClick={() => {
+                                 if (att.type === "file" && photoExtensions.some(ext => att.url.endsWith(ext))) {
+                                    setPreviewUrl(att.url);
+                                    return
+                                 }
+                                 window.open(att.url, "_blank");
+                             }}
+                        >
+                            {att.type === "file" ? (
+                                <img
+                                    src={att.url}
+                                    alt={att.name}
+                                    className={styles.thumb}
+                                />
+                            ) : (
+                                <div className={styles.icon}>
+                                    <LinkIcon size={18} />
+                                </div>
+                            )}
+
+                            <div className={styles.details}>
+                                {att.type === "link" ? (
+                                    <a href={att.url} target="_blank" rel="noopener noreferrer">
+                                        {att.name || att.url}
+                                    </a>
+                                ) : (
+                                    <span>{att.name}</span>
+                                )}
+                                <span>{safeDatetime(att.created_at)}</span>
+                            </div>
+
+                            <div className={styles.actionsRight}>
+                                <button onClick={() => handleRename(att)}>
+                                    <SquarePen size={18} />
+                                </button>
+                                <button
+                                    onClick={() => handleRemove(att)}
+                                    className={styles.destructive}
+                                >
+                                    <Trash size={18} />
+                                </button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+            {/* 🖼️ Повноекранний перегляд */}
+            {previewUrl && (
+                <div className={styles.previewOverlay} onClick={() => setPreviewUrl(null)}>
+                    <button
+                        className={styles.closeBtn}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setPreviewUrl(null);
+                        }}
+                    >
+                        <X size={24} />
+                    </button>
+                    <img src={previewUrl} alt="Preview" className={styles.previewImage} />
+                </div>
+            )}
+        </>
     );
 };
 

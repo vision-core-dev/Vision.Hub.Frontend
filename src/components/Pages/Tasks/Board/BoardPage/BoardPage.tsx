@@ -105,7 +105,7 @@ const BoardPage = () => {
     return (
         <div className={styles.page} style={{backgroundImage: `url(${boardDetails.board.banner_url || ""})`}}>
             <div className={styles.header}>
-                <h1 className={styles.title}>📋 {boardDetails.board.name}</h1>
+                <h1 className={styles.title}>{boardDetails.board.name}</h1>
                 <div className={styles.extraActions}>
                     <button onClick={() => setShowSettings(!showSettings)}><Ellipsis /></button>
                 </div>
