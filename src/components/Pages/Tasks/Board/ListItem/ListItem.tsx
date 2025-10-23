@@ -3,10 +3,11 @@ import TaskItem from "../TaskItem/TaskItem";
 import { Plus, X } from "lucide-react";
 import type { List, Task, TaskTag } from "../BoardPage/BoardPage.tsx";
 import Button from "../../../../basic/Button/Button.tsx";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { api } from "../../../../../utils/api.ts";
 import type { UserType } from "../../../../../types/Users.ts";
 import { getTextColor } from "../../../../../utils/colors.ts";
+import {useParams} from "react-router-dom";
 
 type ListProps = {
     list: List;
@@ -24,6 +25,7 @@ const ListItem = ({
                       users,
                       onTaskMove,
                   }: ListProps) => {
+    const { id } = useParams();
     const [localTasks, setLocalTasks] = useState<Task[]>(list.tasks || []);
     const [insertIndex, setInsertIndex] = useState<number | null>(null);
     const [draggingTaskId, setDraggingTaskId] = useState<string | null>(null);
@@ -40,7 +42,7 @@ const ListItem = ({
         if (!taskName.trim()) return;
         setLoading(true);
         await api
-            .post(`/v1/Hub/Boards/${list.board_id}/Tasks/Create`, {
+            .post(`/v1/Hub/Boards/${id}/Tasks/Create`, {
                 list_id: list.id,
                 name: taskName,
                 description: "",
