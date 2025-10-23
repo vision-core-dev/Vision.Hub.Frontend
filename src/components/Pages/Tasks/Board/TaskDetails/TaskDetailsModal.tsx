@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from "react";
 import styles from "./TaskDetailsModal.module.css";
-import {X, Image, Ellipsis, Archive} from "lucide-react";
+import {X, Image, Ellipsis, Archive, Link} from "lucide-react";
 import Button from "../../../../basic/Button/Button.tsx";
 import {api} from "../../../../../utils/api.ts";
 import type {List} from "../BoardPage/BoardPage.tsx";
@@ -127,9 +127,9 @@ const TaskDetailsModal: React.FC<Props> = ({ taskId, onClose, boardLists, boardT
                 const res = await api.post(`/v1/Hub/Tasks/${taskId}/UploadBanner`, formData);
                 const data = await res.json();
 
-                if (res.ok && data.url) {
+                if (res.ok && data.banner_url) {
                     // 🔄 оновлюємо локальний стан
-                    setTask((prev) => prev ? { ...prev, banner_url: data.url } : prev);
+                    setTask((prev) => prev ? { ...prev, banner_url: data.banner_url } : prev);
                 } else {
                     console.error("Не вдалося завантажити банер:", data.detail || data);
                 }
@@ -142,6 +142,28 @@ const TaskDetailsModal: React.FC<Props> = ({ taskId, onClose, boardLists, boardT
             setShowMenu(false);
         }
     };
+
+    // 🔗 Встановлення банеру за URL
+    const handleBannerByUrl = async () => {
+        try {
+            const url = prompt("Введіть URL зображення банеру:");
+            if (!url) return;
+
+            const res = await api.post(`/v1/Hub/Tasks/${taskId}/SetBanner`, { banner_url: url });
+            const data = await res.json();
+
+            if (res.ok) {
+                setTask((prev) => (prev ? { ...prev, banner_url: url } : prev));
+            } else {
+                console.error("Не вдалося встановити банер за URL:", data.detail || data);
+            }
+        } catch (err) {
+            console.error("Помилка при встановленні банеру за URL:", err);
+        } finally {
+            setShowMenu(false);
+        }
+    };
+
 
 
     useEffect(() => {
@@ -190,14 +212,22 @@ const TaskDetailsModal: React.FC<Props> = ({ taskId, onClose, boardLists, boardT
                             </Button>
                             {showMenu && (
                                 <div className={styles.dropdownMenu}>
+
                                     <div className={styles.dropdownItem} onClick={handleBannerChange}>
                                         <Image size={16} />
-                                        {task.banner_url ? "Змінити банер" : "Додати банер"}
+                                        Загрузити банер
                                     </div>
+
+                                    <div className={styles.dropdownItem} onClick={handleBannerByUrl}>
+                                        <Link size={16} />
+                                        Встановити банер
+                                    </div>
+
                                     <div className={styles.dropdownItem} onClick={handleArchive}>
                                         <Archive size={16} />
                                         Архівувати задачу
                                     </div>
+
                                 </div>
                             )}
                         </div>
@@ -294,9 +324,11 @@ const TaskDetailsModal: React.FC<Props> = ({ taskId, onClose, boardLists, boardT
                         </section>
 
                         <AttachmentsSection
+                            taskId={task.id}
                             attachments={task.attachments || []}
                             onChange={(newList) => {
                                 setTask((prev) => (prev ? { ...prev, attachments: newList } : prev));
+                                // додатково можна ще викликати бекенд, якщо потрібно синхронізувати
                                 api.post(`/v1/Hub/Tasks/${task.id}/UpdateAttachments`, { attachments: newList });
                             }}
                         />
