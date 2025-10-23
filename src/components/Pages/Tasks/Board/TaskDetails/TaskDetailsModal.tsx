@@ -328,8 +328,6 @@ const TaskDetailsModal: React.FC<Props> = ({ taskId, onClose, boardLists, boardT
                             attachments={task.attachments || []}
                             onChange={(newList) => {
                                 setTask((prev) => (prev ? { ...prev, attachments: newList } : prev));
-                                // додатково можна ще викликати бекенд, якщо потрібно синхронізувати
-                                api.post(`/v1/Hub/Tasks/${task.id}/UpdateAttachments`, { attachments: newList });
                             }}
                         />
 

@@ -132,16 +132,16 @@ const BoardPage = () => {
                     </div>
                 </div>
 
-                {selectedTaskId && (
-                    <TaskDetailsModal
-                        taskId={selectedTaskId}
-                        boardTags={boardDetails.tags}
-                        boardLists={boardLists}
-                        onClose={() => setSelectedTaskId(null)}
-                    />
-                )}
-
             </div>
+
+            {selectedTaskId && (
+                <TaskDetailsModal
+                    taskId={selectedTaskId}
+                    boardTags={boardDetails.tags}
+                    boardLists={boardLists}
+                    onClose={() => setSelectedTaskId(null)}
+                />
+            )}
 
         </div>
     );

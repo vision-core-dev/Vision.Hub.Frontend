@@ -54,7 +54,8 @@
 .header.banner {
     background-size: cover;
     background-position: center center;
-    height: 400px;
+    min-height: 180px;
+    max-height: 400px;
     border-bottom: none;
     border-top-left-radius: 12px;
     border-top-right-radius: 12px;
@@ -231,6 +232,7 @@ main > section h3 {
     font-size: 14px;
     color: #111827;
     background: #f3f4f6;
+    cursor: pointer;
 }
 .taskListSelect:hover {
     border-color: #9ca3af;
