@@ -13,20 +13,22 @@ const Header: React.FC = () => {
 
     const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(JSON.parse(localStorage.getItem("sidebar-collapsed") || "false"));
 
-    const [balance, ] = useState<number>(-1);
-    const [balanceEnabled, ] = useState<boolean>(true);
+    const [balance, setBalance] = useState<number>(-1);
+    const [balanceEnabled, setBalanceEnabled] = useState<boolean>(false);
 
     const [showNotifs, setShowNotifs] = useState(false);
     const [unreadCount, setUnreadCount] = useState(0);
 
     const randomGreeting = localStorage.getItem("greeting")
 
-    const fetchUnreadCount = async () => {
+    const fetchMe = async () => {
         try {
-            const response = await api.get("/v1/Hub/UserMe/Notifies/UnreadCount");
+            const response = await api.get("/v1/Hub/UserMe/Get");
             const data = await response.json();
             if (response.ok) {
-                setUnreadCount(data.count);
+                setUnreadCount(data.unread_count);
+                setBalance(data.balance_uah);
+                setBalanceEnabled(data.balance_visible);
             }
         } catch (error) {
             console.error("Failed to fetch unread notifications count:", error);
@@ -44,8 +46,8 @@ const Header: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        fetchUnreadCount();
-        const interval = setInterval(fetchUnreadCount, 7000); // ⏱️ 7 сек (оптимально)
+        fetchMe();
+        const interval = setInterval(fetchMe, 7000); // ⏱️ 7 сек (оптимально)
         return () => clearInterval(interval);
     }, []);
 
