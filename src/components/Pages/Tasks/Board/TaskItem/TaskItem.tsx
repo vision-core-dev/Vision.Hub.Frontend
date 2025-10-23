@@ -1,8 +1,9 @@
 import styles from "./TaskItem.module.css";
-import { Check } from "lucide-react";
+import {Check, Clock} from "lucide-react";
 import type { Task, TaskTag } from "../BoardPage/BoardPage.tsx";
 import { getTextColor } from "../../../../../utils/colors.ts";
 import type { UserType } from "../../../../../types/Users.ts";
+import {safeDate} from "../../../../../utils/safeDate.ts";
 
 type TaskProps = {
     task: Task;
@@ -59,6 +60,14 @@ const TaskItem = ({ task, boardTags, users }: TaskProps) => {
                         </div>
                     )}
                     <h3 className={styles.title}>{task.name}</h3>
+                </div>
+
+                <div className={styles.deadline}>
+                    {(task.deadline_at || task.started_at) && (
+                        <>
+                            <Clock /><span>{task.started_at && safeDate(task.started_at)} {(task.started_at && task.deadline_at) && "–"} {task.deadline_at && safeDate(task.deadline_at)}</span>
+                        </>
+                    )}
                 </div>
 
                 {/* 👥 Виконавці */}

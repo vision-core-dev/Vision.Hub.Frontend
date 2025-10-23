@@ -18,6 +18,7 @@ export type Task = {
     list_id: string;
     status: string;
     priority: string;
+    started_at?: string;
     deadline_at?: string;
     assignees: string[];
     tags: string[];

@@ -291,35 +291,67 @@ const TaskDetailsModal: React.FC<Props> = ({ taskId, onClose, boardLists, boardT
                             />
                         </section>
 
-                        {(task.started_at || task.deadline_at) && (
-                            <section>
-                                <div>
-                                    <h3>Дата початку</h3>
+                        <section className={styles.datesSection}>
+                            <h3>Терміни виконання</h3>
+
+                            <div className={styles.datesRow}>
+                                <div className={styles.dateBlock}>
+                                    <label>Дата початку</label>
                                     <input
                                         type="datetime-local"
                                         className={styles.dateInput}
-                                        value={task.started_at ? task.started_at.split("T")[0] : ""}
-                                        // onChange={(e) => handleDateChange("started_at", e.target.value)}
-                                        // onBlur={handleDateBlur}
+                                        value={
+                                            task.started_at
+                                                ? task.started_at.slice(0, 16) // формат YYYY-MM-DDTHH:mm
+                                                : ""
+                                        }
+                                        onChange={(e) =>
+                                            setTask((prev) =>
+                                                prev ? { ...prev, started_at: e.target.value } : prev
+                                            )
+                                        }
+                                        onBlur={async (e) => {
+                                            try {
+                                                await api.post(`/v1/Hub/Tasks/${task.id}/UpdateDates`, {
+                                                    started_at: e.target.value || null,
+                                                    deadline_at: task.deadline_at || null,
+                                                });
+                                            } catch (err) {
+                                                console.error("❌ Помилка оновлення дати початку:", err);
+                                            }
+                                        }}
                                     />
                                 </div>
 
-                                {(task.started_at && task.deadline_at) && (
-                                    "—"
-                                )}
-
-                                <div>
-                                    <h3>Дедлайн</h3>
+                                <div className={styles.dateBlock}>
+                                    <label>Дедлайн</label>
                                     <input
                                         type="datetime-local"
                                         className={styles.dateInput}
-                                        value={task.deadline_at ? task.deadline_at.split("T")[0] : ""}
-                                        // onChange={(e) => handleDateChange("deadline_at", e.target.value)}
-                                        // onBlur={handleDateBlur}
+                                        value={
+                                            task.deadline_at
+                                                ? task.deadline_at.slice(0, 16)
+                                                : ""
+                                        }
+                                        onChange={(e) =>
+                                            setTask((prev) =>
+                                                prev ? { ...prev, deadline_at: e.target.value } : prev
+                                            )
+                                        }
+                                        onBlur={async (e) => {
+                                            try {
+                                                await api.post(`/v1/Hub/Tasks/${task.id}/UpdateDates`, {
+                                                    started_at: task.started_at || null,
+                                                    deadline_at: e.target.value || null,
+                                                });
+                                            } catch (err) {
+                                                console.error("❌ Помилка оновлення дедлайну:", err);
+                                            }
+                                        }}
                                     />
                                 </div>
-                            </section>
-                        )}
+                            </div>
+                        </section>
 
                         <section className={styles.descriptionSection}>
                             <h3>Опис</h3>

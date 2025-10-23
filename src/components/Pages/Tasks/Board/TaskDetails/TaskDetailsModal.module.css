@@ -369,3 +369,56 @@ main > section h3 {
 .dropdownItem:hover {
     background-color: #f3f4f6;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+.datesSection {
+    display: flex;
+    flex-direction: column;
+    /*gap: 8px;*/
+    /*margin-top: 16px;*/
+}
+
+.datesRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.dateBlock {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    min-width: 200px;
+}
+
+.dateBlock > label {
+    font-size: 14px;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.dateInput {
+    padding: 8px 10px;
+    font-size: 14px;
+    border: 1px solid #dfe1e6;
+    border-radius: 8px;
+    font-family: inherit;
+    background: #fff;
+    transition: border-color 0.2s ease;
+}
+
+.dateInput:focus {
+    outline: none;
+    border-color: #00a86b;
+}
