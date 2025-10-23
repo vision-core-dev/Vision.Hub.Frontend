@@ -3,9 +3,10 @@ import TaskItem from "../TaskItem/TaskItem";
 import { Plus, X } from "lucide-react";
 import type {List, Task, TaskTag} from "../BoardPage/BoardPage.tsx";
 import Button from "../../../../basic/Button/Button.tsx";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { api } from "../../../../../utils/api.ts";
 import type {UserType} from "../../../../../types/Users.ts";
+import {getTextColor} from "../../../../../utils/colors.ts";
 
 type ListProps = {
     list: List;
@@ -65,14 +66,23 @@ const ListItem = ({ list, onSelectTask, boardId, refresh, boardTags, users }: Li
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, [showCreateTask]);
 
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (e.key === "Enter") {
+            e.preventDefault()
+            createTask();
+        }; // ❌ блокуємо перенос рядка
+    };
+
     return (
         <div
             className={styles.list}
-            style={{ backgroundColor: list.color || "#fff" }}
+            style={{ backgroundColor: list.color || "#f1f2f4" }}
             ref={listRef}
         >
             <div className={styles.header}>
-                <h2 className={styles.title}>{list.name}</h2>
+                <h2 className={styles.title}
+                    style={{ color: getTextColor(list.color || "#f1f2f4") }}
+                >{list.name}</h2>
                 <span className={styles.count}>{list.tasks.length}</span>
             </div>
 
@@ -92,6 +102,7 @@ const ListItem = ({ list, onSelectTask, boardId, refresh, boardTags, users }: Li
                         value={taskName}
                         onChange={(e) => setTaskName(e.target.value)}
                         onClick={(e) => e.stopPropagation()}
+                        onKeyDown={handleKeyDown}
                     />
                     <div className={styles.actions}>
                         <Button variant="primary" onClick={createTask} disabled={loading}>

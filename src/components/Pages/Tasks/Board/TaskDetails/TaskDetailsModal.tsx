@@ -8,6 +8,8 @@ import LoaderDots from "../../../../basic/LoaderDots/LoaderDots.tsx";
 import AssigneeSelector from "./AssigneeSelector/AssigneeSelector.tsx";
 import TaskNameInput from "./TaskNameInput/TaskNameInput.tsx";
 import TagSelector from "./TagSelector/TagSelector.tsx";
+import TextEditor from "../../../../basic/TextEditor/TextEditor.tsx";
+import AttachmentsSection from "./AttachmentsSection/AttachmentsSection.tsx";
 
 interface User {
     id: string;
@@ -104,6 +106,17 @@ const TaskDetailsModal: React.FC<Props> = ({ taskId, onClose, boardLists, boardT
         }
     };
 
+    const handleNameChange = async (newName: string) => {
+        setTask((prev) => (prev ? { ...prev, name: newName } : prev));
+        try {
+            await api.post(`/v1/Hub/Tasks/${taskId}/UpdateName`, {
+                name: newName
+            });
+        } catch (err) {
+            console.error("Не вдалося оновити назву:", err);
+        }
+    }
+
     useEffect(() => {
         if (taskId) fetchTaskDetails();
     }, [taskId]);
@@ -144,7 +157,6 @@ const TaskDetailsModal: React.FC<Props> = ({ taskId, onClose, boardLists, boardT
                     </select>
 
                     <div className={styles.actions}>
-                        {/* ⋯ Меню дій */}
                         <div className={styles.menuWrapper} ref={menuRef}>
                             <Button variant="secondary" onClick={() => setShowMenu((s) => !s)}>
                                 <Ellipsis size={18} />
@@ -170,31 +182,30 @@ const TaskDetailsModal: React.FC<Props> = ({ taskId, onClose, boardLists, boardT
 
                 <div className={styles.content}>
                     <main>
-                        <TaskNameInput value={task.name} />
+                        <TaskNameInput value={task.name} onChange={handleNameChange} />
 
-                        <section className={styles.changeInfo}>
-                            {/* 👥 Учасники */}
-                            <div>
-                                <h3>Учасники</h3>
-                                <AssigneeSelector
-                                    taskId={task.id}
-                                    assignees={task.assignees}
-                                    onUpdate={(newAssignees) => setTask((prev) => prev ? { ...prev, assignees: newAssignees } : prev)}
-                                />
-                            </div>
+                        {/* 👥 Учасники */}
+                        <section className={styles.infoItem}>
+                            <h3>Учасники</h3>
+                            <AssigneeSelector
+                                taskId={task.id}
+                                assignees={task.assignees}
+                                onUpdate={(newAssignees) => setTask((prev) => prev ? { ...prev, assignees: newAssignees } : prev)}
+                            />
+                        </section>
 
-                            {/* 🏷️ Мітки */}
-                            <div>
-                                <h3>Мітки</h3>
-                                <TagSelector
-                                    taskId={task.id}
-                                    boardTags={boardTags}
-                                    selectedTags={task.tags}
-                                    onUpdate={(newTags) =>
-                                        setTask((prev) => (prev ? { ...prev, tags: newTags } : prev))
-                                    }
-                                />
-                            </div>
+                        {/* 🏷️ Мітки */}
+                        <section className={styles.infoItem}>
+                            <h3>Мітки</h3>
+                            <TagSelector
+                                taskId={task.id}
+                                boardTags={boardTags}
+                                selectedTags={task.tags}
+                                onUpdate={(newTags) =>
+                                    setTask((prev) => (prev ? { ...prev, tags: newTags } : prev))
+                                }
+                            />
+                        </section>
 
                             {/*<div>*/}
                             {/*    <h3>Дата початку</h3>*/}
@@ -219,120 +230,76 @@ const TaskDetailsModal: React.FC<Props> = ({ taskId, onClose, boardLists, boardT
                             {/*</div>*/}
 
 
+                        <section className={styles.descriptionSection}>
+                            <h3>Опис</h3>
+                            <TextEditor
+                                mode="edit"
+                                value={task.description || ""}
+                                onChange={async (newHtml) => {
+                                    setTask((prev) => prev ? { ...prev, description: newHtml } : prev);
+                                    // 💾 одразу відправляємо оновлення на бекенд
+                                    try {
+                                        await api.post(`/v1/Hub/Tasks/${task.id}/UpdateDescription`, {
+                                            description: newHtml
+                                        });
+                                    } catch (err) {
+                                        console.error("Не вдалося оновити опис:", err);
+                                    }
+                                }}
+                                onUploadImage={async (file) => {
+                                    // 🔄 логіка кастомного аплоаду (можеш винести в util)
+                                    const formData = new FormData();
+                                    formData.append("file", file);
+                                    const res = await api.post(`/v1/Hub/Tasks/${task.id}/UploadFileAttachment`, formData);
+                                    const { url } = await res.json();
+                                    // якщо потрібно вставити у текст:
+                                    document.execCommand("insertHTML", false, `<img src="${url}" alt=""/>`);
+                                }}
+                            />
                         </section>
 
+                        <AttachmentsSection
+                            attachments={task.attachments || []}
+                            onChange={(newList) => {
+                                // 🔄 Оновлюємо у стані
+                                setTask((prev) => ({ ...prev, attachments: newList }));
 
-                        <section className={styles.attachments}>
-                            <header>
-                                <div><Paperclip /><h3>Вкладення</h3></div>
-                                <Button variant="secondary">Додати</Button>
-                            </header>
-                            <div>
-                                <div className={styles.attachmentsDiv}>
-                                    <h3>Посилання</h3>
-                                </div>
-                                <div className={styles.attachmentsDiv}>
-                                    <h3>Файли</h3>
-                                </div>
-                            </div>
-                        </section>
+                                // 💾 Зберігаємо на бекенд
+                                api.post(`/v1/Hub/Tasks/${task.id}/UpdateAttachments`, { attachments: newList });
+                            }}
+                        />
 
-                        {/*/!* 🏷️ Теги *!/*/}
-                        {/*{task.tags?.length > 0 && (*/}
-                        {/*    <section className={styles.tags}>*/}
-                        {/*        {task.tags.map((tag) => (*/}
-                        {/*            <span*/}
-                        {/*                key={tag.id}*/}
-                        {/*                className={styles.tag}*/}
-                        {/*                style={{backgroundColor: tag.color}}*/}
-                        {/*            >*/}
-                        {/*            {tag.name}*/}
-                        {/*        </span>*/}
-                        {/*        ))}*/}
-                        {/*    </section>*/}
-                        {/*)}*/}
-
-                        {/*/!* 👥 Виконавці *!/*/}
-                        {/*{task.assignees?.length > 0 && (*/}
-                        {/*    <div className={styles.assignees}>*/}
-                        {/*        {task.assignees.map((a) => (*/}
-                        {/*            <div key={a.id} className={styles.assignee}>*/}
-                        {/*                <img*/}
-                        {/*                    src={a.avatar_url || "/default-avatar.png"}*/}
-                        {/*                    alt={a.first_name}*/}
-                        {/*                />*/}
-                        {/*                <span>{a.first_name}</span>*/}
-                        {/*            </div>*/}
-                        {/*        ))}*/}
-                        {/*    </div>*/}
-                        {/*)}*/}
-
-                        {/*/!* 📄 Опис *!/*/}
-                        {/*{task.description && (*/}
-                        {/*    <div className={styles.section}>*/}
-                        {/*        <h3>Опис</h3>*/}
-                        {/*        <div*/}
-                        {/*            className={styles.description}*/}
-                        {/*            dangerouslySetInnerHTML={{__html: task.description}}*/}
-                        {/*        />*/}
-                        {/*    </div>*/}
-                        {/*)}*/}
-
-                        {/*/!* 📎 Вкладення *!/*/}
-                        {/*{task.attachments?.length > 0 && (*/}
-                        {/*    <div className={styles.section}>*/}
-                        {/*        <h3>Вкладення</h3>*/}
-                        {/*        <div className={styles.attachments}>*/}
-                        {/*            {task.attachments.map((att) => (*/}
-                        {/*                <a*/}
-                        {/*                    key={att.id}*/}
-                        {/*                    href={att.url}*/}
-                        {/*                    target="_blank"*/}
-                        {/*                    rel="noopener noreferrer"*/}
-                        {/*                    className={styles.attachment}*/}
-                        {/*                >*/}
-                        {/*                    {att.type === "link" ? (*/}
-                        {/*                        <LinkIcon size={16}/>*/}
-                        {/*                    ) : (*/}
-                        {/*                        <Paperclip size={16}/>*/}
-                        {/*                    )}*/}
-                        {/*                    <span>{att.name || att.url}</span>*/}
-                        {/*                </a>*/}
-                        {/*            ))}*/}
-                        {/*        </div>*/}
-                        {/*    </div>*/}
-                        {/*)}*/}
                     </main>
 
                     <aside>
                         {/* 💬 Коментарі */}
-                        {task.comments?.length > 0 && (
-                            <div className={styles.section}>
-                                <h3>Коментарі</h3>
-                                <div className={styles.comments}>
-                                    {task.comments.map((c) => (
-                                        <div key={c.id} className={styles.comment}>
-                                            <img
-                                                src={c.user.avatar_url || "/default-avatar.png"}
-                                                alt={c.user.first_name}
-                                            />
-                                            <div>
-                                                <div className={styles.commentHeader}>
-                                                    <strong>{c.user.first_name}</strong>
-                                                    <span>
-                                                    {new Date(c.created_at).toLocaleString("uk-UA")}
-                                                </span>
-                                                </div>
-                                                <div
-                                                    className={styles.commentContent}
-                                                    dangerouslySetInnerHTML={{__html: c.content}}
-                                                />
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
+                        {/*{task.comments?.length > 0 && (*/}
+                        {/*    <div className={styles.section}>*/}
+                        {/*        <h3>Коментарі</h3>*/}
+                        {/*        <div className={styles.comments}>*/}
+                        {/*            {task.comments.map((c) => (*/}
+                        {/*                <div key={c.id} className={styles.comment}>*/}
+                        {/*                    <img*/}
+                        {/*                        src={c.user.avatar_url || "/default-avatar.png"}*/}
+                        {/*                        alt={c.user.first_name}*/}
+                        {/*                    />*/}
+                        {/*                    <div>*/}
+                        {/*                        <div className={styles.commentHeader}>*/}
+                        {/*                            <strong>{c.user.first_name}</strong>*/}
+                        {/*                            <span>*/}
+                        {/*                            {new Date(c.created_at).toLocaleString("uk-UA")}*/}
+                        {/*                        </span>*/}
+                        {/*                        </div>*/}
+                        {/*                        <div*/}
+                        {/*                            className={styles.commentContent}*/}
+                        {/*                            dangerouslySetInnerHTML={{__html: c.content}}*/}
+                        {/*                        />*/}
+                        {/*                    </div>*/}
+                        {/*                </div>*/}
+                        {/*            ))}*/}
+                        {/*        </div>*/}
+                        {/*    </div>*/}
+                        {/*)}*/}
                     </aside>
                 </div>
             </div>

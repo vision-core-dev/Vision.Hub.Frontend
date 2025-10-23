@@ -122,9 +122,6 @@
 
 
 
-main > section {
-    margin-bottom: 24px;
-}
 
 main > section h3 {
     font-size: 15px;
@@ -245,31 +242,32 @@ main > section h3 {
 
 
 
-.changeInfo {
-    padding: 8px 8px;
-}
+/*.changeInfo {*/
+/*    !*padding: 8px 8px;*!*/
+/*}*/
 
-.changeInfo {
-    display: flex;
-    flex-wrap: wrap;
-    padding-left: 8px;
-    column-gap: 12px;
-    row-gap: 8px;
-}
+/*.changeInfo {*/
+/*    display: flex;*/
+/*    flex-direction: column;*/
+/*    !*flex-wrap: wrap;*!*/
+/*    !*padding-left: 8px;*!*/
+/*    column-gap: 12px;*/
+/*    row-gap: 8px;*/
+/*}*/
 
-.changeInfo > div {
+.infoItem {
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
     max-width: 100%;
 }
 
-.changeInfo h3 {
-    font-size: 14px;
-    color: #6b7280;
-    margin-bottom: 4px;
-    font-weight: 600;
-}
+/*.changeInfo h3 {*/
+/*    !*font-size: 14px;*!*/
+/*    !*color: #6b7280;*!*/
+/*    margin-bottom: 4px;*/
+/*    font-weight: 600;*/
+/*}*/
 
 
 

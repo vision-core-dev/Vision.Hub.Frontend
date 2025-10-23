@@ -1,0 +1,75 @@
+.editor {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    background: white;
+    overflow: hidden;
+}
+
+.toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-bottom: 1px solid #f1f2f4;
+    background: #fafafa;
+}
+
+.toolbar button {
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.toolbar button:hover {
+    background: #f3f4f6;
+}
+
+.upload {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 12px;
+    min-height: 120px;
+    outline: none;
+    font-size: 15px;
+    line-height: 1.6;
+    white-space: pre-wrap; /* ✅ автоперенос */
+    word-break: break-word; /* ✅ перенос довгих слів */
+}
+
+.content ul, .content ol {
+    margin-left: 20px;
+    padding-left: 16px;
+}
+
+.content blockquote {
+    border-left: 3px solid #ccc;
+    padding-left: 10px;
+    color: #555;
+    margin: 6px 0;
+}
+
+.viewer {
+    padding: 8px 0;
+    line-height: 1.6;
+    font-size: 15px;
+}
+
+.viewer img {
+    max-width: 100%;
+    border-radius: 8px;
+    margin-top: 6px;
+}

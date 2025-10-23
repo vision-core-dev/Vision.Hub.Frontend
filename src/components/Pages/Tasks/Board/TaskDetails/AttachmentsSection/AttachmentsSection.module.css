@@ -1,0 +1,95 @@
+.attachments {
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.titleWrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.actions {
+    display: flex;
+    gap: 8px;
+}
+
+.groups {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.group h4 {
+    margin: 0 0 4px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #444;
+}
+
+.items {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f9fafb;
+    border: 1px solid #edf0f2;
+    border-radius: 8px;
+    padding: 8px 10px;
+    gap: 10px;
+}
+
+.item:hover {
+    background: #f3f4f6;
+}
+
+.thumb {
+    width: 42px;
+    height: 42px;
+    border-radius: 6px;
+    object-fit: cover;
+    border: 1px solid #ddd;
+}
+
+.details {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.details a {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.details span {
+    font-size: 12px;
+    color: #777;
+}
+
+.more {
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 4px;
+}
+
+.actionsRight {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}

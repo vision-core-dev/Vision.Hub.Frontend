@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import styles from "./TaskNameInput.module.css";
 
 interface Props {
@@ -8,14 +8,26 @@ interface Props {
 
 const TaskNameInput: React.FC<Props> = ({ value, onChange }) => {
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const [internalValue, setInternalValue] = useState(value);
 
-    // 🔹 Автоматична висота
+    // 🔄 Синхронізація зовнішнього value з внутрішнім
+    useEffect(() => {
+        setInternalValue(value);
+    }, [value]);
+
+    // 🔹 Автоматична висота textarea
     useEffect(() => {
         const el = textareaRef.current;
         if (!el) return;
-        el.style.height = "auto"; // скидаємо висоту
-        el.style.height = el.scrollHeight + "px"; // підлаштовуємо
-    }, [value]);
+        el.style.height = "auto";
+        el.style.height = el.scrollHeight + "px";
+    }, [internalValue]);
+
+    const handleBlur = () => {
+        if (onChange && internalValue.trim() !== value.trim()) {
+            onChange(internalValue.trim());
+        }
+    };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === "Enter") e.preventDefault(); // ❌ блокуємо перенос рядка
@@ -25,8 +37,9 @@ const TaskNameInput: React.FC<Props> = ({ value, onChange }) => {
         <div className={styles.taskName}>
             <textarea
                 ref={textareaRef}
-                value={value}
-                onChange={(e) => onChange && onChange(e.target.value)}
+                value={internalValue}
+                onChange={(e) => setInternalValue(e.target.value)}
+                onBlur={handleBlur}
                 onKeyDown={handleKeyDown}
                 rows={1}
                 spellCheck={false}
