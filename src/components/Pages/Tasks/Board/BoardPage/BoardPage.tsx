@@ -14,11 +14,13 @@ import TaskDetailsModal from "../TaskDetails/TaskDetailsModal.tsx";
 export type Task = {
     id: string;
     name: string;
+    banner_url?: string;
     list_id: string;
     status: string;
     priority: string;
     deadline_at?: string;
     assignees: string[];
+    tags: string[];
 };
 
 export type List = {
@@ -29,7 +31,7 @@ export type List = {
     tasks: Task[];
 };
 
-type TaskTag = {
+export type TaskTag = {
     id: string;
     name: string;
     color: string;
@@ -51,6 +53,8 @@ type BoardDetails = {
 const BoardPage = () => {
     const { id } = useParams();
     const [boardDetails, setBoardDetails] = useState<BoardDetails | null>(null);
+    const [boardLists, setBoardLists] = useState<List[]>([]);
+
     const [loading, setLoading] = useState(true);
 
     const [showSettings, setShowSettings] = useState(false);
@@ -64,6 +68,8 @@ const BoardPage = () => {
             if (!silent) setLoading(true);
             const res = await api.get(`/v1/Hub/Boards/${id}/GetDetails`);
             const data: BoardDetails = await res.json();
+
+            setBoardLists(data.lists)
 
             const listsWithTasks: List[] = data.lists.map((list) => ({
                 ...list,
@@ -110,6 +116,7 @@ const BoardPage = () => {
                         <ListItem
                             refresh={() => fetchBoard(true)}
                             boardId={id}
+                            boardTags={boardDetails.tags}
                             key={list.id}
                             list={list}
                             onSelectTask={(task) => setSelectedTaskId(task.id)}
@@ -127,6 +134,7 @@ const BoardPage = () => {
                     <TaskDetailsModal
                         taskId={selectedTaskId}
                         boardTags={boardDetails.tags}
+                        boardLists={boardLists}
                         onClose={() => setSelectedTaskId(null)}
                     />
                 )}

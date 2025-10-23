@@ -1,7 +1,7 @@
 .task {
     background: #ffffff;
-    border-radius: 8px;
-    padding: 10px 12px;
+    border-radius: 10px;
+    overflow: hidden;
     cursor: pointer;
     transition: background 0.2s, outline-color 0.1s;
     display: flex;
@@ -13,12 +13,47 @@
 .task:hover {
     background: #f4f5f7;
     outline-color: #00a86b;
-    /*transform: translateY(-1px);*/
 }
 
+.banner {
+    width: 100%;
+    height: 120px;
+    overflow: hidden;
+    border-radius: 8px 8px 0 0;
+}
+
+.banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.content {
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* 🏷️ Теги */
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.tag {
+    font-size: 12px;
+    font-weight: 500;
+    color: #fff;
+    border-radius: 6px;
+    padding: 2px 6px;
+    line-height: 1.3;
+}
+
+/* 📋 Назва */
 .taskTitle {
     display: flex;
-    flex-direction: row;
     align-items: center;
     gap: 8px;
 }
@@ -26,12 +61,13 @@
 .done {
     width: 16px;
     height: 16px;
-    border-radius: 50px;
+    border-radius: 50%;
     background-color: #00a86b;
     display: flex;
     align-items: center;
     justify-content: center;
 }
+
 .done svg {
     color: #ffffff;
     width: 10px;
@@ -40,13 +76,88 @@
 
 .title {
     font-size: 15px;
-    font-weight: 500;
+    font-weight: 600;
     color: #172b4d;
 }
 
-.description {
-    font-size: 13px;
-    color: #5e6c84;
+/* 👥 Асайні */
+.assignees {
+    display: flex;
+    gap: 4px;
     margin-top: 4px;
-    line-height: 1.4;
 }
+
+.avatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+
+/*.task {*/
+/*    background: #ffffff;*/
+/*    border-radius: 8px;*/
+/*    padding: 10px 12px;*/
+/*    cursor: pointer;*/
+/*    transition: background 0.2s, outline-color 0.1s;*/
+/*    display: flex;*/
+/*    flex-direction: column;*/
+/*    outline: 2px solid #ffffff;*/
+/*    outline-offset: -2px;*/
+/*}*/
+
+/*.task:hover {*/
+/*    background: #f4f5f7;*/
+/*    outline-color: #00a86b;*/
+/*    !*transform: translateY(-1px);*!*/
+/*}*/
+
+/*.taskTitle {*/
+/*    display: flex;*/
+/*    flex-direction: row;*/
+/*    align-items: center;*/
+/*    gap: 8px;*/
+/*}*/
+
+/*.done {*/
+/*    width: 16px;*/
+/*    height: 16px;*/
+/*    border-radius: 50px;*/
+/*    background-color: #00a86b;*/
+/*    display: flex;*/
+/*    align-items: center;*/
+/*    justify-content: center;*/
+/*}*/
+/*.done svg {*/
+/*    color: #ffffff;*/
+/*    width: 10px;*/
+/*    height: 10px;*/
+/*}*/
+
+/*.title {*/
+/*    font-size: 15px;*/
+/*    font-weight: 500;*/
+/*    color: #172b4d;*/
+/*}*/
+
+/*.description {*/
+/*    font-size: 13px;*/
+/*    color: #5e6c84;*/
+/*    margin-top: 4px;*/
+/*    line-height: 1.4;*/
+/*}*/

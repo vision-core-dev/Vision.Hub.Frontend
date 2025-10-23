@@ -1,0 +1,24 @@
+.taskName {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.taskName > textarea {
+    width: 100%;
+    min-height: 32px;
+    font-size: 26px;
+    font-weight: 600;
+    color: #111827;
+    border: none;
+    outline: none;
+    background-color: transparent;
+    resize: none;
+    overflow: hidden;
+    border-bottom: 2px solid #ffffff;
+    transition: border-color 0.1s ease;
+}
+
+.taskName textarea:focus {
+    border-bottom: 2px solid #00a86b;
+}

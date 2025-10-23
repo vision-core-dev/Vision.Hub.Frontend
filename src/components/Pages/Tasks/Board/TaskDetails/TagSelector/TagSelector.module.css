@@ -1,0 +1,107 @@
+.tagsWrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.tagsList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.tag {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 8px;
+    /*border: 1px solid #d1d5db;*/
+    border-radius: 8px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.removeBtn {
+    cursor: pointer;
+    color: #ffffffcc;
+    transition: 0.2s;
+    margin-right: 2px;
+}
+.removeBtn:hover {
+    color: #fff;
+    opacity: 0.7;
+}
+
+.dropdown {
+    position: absolute;
+    top: 110%;
+    left: 0;
+    z-index: 100;
+    background: #fff;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 6px;
+    min-width: 180px;
+    max-height: 240px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.searchBox {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    width: 100%;
+    padding: 6px 8px;
+    margin-bottom: 6px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+.searchBox input {
+    border: none;
+    outline: none;
+    flex: 1;
+    background: transparent;
+    font-size: 14px;
+    color: #111827;
+}
+
+.tagsListDropdown {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.tagOption {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.1s;
+}
+
+.tagOption:hover {
+    background: #f3f4f6;
+}
+
+.tagColor {
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+}
+
+.empty {
+    text-align: center;
+    color: #9ca3af;
+    font-size: 13px;
+    padding: 6px;
+}

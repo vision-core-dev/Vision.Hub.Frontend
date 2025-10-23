@@ -1,24 +1,70 @@
 import styles from "./TaskItem.module.css";
 import {Check} from "lucide-react";
-import type {Task} from "../BoardPage/BoardPage.tsx";
+import type {Task, TaskTag} from "../BoardPage/BoardPage.tsx";
+import {getTextColor} from "../../../../../utils/colors.ts";
 
 
 type TaskProps = {
     task: Task;
+    boardTags: TaskTag[];
 };
 
-const TaskItem = ({ task }: TaskProps) => {
+const TaskItem = ({ task, boardTags }: TaskProps) => {
+    const taskTags =
+        task.tags && task.tags.length > 0
+            ? boardTags.filter((t) => task.tags.includes(t.id))
+            : [];
+
     return (
-        <div className={`${styles.task}`}>
-            <div className={styles.taskTitle}>
-                {task.status === "done" && (
-                    <div className={styles.done}><Check strokeWidth={3} /></div>
+        <div className={styles.task}>
+            {/* 🖼️ Банер */}
+            {task.banner_url && (
+                <div className={styles.banner}>
+                    <img src={task.banner_url} alt="Banner" />
+                </div>
+            )}
+
+            <div className={styles.content}>
+                {/* 🏷️ Теги */}
+                {taskTags.length > 0 && (
+                    <div className={styles.tags}>
+                        {taskTags.map((tag) => (
+                            <span
+                                key={tag.id}
+                                className={styles.tag}
+                                style={{ backgroundColor: tag.color, color: getTextColor(tag.color) }}
+                            >
+                                {tag.name}
+                            </span>
+                        ))}
+                    </div>
                 )}
-                <h3 className={styles.title}>{task.name}</h3>
+
+                {/* 📋 Назва задачі */}
+                <div className={styles.taskTitle}>
+                    {task.status === "done" && (
+                        <div className={styles.done}>
+                            <Check strokeWidth={3} />
+                        </div>
+                    )}
+                    <h3 className={styles.title}>{task.name}</h3>
+                </div>
+
+                {/* 👥 Виконавці */}
+                {/*{task.assignees && task.assignees.length > 0 && (*/}
+                {/*    <div className={styles.assignees}>*/}
+                {/*        /!*{task.assignees.map((a) => (*!/*/}
+                {/*        /!*    // <div key={a.id} className={styles.avatar}>*!/*/}
+                {/*        /!*    //     {a.avatar_url ? (*!/*/}
+                {/*        /!*    //         <img src={a.avatar_url} alt={a.first_name} />*!/*/}
+                {/*        /!*    //     ) : (*!/*/}
+                {/*        /!*    //         <span>{a.first_name[0]}</span>*!/*/}
+                {/*        /!*    //     )}*!/*/}
+                {/*        /!*    // </div>*!/*/}
+                {/*        /!*))}*!/*/}
+                {/*    </div>*/}
+                {/*)}*/}
             </div>
-            {/*{task.description && (*/}
-            {/*    <p className={styles.description}>{task.description}</p>*/}
-            {/*)}*/}
         </div>
     );
 };

@@ -18,12 +18,18 @@
     z-index: 10000;
     background: #fff;
     border-radius: 12px;
-    width: 750px;
+    width: 900px;
+    min-height: 10vh;
     max-height: 90vh;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    max-width: 96%;
+}
+
+.modal div {
+    display: flex;
 }
 
 .header {
@@ -32,6 +38,17 @@
     align-items: start;
     padding: 18px;
     border-bottom: 1px solid #e5e7eb;
+}
+.header div {
+    display: flex;
+    gap: 12px;
+}
+.header button {
+    font-size: 16px;
+    padding: 8px;
+    background: #f3f4f6;
+    color: #111827;
+    transition: 0.2s;
 }
 .header.banner {
     background-size: cover;
@@ -48,57 +65,68 @@
     margin: 0;
 }
 
-/*.banner img {*/
-/*    width: 100%;*/
-/*    max-height: 240px;*/
-/*    object-fit: cover;*/
-/*    border-bottom: 1px solid #e5e7eb;*/
+.content {
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+    border-radius: 0 0 12px 12px;
+}
+
+/*.content button {*/
+/*    background: #e5e7eb;*/
+/*    color: #111827;*/
+/*    padding: 8px;*/
+/*    font-size: 14px;*/
+/*    font-weight: 500;*/
+/*    border-radius: 6px;*/
 /*}*/
 
-.content {
-    padding: 20px 24px;
+@media (max-width: 800px) {
+    .content {
+        flex-direction: column;
+    }
+    .content aside {
+        width: 100%;
+        border-left: none;
+        border-top: 1px solid #091e4224;
+        height: auto;
+        margin-top: 16px;
+    }
 }
 
-.tags {
+.content main {
+    padding: 16px;
     display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-bottom: 12px;
+    flex-direction: column;
+    /*!*display: grid;*!*/
+    /*!*grid-template-columns: 1fr;*!*/
+    /*!*grid-template-rows: 0fr 1fr;*!*/
+    flex: 1.2 .8;
+    /*!*width: 100%;*!*/
+    overflow-y: auto;
+    gap: 14px
 }
 
-.tag {
-    font-size: 13px;
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-weight: 500;
-    color: #fff;
+.content aside {
+    box-sizing: border-box;
+    /*width: 460px;*/
+    flex: 1 0 auto;
+    height: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
+    border-left: 1px solid #091e4224;
+    background-color: #f7f8f9;
+    transition: width 0.3s
+    ease-in-out;
 }
 
-.assignees {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-}
 
-.assignee {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 14px;
-}
 
-.assignee img {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    object-fit: cover;
-}
-
-.section {
+main > section {
     margin-bottom: 24px;
 }
 
-.section h3 {
+main > section h3 {
     font-size: 15px;
     font-weight: 600;
     color: #111827;
@@ -115,6 +143,32 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
+}
+
+.attachments > div {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.section > header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.attachments h2 {
+    color: #292a2e;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.attachments h3 {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 14px;
 }
 
 .attachment {
@@ -168,4 +222,101 @@
 .commentContent {
     font-size: 14px;
     color: #374151;
+}
+
+
+.taskListSelect {
+    /*width: 100%;*/
+    padding: 8px 8px;
+    border: 1px solid #d1d5db;;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #111827;
+    background: #f3f4f6;
+}
+.taskListSelect:hover {
+    border-color: #9ca3af;
+}
+.taskListSelect:focus {
+    outline: none;
+}
+
+
+
+
+
+.changeInfo {
+    padding: 8px 8px;
+}
+
+.changeInfo {
+    display: flex;
+    flex-wrap: wrap;
+    padding-left: 8px;
+    column-gap: 12px;
+    row-gap: 8px;
+}
+
+.changeInfo > div {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    max-width: 100%;
+}
+
+.changeInfo h3 {
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 4px;
+    font-weight: 600;
+}
+
+
+
+
+/*fdsffdsfdsfdsfdfsdfdsfdsfdsfdsfdsfds*/
+.assignees, .tags {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.assignee {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #f3f4f6;
+    border-radius: 8px;
+    padding: 4px 8px;
+}
+
+.assignee img {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.removeBtn, .removeTag {
+    border: none;
+    background: transparent;
+    color: #6b7280;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.dateInput {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    font-size: 14px;
+    background: #f9fafb;
+    color: #111827;
+    height: 24px;
+}
+
+.dateInput:focus {
+    border-color: #00a86b;
+    outline: none;
 }

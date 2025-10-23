@@ -27,3 +27,7 @@ hr {
 input[type="checkbox"] {
     accent-color: #00a86b;
 }
+
+input {
+    font-size: 0.95rem;
+}

@@ -179,7 +179,7 @@ const BoardSettings: React.FC<Props> = ({ boardId }) => {
                                     style={{ backgroundColor: tag.color }}
                                 />
                                 <span>{tag.name}</span>
-                                <Button onClick={() => deleteTag(tag.id)}><Trash /></Button>
+                                <Button variant="danger" onClick={() => deleteTag(tag.id)}><Trash /></Button>
                             </div>
                         ))}
                     </div>
