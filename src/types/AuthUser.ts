@@ -13,12 +13,16 @@ export interface MeUser {
     avatar_url: string | null;
     birthday: string | null;
     temp_token: string | null;
+    is_balance_visible: boolean;
+    balance: number;
+    is_need_accept_terms: boolean;
+    is_terms_accepted: boolean;
+    terms_accepted_at: string | null;
     created_at: string;
     updated_at: string;
 }
 
 export interface CheckMeResponse {
-    ok: boolean;
     user: MeUser;
     role: MyRole;
     detail?: string;

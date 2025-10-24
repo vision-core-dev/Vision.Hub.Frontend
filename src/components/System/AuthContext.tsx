@@ -55,6 +55,12 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
                     setIsAuthenticated(true);
                     setUser(data.user);
                     setRole(data.role);
+
+                    if (data?.user.is_need_accept_terms && !data?.user.is_terms_accepted) {
+                        navigate("/offer-agreement");
+                        return;
+                    }
+
                     chooseGreeting()
                     if (path === "/login" || path === "/") {
                         navigate("/dashboard");

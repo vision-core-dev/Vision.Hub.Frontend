@@ -25,6 +25,7 @@ import ProfilePage from "./components/Pages/My/Profile/Profile.tsx";
 import DashboardPage from "./components/Pages/Dashboard/Dashboard.tsx";
 import KnowledgeLayout from "./components/Pages/Knowledge/KnowledgeLayout/KnowledgeLayout.tsx";
 import ModerateEventDetails from "./components/Pages/Events/EventDetails/ModerateEventDetails.tsx";
+import OfferAgreementPage from "./components/Pages/auth/OfferAgreementPage/OfferAgreementPage.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
@@ -35,6 +36,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
 
                     <Route path="/login" element={<Login />} />
                     <Route path="/deactivated" element={<AccountDeactivated />} />
+                    <Route path="/offer-agreement" element={<OfferAgreementPage />} />
 
                     <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>}/>
 

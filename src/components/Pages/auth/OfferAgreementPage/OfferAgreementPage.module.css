@@ -1,0 +1,118 @@
+.wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f9fafb 0%, #f1f5f9 100%);
+    padding: 24px;
+}
+
+.card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 40px;
+    width: 100%;
+    max-width: 780px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    animation: fadeIn 0.4s ease;
+}
+
+.header {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.icon {
+    background: #ecfdf5;
+    color: #059669;
+    border-radius: 50%;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.title {
+    font-size: 26px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+}
+
+.subtitle {
+    color: #4b5563;
+    font-size: 16px;
+    max-width: 540px;
+    line-height: 1.6;
+}
+
+.textBox {
+    background: #f9fafb;
+    border-radius: 14px;
+    padding: 24px;
+    line-height: 1.7;
+    color: #374151;
+    font-size: 15px;
+    border: 1px solid #e5e7eb;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.document h1,
+.document h2,
+.document h3 {
+    color: #111827;
+    margin-top: 16px;
+    font-weight: 600;
+}
+
+.document p {
+    margin-bottom: 10px;
+}
+
+.document ul {
+    margin-left: 20px;
+}
+
+.actions {
+    display: flex;
+    justify-content: center;
+}
+
+.footerNote {
+    text-align: center;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.loader {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #6b7280;
+    font-size: 15px;
+    justify-content: center;
+}
+
+.error {
+    text-align: center;
+    color: #dc2626;
+    font-weight: 500;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
