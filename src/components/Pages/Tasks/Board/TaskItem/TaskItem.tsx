@@ -62,13 +62,15 @@ const TaskItem = ({ task, boardTags, users }: TaskProps) => {
                     <h3 className={styles.title}>{task.name}</h3>
                 </div>
 
-                <div className={styles.deadline}>
-                    {(task.deadline_at || task.started_at) && (
-                        <>
-                            <Clock /><span>{task.started_at && safeDate(task.started_at)} {(task.started_at && task.deadline_at) && "–"} {task.deadline_at && safeDate(task.deadline_at)}</span>
-                        </>
-                    )}
-                </div>
+                {(task.deadline_at || task.started_at) && (
+                    <div className={styles.deadline}>
+                        {(task.deadline_at || task.started_at) && (
+                            <>
+                                <Clock /><span>{task.started_at && safeDate(task.started_at)} {(task.started_at && task.deadline_at) && "–"} {task.deadline_at && safeDate(task.deadline_at)}</span>
+                            </>
+                        )}
+                    </div>
+                )}
 
                 {/* 👥 Виконавці */}
                 {taskAssignees.length > 0 && (
