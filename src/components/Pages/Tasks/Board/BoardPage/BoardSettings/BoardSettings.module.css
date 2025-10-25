@@ -4,8 +4,8 @@
     gap: 16px;
     background: #fff;
     padding: 20px;
-    width: 300px;
-    max-width: 300px;
+    width: 400px;
+    max-width: 500px;
     border-left: 1px solid #e5e7eb;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     height: 100%;
@@ -125,4 +125,17 @@
 
 .uploadButton:hover {
     background: #e5e7eb;
+}
+
+.memberItem {
+    background-color: #f3f4f6;
+    border-radius: 6px;
+    padding: 6px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+.memberItem > div {
+    display: flex;
+    gap: 16px;
 }

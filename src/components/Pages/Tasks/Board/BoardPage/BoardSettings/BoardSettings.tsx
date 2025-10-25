@@ -4,6 +4,8 @@ import { api } from "../../../../../../utils/api.ts";
 import Button from "../../../../../basic/Button/Button.tsx";
 import LoaderDots from "../../../../../basic/LoaderDots/LoaderDots.tsx";
 import { Trash, Image, Upload } from "lucide-react";
+import type {UserType} from "../../../../../../types/Users.ts";
+import UserLabel from "../../../../../basic/User/UserLabel.tsx";
 
 type Tag = {
     id: string;
@@ -21,12 +23,24 @@ type List = {
 interface Props {
     boardId: string;
 }
+type Member = {
+    id: string;
+    first_name: string;
+    last_name?: string;
+    avatar_url?: string;
+    role: string;
+};
+
+
 
 const BoardSettings: React.FC<Props> = ({ boardId }) => {
-    const [activeTab, setActiveTab] = useState<"tags" | "lists" | "banner">("tags");
+    const [activeTab, setActiveTab] = useState<"tags" | "lists" | "banner" | "members">("tags");
     const [tags, setTags] = useState<Tag[]>([]);
     const [lists, setLists] = useState<List[]>([]);
     const [bannerUrl, setBannerUrl] = useState<string>("");
+
+    const [allUsers, setAllUsers] = useState<UserType[]>([]);
+    const [members, setMembers] = useState<Member[]>([]);
 
     const [loading, setLoading] = useState(true);
     const [uploading, setUploading] = useState(false);
@@ -49,6 +63,23 @@ const BoardSettings: React.FC<Props> = ({ boardId }) => {
                 setTags(data.tags);
                 setLists(data.lists);
                 setBannerUrl(data.board.banner_url || "");
+                setAllUsers(data.users || []);
+
+                const boardMembers: Record<string, string> = data.board.members || {};
+                const users: UserType[] = data.users || [];
+
+                const combinedMembers = users
+                    .filter((u) => Object.keys(boardMembers).includes(u.id)) // беремо лише тих, хто у members
+                    .map((u) => ({
+                        id: u.id,
+                        first_name: u.first_name,
+                        last_name: u.last_name,
+                        avatar_url: u.avatar_url,
+                        role: boardMembers[u.id] || "member",
+                    }));
+
+                setMembers(combinedMembers);
+
             } else {
                 setError(data.detail);
             }
@@ -119,6 +150,33 @@ const BoardSettings: React.FC<Props> = ({ boardId }) => {
         }
     };
 
+    const [newMemberId, setNewMemberId] = useState("");
+    const [newMemberRole, setNewMemberRole] = useState("member");
+
+    const addMember = async () => {
+        const res = await api.post(`/v1/Hub/Boards/${boardId}/Members/Add`, {
+            user_id: newMemberId,
+            role: newMemberRole,
+        });
+        await refresh(res);
+    };
+
+    const removeMember = async (id: string) => {
+        const res = await api.post(`/v1/Hub/Boards/${boardId}/Members/Remove`, {
+            user_id: id,
+        });
+        await refresh(res);
+    };
+
+    const changeRole = async (id: string, newRole: string) => {
+        const res = await api.post(`/v1/Hub/Boards/${boardId}/Members/ChangeRole`, {
+            user_id: id,
+            new_role: newRole,
+        });
+        await refresh(res);
+    };
+
+
 
 
     if (loading) {
@@ -149,6 +207,12 @@ const BoardSettings: React.FC<Props> = ({ boardId }) => {
                     onClick={() => setActiveTab("banner")}
                 >
                     Банер
+                </Button>
+                <Button
+                    variant={activeTab === "members" ? "primary" : "secondary"}
+                    onClick={() => setActiveTab("members")}
+                >
+                    Учасники
                 </Button>
             </div>
 
@@ -257,6 +321,62 @@ const BoardSettings: React.FC<Props> = ({ boardId }) => {
                     </div>
                 </div>
             )}
+
+            {activeTab === "members" && (
+                <div className={styles.tabContent}>
+                    <div className={styles.createRow}>
+                        <select
+                            value={newMemberId}
+                            onChange={(e) => setNewMemberId(e.target.value)}
+                        >
+                            <option value="">Вибери користувача...</option>
+                            {allUsers
+                                .filter((u) => !members.some((m) => m.id === u.id)) // не показує вже доданих
+                                .map((u) => (
+                                    <option key={u.id} value={u.id}>
+                                        {u.first_name || "Без імені"}
+                                    </option>
+                                ))}
+                        </select>
+
+                        <select
+                            value={newMemberRole}
+                            onChange={(e) => setNewMemberRole(e.target.value)}
+                        >
+                            <option value="member">Учасник</option>
+                            <option value="admin">Адмін</option>
+                            <option value="viewer">Перегляд</option>
+                        </select>
+
+                        <Button onClick={addMember} disabled={!newMemberId}>
+                            Додати
+                        </Button>
+                    </div>
+
+                    <div className={styles.list}>
+                        {members.map((m) => (
+                            <div key={m.id} className={styles.memberItem}>
+                                <div>
+                                    <UserLabel user_id={m.id} avatar_url={m.avatar_url} name={`${m.first_name} ${m.last_name || ""}`} />
+                                    <select
+                                        value={m.role || "member"}
+                                        onChange={(e) => changeRole(m.id, e.target.value)}
+                                    >
+                                        <option value="member">Учасник</option>
+                                        <option value="admin">Адмін</option>
+                                    </select>
+                                </div>
+
+                                <Button variant="danger" onClick={() => removeMember(m.id)}>
+                                    <Trash />
+                                </Button>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+
         </div>
     );
 };
