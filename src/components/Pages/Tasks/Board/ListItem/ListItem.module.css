@@ -25,10 +25,24 @@
     flex-direction: column;
     gap: 8px;
     overflow-y: auto;
-    flex: 1; /* ✅ це ключ, щоб tasks займали все місце і скролились */
-    /*padding-right: 4px;*/
-    min-height: 0; /* 👈 обовʼязково, щоб flex працював зі скролом */
+    flex: 1;
+    min-height: 0;
+
+    /* ✨ магія — резервує місце під скрол тільки коли він зʼявляється */
+    scrollbar-gutter: stable both-edges;
+    padding-right: 4px;
 }
+
+
+/*.tasks {*/
+/*    display: flex;*/
+/*    flex-direction: column;*/
+/*    gap: 8px;*/
+/*    overflow-y: auto;*/
+/*    flex: 1; !* ✅ це ключ, щоб tasks займали все місце і скролились *!*/
+/*    !*padding-right: 4px;*!*/
+/*    min-height: 0; !* 👈 обовʼязково, щоб flex працював зі скролом *!*/
+/*}*/
 
 .tasks::-webkit-scrollbar {
     width: 6px;
