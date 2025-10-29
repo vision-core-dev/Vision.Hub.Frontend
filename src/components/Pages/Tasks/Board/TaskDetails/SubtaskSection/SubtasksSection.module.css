@@ -1,0 +1,60 @@
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    background: #f9fafb;
+    border-radius: 8px;
+    transition: 0.2s;
+}
+
+.item:hover {
+    background: #f3f4f6;
+}
+
+.statusBtn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+}
+
+.completed .name {
+    text-decoration: line-through;
+    color: #9ca3af;
+}
+
+.name {
+    flex: 1;
+}
+
+.deleteBtn {
+    background: none;
+    border: none;
+    color: #ef4444;
+    cursor: pointer;
+}
+
+.addRow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.addRow > button {
+    width: fit-content;
+}

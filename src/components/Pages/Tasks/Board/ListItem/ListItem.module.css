@@ -10,7 +10,7 @@
     box-sizing: border-box;
     overflow-y: auto;
     overflow-x: hidden;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     gap: 12px;
 }
 
@@ -23,26 +23,12 @@
 .tasks {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 12px;
     overflow-y: auto;
     flex: 1;
     min-height: 0;
-
-    /* ✨ магія — резервує місце під скрол тільки коли він зʼявляється */
-    scrollbar-gutter: stable both-edges;
     padding-right: 4px;
 }
-
-
-/*.tasks {*/
-/*    display: flex;*/
-/*    flex-direction: column;*/
-/*    gap: 8px;*/
-/*    overflow-y: auto;*/
-/*    flex: 1; !* ✅ це ключ, щоб tasks займали все місце і скролились *!*/
-/*    !*padding-right: 4px;*!*/
-/*    min-height: 0; !* 👈 обовʼязково, щоб flex працював зі скролом *!*/
-/*}*/
 
 .tasks::-webkit-scrollbar {
     width: 6px;
@@ -68,17 +54,8 @@
 }
 
 .addTask:hover {
-    /*background: #dfe1e6;*/
     background: rgba(255, 255, 255, 0.55);
 }
-
-
-
-
-
-
-
-
 
 .title {
     font-size: 16px;
@@ -94,9 +71,6 @@
     font-weight: 500;
     color: #5e6c84;
 }
-
-
-
 
 .createTask {
     display: flex;
@@ -126,12 +100,10 @@
     align-items: center;
 }
 
-
-
-
-
 .taskWrapper {
-    transition: transform 0.15s ease, background 0.2s ease;
+    transition:
+            transform 0.15s ease,
+            background 0.2s ease;
     border-radius: 8px;
     cursor: grab;
 }
@@ -142,9 +114,9 @@
 }
 
 .insertLine {
-    height: 4px;
-    background: #007aff;
+    min-height: 4px;
+    background: #75b37f;
     border-radius: 2px;
     margin: 4px 0;
-    box-shadow: 0 0 0 1px rgba(0,0,0,.06);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06);
 }

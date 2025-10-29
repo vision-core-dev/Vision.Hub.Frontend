@@ -1,7 +1,6 @@
 .page {
     display: flex;
     flex-direction: column;
-    /*min-height: 100vh;*/
     height: 100%;
     background-size: cover;
     background-position: center center;
@@ -21,7 +20,7 @@
     display: flex;
     justify-content: space-between;
     user-select: none;
-    overflow: hidden; /* 👈 щоб нічого не вилазило за межі */
+    overflow: hidden;
     backdrop-filter: blur(10px);
 }
 
@@ -32,18 +31,17 @@
     overflow-y: hidden;
     padding: 20px;
     box-sizing: border-box;
-
     overflow-x: auto;
-    /*cursor: grab;*/
     user-select: none;
     touch-action: pan-y;
 }
-.lists.dragging, .lists.active {
+.lists.dragging,
+.lists.active {
     cursor: grabbing;
 }
 
 .lists.active {
-    /*cursor: grabbing;*/
+    cursor: grabbing;
 }
 
 .lists::-webkit-scrollbar {
@@ -54,8 +52,6 @@
     background: #c1c7d0;
     border-radius: 4px;
 }
-
-
 
 .extraActions {
     display: flex;
@@ -75,7 +71,7 @@
     background: rgba(255, 255, 255, 0.3);
     border: none;
     border-radius: 6px;
-    color: #FFFFFF;
+    color: #ffffff;
     cursor: pointer;
     font-size: 14px;
     padding: 6px 12px;
@@ -88,7 +84,7 @@
 .title {
     overflow: hidden;
     background: transparent;
-    color: #FFFFFF;
+    color: #ffffff;
     font-size: 18px;
     font-weight: bold;
     line-height: 32px;
@@ -105,7 +101,6 @@
     position: absolute;
     right: 0;
     top: 0;
-    /*height: 100%;*/
     transform: translateX(100%);
     opacity: 1;
     transition: transform 0.4s ease;

@@ -10,6 +10,7 @@ import TaskNameInput from "./TaskNameInput/TaskNameInput.tsx";
 import TagSelector from "./TagSelector/TagSelector.tsx";
 import TextEditor from "../../../../basic/TextEditor/TextEditor.tsx";
 import AttachmentsSection, {type Attachment} from "./AttachmentsSection/AttachmentsSection.tsx";
+import SubtaskSection from "./SubtaskSection/SubtasksSection.tsx";
 
 interface User {
     id: string;
@@ -389,37 +390,12 @@ const TaskDetailsModal: React.FC<Props> = ({ taskId, onClose, boardLists, boardT
                             }}
                         />
 
+                        {/*<SubtaskSection taskId={task.id} />*/}
+
                     </main>
 
                     <aside>
-                        {/* 💬 Коментарі */}
-                        {/*{task.comments?.length > 0 && (*/}
-                        {/*    <div className={styles.section}>*/}
-                        {/*        <h3>Коментарі</h3>*/}
-                        {/*        <div className={styles.comments}>*/}
-                        {/*            {task.comments.map((c) => (*/}
-                        {/*                <div key={c.id} className={styles.comment}>*/}
-                        {/*                    <img*/}
-                        {/*                        src={c.user.avatar_url || "/default-avatar.png"}*/}
-                        {/*                        alt={c.user.first_name}*/}
-                        {/*                    />*/}
-                        {/*                    <div>*/}
-                        {/*                        <div className={styles.commentHeader}>*/}
-                        {/*                            <strong>{c.user.first_name}</strong>*/}
-                        {/*                            <span>*/}
-                        {/*                            {new Date(c.created_at).toLocaleString("uk-UA")}*/}
-                        {/*                        </span>*/}
-                        {/*                        </div>*/}
-                        {/*                        <div*/}
-                        {/*                            className={styles.commentContent}*/}
-                        {/*                            dangerouslySetInnerHTML={{__html: c.content}}*/}
-                        {/*                        />*/}
-                        {/*                    </div>*/}
-                        {/*                </div>*/}
-                        {/*            ))}*/}
-                        {/*        </div>*/}
-                        {/*    </div>*/}
-                        {/*)}*/}
+
                     </aside>
                 </div>
             </div>

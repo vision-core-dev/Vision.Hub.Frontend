@@ -5,7 +5,11 @@
     gap: 12px;
 }
 
-header {
+.attachments h3 {
+    margin: 0;
+}
+
+.attachments > header {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -65,6 +69,10 @@ header {
 
 .itemName {
     font-size: 16px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 220px;
 }
 
 .details a {

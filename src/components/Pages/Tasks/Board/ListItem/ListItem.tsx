@@ -15,7 +15,7 @@ type ListProps = {
     boardTags: TaskTag[];
     boardId?: string | null;
     users: UserType[];
-    onTaskMove?: (taskId: string, toListId: string, newIndex: number) => void;
+    onTaskMove?: (taskId: string, toListId: string, newIndex: number) => Task | null; // 👈 ось тут
 };
 
 const ListItem = ({
@@ -34,8 +34,23 @@ const ListItem = ({
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
+        const handleGlobalEnd = () => {
+            setDraggingTaskId(null);
+            setInsertIndex(null);
+        };
+
+        window.addEventListener("mouseup", handleGlobalEnd);
+        window.addEventListener("dragend", handleGlobalEnd);
+
+        return () => {
+            window.removeEventListener("mouseup", handleGlobalEnd);
+            window.removeEventListener("dragend", handleGlobalEnd);
+        };
+    }, []);
+
+    useEffect(() => {
         setLocalTasks(list.tasks || []);
-    }, [list.tasks]);
+    }, [list.id]);
 
     // 🧠 Create
     const createTask = async () => {
@@ -57,7 +72,6 @@ const ListItem = ({
         setLoading(false);
     };
 
-
     // 🎯 start
     const handleDragStart = (e: React.DragEvent<HTMLDivElement>, taskId: string) => {
         e.dataTransfer.effectAllowed = "move";
@@ -67,77 +81,105 @@ const ListItem = ({
         setInsertIndex(null);
     };
 
-// 🧲 over на картці — визначаємо before/after відносно половини висоти
+    // 🧲 over task
     const handleDragOverTask = (e: React.DragEvent<HTMLDivElement>, index: number) => {
         e.preventDefault();
-        e.stopPropagation(); // 👈 щоб список не перезаписав індекс
+        e.stopPropagation();
         const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
-        const before = (e.clientY - rect.top) < rect.height / 2;
+        const before = e.clientY - rect.top < rect.height / 2;
         setInsertIndex(before ? index : index + 1);
     };
 
-// 🧲 over на списку — тільки коли реально над списком (а не над карткою)
+    // 🧲 over list
     const handleDragOverList = (e: React.DragEvent<HTMLDivElement>) => {
-        if (e.target !== e.currentTarget) return; // 👈 не чіпаємо, якщо подія від дитини
+        if (e.target !== e.currentTarget) return;
         e.preventDefault();
-        setInsertIndex(localTasks.length); // в кінець
+        setInsertIndex(localTasks.length);
     };
 
-// 💾 drop
+    // 💾 drop
     const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
+        e.stopPropagation();
+
         const taskId = e.dataTransfer.getData("task_id");
         const sourceListId = e.dataTransfer.getData("source_list_id");
-        if (!taskId) return;
+        if (!taskId) return handleDragEnd();
 
         const toIndex = Math.max(0, Math.min(insertIndex ?? localTasks.length, localTasks.length));
 
-        if (sourceListId === list.id) {
-            // reorder в межах списку
-            const fromIndex = localTasks.findIndex(t => t.id === taskId);
-            if (fromIndex === -1) return;
+        try {
+            if (sourceListId === list.id) {
+                // 🔁 reorder у межах того ж списку
+                const fromIndex = localTasks.findIndex(t => t.id === taskId);
+                if (fromIndex === -1) return handleDragEnd();
 
-            if (fromIndex === toIndex || fromIndex + 1 === toIndex) {
-                // позиція не змінилась фактично
-                setInsertIndex(null);
-                setDraggingTaskId(null);
-                return;
+                const updated = [...localTasks];
+                const [moved] = updated.splice(fromIndex, 1);
+                const normalizedTarget = fromIndex < toIndex ? toIndex - 1 : toIndex;
+                updated.splice(normalizedTarget, 0, moved);
+                setLocalTasks(updated);
+
+                api.post(`/v1/Hub/Tasks/${taskId}/SetTaskOrder`, {
+                    list_id: list.id,
+                    order: normalizedTarget,
+                }).catch(console.error);
+            } else {
+                // 🚀 між списками — переносимо сам об'єкт, не "…"
+                let movedTask: Task | null = null;
+
+                // 1️⃣ дістаємо саму таску з попереднього списку через callback
+                if (onTaskMove) {
+                    movedTask = onTaskMove(taskId, list.id, toIndex);
+                }
+
+                // 2️⃣ додаємо в локальний список одразу реальний таск
+                if (movedTask) {
+                    setLocalTasks(prev => {
+                        const updated = [...prev];
+                        const normalizedTarget = Math.min(toIndex, updated.length);
+                        updated.splice(normalizedTarget, 0, movedTask!);
+                        return updated;
+                    });
+                }
+
+                // 3️⃣ один запит на бекенд
+                api.post(`/v1/Hub/Tasks/${taskId}/SetTaskOrder`, {
+                    list_id: list.id,
+                    order: toIndex,
+                }).catch(console.error);
             }
-
-            const updated = [...localTasks];
-            const [moved] = updated.splice(fromIndex, 1);
-            // якщо тягнули вниз, після вирізання індекс цілі зміщується на -1
-            const normalizedTarget = fromIndex < toIndex ? toIndex - 1 : toIndex;
-            updated.splice(normalizedTarget, 0, moved);
-            setLocalTasks(updated);
-
-            api.post(`/v1/Hub/Tasks/${taskId}/SetTaskOrder`, {
-                order: normalizedTarget,
-                list_id: list.id,
-            }).catch(console.error);
-        } else {
-            // між списками
-            onTaskMove?.(taskId, list.id, toIndex);
+        } finally {
+            handleDragEnd();
         }
-
-        setInsertIndex(null);
-        setDraggingTaskId(null);
     };
 
-// ❌ leave — чистимо тільки коли реально вийшли зі списку
+
+
+
+
     const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
         if (!e.currentTarget.contains(e.relatedTarget as Node)) {
             setInsertIndex(null);
         }
     };
 
+    const handleDragEnd = () => {
+        setDraggingTaskId(null);
+        setInsertIndex(null);
+    };
 
     return (
         <div
             className={styles.list}
-            style={{ backgroundColor: list.color || "#f1f2f4" }}
-            onDragOver={handleDragOverList}
-            onDrop={handleDrop}
+            onDragOver={(e) => {
+                e.preventDefault(); // 🧠 must have
+                handleDragOverList(e);
+            }}
+            onDrop={(e) => {
+                e.preventDefault();
+                handleDrop(e);
+            }}
             onDragLeave={handleDragLeave}
         >
             <div className={styles.header}>
@@ -158,6 +200,8 @@ const ListItem = ({
                             draggable
                             onDragStart={(e) => handleDragStart(e, task.id)}
                             onDragOver={(e) => handleDragOverTask(e, index)}
+                            onDragEnd={handleDragEnd} // 👈 вот это
+                            onDrop={(e) => handleDrop(e)} // 👈 чтоб точно сработал drop
                             className={`${styles.taskWrapper} ${
                                 draggingTaskId === task.id ? styles.dragging : ""
                             }`}

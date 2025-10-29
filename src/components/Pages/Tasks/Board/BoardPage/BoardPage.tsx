@@ -100,39 +100,37 @@ const BoardPage = () => {
         return () => clearInterval(interval);
     }, [id]);
 
-    const handleTaskMove = async (taskId: string, toListId: string, newIndex: number) => {
-        setBoardLists(prev =>
-            prev.map(list => {
-                const oldTasks = list.tasks || [];
-                const newTasks = oldTasks.filter(t => t.id !== taskId);
+    const handleTaskMove = (taskId: string, toListId: string, newIndex: number): Task | null => {
+        let movedTask: Task | null = null;
 
-                return { ...list, tasks: newTasks };
+        setBoardLists(prevLists => {
+            const updated = prevLists.map(list => {
+                const safeTasks = Array.isArray(list.tasks) ? list.tasks : [];
+
+                // видаляємо зі старого списку
+                if (safeTasks.some(t => t.id === taskId)) {
+                    movedTask = safeTasks.find(t => t.id === taskId) || null;
+                    return { ...list, tasks: safeTasks.filter(t => t.id !== taskId) };
+                }
+
+                return list;
             }).map(list => {
-                if (list.id === toListId) {
-                    const safeTasks = list.tasks || [];
-                    return {
-                        ...list,
-                        tasks: [
-                            ...safeTasks.slice(0, newIndex),
-                            { id: taskId, name: "…" } as Task,
-                            ...safeTasks.slice(newIndex),
-                        ],
-                    };
+                // додаємо в новий список
+                const safeTasks = Array.isArray(list.tasks) ? list.tasks : [];
+                if (list.id === toListId && movedTask) {
+                    const newTasks = [...safeTasks];
+                    newTasks.splice(newIndex, 0, movedTask);
+                    return { ...list, tasks: newTasks };
                 }
                 return list;
-            })
-        );
-
-        try {
-            await api.post(`/v1/Hub/Tasks/${taskId}/SetTaskOrder`, {
-                order: newIndex,
-                list_id: toListId,
             });
-        } catch (err) {
-            console.error("Помилка при оновленні порядку:", err);
-        }
-    };
 
+            // повертаємо оновлений список у state
+            return updated;
+        });
+
+        return movedTask;
+    };
 
     if (loading) return <LoaderDots />;
     if (!boardDetails) return <div className={styles.error}>Дошку не знайдено 😔</div>;

@@ -16,7 +16,6 @@
     gap: 8px;
 }
 
-
 .tabContent {
     display: flex;
     flex-direction: column;
@@ -57,7 +56,8 @@
     gap: 8px;
 }
 
-.tagItem, .listItem {
+.tagItem,
+.listItem {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -103,7 +103,6 @@
     padding: 6px 10px;
     margin-bottom: 10px;
 }
-
 
 .uploadRow {
     margin-top: 10px;
