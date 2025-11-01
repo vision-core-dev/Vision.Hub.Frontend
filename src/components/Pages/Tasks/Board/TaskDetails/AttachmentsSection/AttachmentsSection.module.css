@@ -36,8 +36,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: #f9fafb;
-    border: 1px solid #edf0f2;
+    background: #f8f8f8;
+    border: 1px solid #d1d5db;
     border-radius: 8px;
     padding: 8px 10px;
     gap: 10px;

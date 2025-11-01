@@ -26,6 +26,8 @@ import DashboardPage from "./components/Pages/Dashboard/Dashboard.tsx";
 import KnowledgeLayout from "./components/Pages/Knowledge/KnowledgeLayout/KnowledgeLayout.tsx";
 import ModerateEventDetails from "./components/Pages/Events/EventDetails/ModerateEventDetails.tsx";
 import OfferAgreementPage from "./components/Pages/auth/OfferAgreementPage/OfferAgreementPage.tsx";
+import SalaryPage from "./components/Pages/Salary/SalaryPage.tsx";
+import NotFound from "./components/Layout/NotFound/NotFound.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
@@ -69,7 +71,13 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                     <Route path="/knowledge" element={<ProtectedRoute><KnowledgeLayout /></ProtectedRoute>} />
                     <Route path="/knowledge/d/:id" element={<ProtectedRoute><KnowledgeLayout /></ProtectedRoute>} />
 
-                    <Route path="*" element={<div>404</div>} />
+                    {/*salary*/}
+                    <Route path="/salary" element={<ProtectedRoute><SalaryPage /></ProtectedRoute>} />
+
+                    {/*finance*/}
+                    <Route path="/finance" element={<ProtectedRoute><div>Finance Page</div></ProtectedRoute>} />
+
+                    <Route path="*" element={<NotFound />} />
                 </Routes>
             </AuthProvider>
         </BrowserRouter>

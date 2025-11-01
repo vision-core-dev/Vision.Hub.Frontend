@@ -24,7 +24,7 @@ const DefaultPage: React.FC<DefaultPageProps> = ({
             { (title || description || action) && (
                     <div className={styles.pageHeader}>
                         <div className={styles.pageTitleBlock}>
-                            {title && <h1 className={styles.title}>{title}</h1>}
+                            {title && <span className={styles.title}>{title}</span>}
                             {description && <p className={styles.description}>{description}</p>}
                         </div>
                         {action && <div className={styles.action}>{action}</div>}

@@ -12,6 +12,10 @@ const sidebarList: Record<string, string> = {
     "events": "Події",
     "users": "Користувачі",
     "knowledge": "База знань",
+    "salary": "Зарплата",
+    "finance": "Фінанси",
+    "reports": "Звіти",
+    "settings": "Налаштування",
 };
 
 export function getErrorText(code: string, fallback = "Сталася невідома помилка"): string {

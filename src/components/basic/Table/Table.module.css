@@ -27,17 +27,24 @@
 .table > tbody > tr {
     transition: background 0.1s;
 }
-.table > tbody > tr:hover {
-    background: rgb(250, 250, 250);
+
+.clickableRow {
+    cursor: pointer;
+    transition: background 0.1s;
+}
+.clickableRow:hover {
+    background: rgb(245, 255, 250);
 }
 
+/*.table > tbody > tr:hover {*/
+/*    background: rgb(250, 250, 250);*/
+/*}*/
+
 .table td {
-    cursor: pointer;
     padding: 1rem;
     border-top: 1px solid #e5e7eb;
 }
 .table td {
-    cursor: pointer;
     padding: 1rem;
     border-top: 1px solid #e5e7eb;
 }

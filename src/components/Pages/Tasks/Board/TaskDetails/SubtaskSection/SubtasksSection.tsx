@@ -1,21 +1,24 @@
 import React, { useState, useEffect } from "react";
 import styles from "./SubtasksSection.module.css";
 import { CheckCircle2, Circle, Plus, Trash2 } from "lucide-react";
-import {api} from "../../../../../../utils/api.ts";
+import { api } from "../../../../../../utils/api.ts";
 import Button from "../../../../../basic/Button/Button.tsx";
+import type { UserType } from "../../../../../../types/Users.ts";
 
 export interface Subtask {
     id: string;
     name: string;
     status: "no_status" | "in_progress" | "completed";
+    assignee_id?: string | null;
     deadline_at?: string | null;
 }
 
 interface Props {
     taskId: string;
+    users: UserType[];
 }
 
-const SubtasksSection: React.FC<Props> = ({ taskId }) => {
+const SubtasksSection: React.FC<Props> = ({ taskId, users }) => {
     const [subtasks, setSubtasks] = useState<Subtask[]>([]);
     const [newName, setNewName] = useState("");
 
@@ -66,6 +69,20 @@ const SubtasksSection: React.FC<Props> = ({ taskId }) => {
         }
     };
 
+    const handleUpdateAssignee = async (id: string, assignee_id: string) => {
+        await api.post(`/v1/Hub/Subtasks/${id}/UpdateAssignee`, { assignee_id });
+        setSubtasks((prev) =>
+            prev.map((s) => (s.id === id ? { ...s, assignee_id } : s))
+        );
+    };
+
+    const handleUpdateDeadline = async (id: string, deadline_at: string) => {
+        await api.post(`/v1/Hub/Subtasks/${id}/UpdateDeadline`, { deadline_at });
+        setSubtasks((prev) =>
+            prev.map((s) => (s.id === id ? { ...s, deadline_at } : s))
+        );
+    };
+
     const handleDelete = async (id: string) => {
         try {
             const res = await api.post(`/v1/Hub/Subtasks/${id}/Delete`);
@@ -79,7 +96,6 @@ const SubtasksSection: React.FC<Props> = ({ taskId }) => {
         <section className={styles.section}>
             <h3>Підзадачі</h3>
             <div className={styles.list}>
-
                 {subtasks.map((s) => (
                     <div
                         key={s.id}
@@ -90,7 +106,31 @@ const SubtasksSection: React.FC<Props> = ({ taskId }) => {
                         <button onClick={() => handleToggle(s)} className={styles.statusBtn}>
                             {s.status === "completed" ? <CheckCircle2 /> : <Circle />}
                         </button>
+
                         <span className={styles.name}>{s.name}</span>
+
+                        <div className={styles.meta}>
+                            <select
+                                value={s.assignee_id || ""}
+                                onChange={(e) => handleUpdateAssignee(s.id, e.target.value)}
+                                className={styles.select}
+                            >
+                                <option value="">Без виконавця</option>
+                                {users.map((u) => (
+                                    <option key={u.id} value={u.id}>
+                                        {u.first_name} {u.last_name || ""}
+                                    </option>
+                                ))}
+                            </select>
+
+                            <input
+                                type="date"
+                                value={s.deadline_at ? s.deadline_at.split("T")[0] : ""}
+                                onChange={(e) => handleUpdateDeadline(s.id, e.target.value)}
+                                className={styles.dateInput}
+                            />
+                        </div>
+
                         <button onClick={() => handleDelete(s.id)} className={styles.deleteBtn}>
                             <Trash2 size={16} />
                         </button>
@@ -98,7 +138,6 @@ const SubtasksSection: React.FC<Props> = ({ taskId }) => {
                 ))}
 
                 <div className={styles.addRow}>
-                    <Button variant="secondary"><Plus strokeWidth={2.25} /></Button>
                     <input
                         type="text"
                         value={newName}
@@ -106,9 +145,9 @@ const SubtasksSection: React.FC<Props> = ({ taskId }) => {
                         onChange={(e) => setNewName(e.target.value)}
                         onKeyDown={(e) => e.key === "Enter" && handleAdd()}
                     />
-                    <button onClick={handleAdd}>
-                        <Plus size={16} />
-                    </button>
+                    <Button variant="secondary" onClick={handleAdd}>
+                        <Plus strokeWidth={2.25} />
+                    </Button>
                 </div>
             </div>
         </section>

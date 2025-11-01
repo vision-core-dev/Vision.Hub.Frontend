@@ -10,7 +10,7 @@ import TaskNameInput from "./TaskNameInput/TaskNameInput.tsx";
 import TagSelector from "./TagSelector/TagSelector.tsx";
 import TextEditor from "../../../../basic/TextEditor/TextEditor.tsx";
 import AttachmentsSection, {type Attachment} from "./AttachmentsSection/AttachmentsSection.tsx";
-import SubtaskSection from "./SubtaskSection/SubtasksSection.tsx";
+
 
 interface User {
     id: string;
@@ -178,6 +178,7 @@ const TaskDetailsModal: React.FC<Props> = ({ taskId, onClose, boardLists, boardT
                 <div className={styles.modal}>
                     <LoaderDots />
                 </div>
+                <div className={styles.backdrop} onClick={onClose}></div>
             </div>
         );
     }
@@ -193,7 +194,6 @@ const TaskDetailsModal: React.FC<Props> = ({ taskId, onClose, boardLists, boardT
         );
     }
 
-    // ✅ Основний вміст
     return (
         <div className={styles.overlay}>
             <div className={styles.modal}>
