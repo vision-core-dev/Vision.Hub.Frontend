@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styles from "./SalaryPage.module.css";
 import {ArrowUpRight, ArrowDownRight, HandCoins} from "lucide-react";
 import SalaryWithdrawModal from "./SalaryWithdrawModal.tsx";
@@ -31,62 +31,62 @@ interface BalanceData {
 }
 
 const SalaryPage: React.FC = () => {
-    const [data, setData] = useState<BalanceData | null>(null);
+    const [data, ] = useState<BalanceData | null>(null);
     const [showModal, setShowModal] = useState(false);
 
-    const testData: BalanceData = {
-        balance: 4210.75,
-        withdrawable: 2000.0,
-        withdrawn_total: 8700.0,
-        transactions: [
-            {
-                id: "1",
-                type: "credit",
-                amount: 1500,
-                name: "Завдання: Дашборд HR модуль",
-                created_at: "2025-10-20T15:30:00Z",
-            },
-            {
-                id: "2",
-                type: "withdraw",
-                amount: 1000,
-                name: "Вивід на картку",
-                created_at: "2025-09-30T10:00:00Z",
-            },
-            {
-                id: "3",
-                type: "deduction",
-                amount: 400,
-                name: "Корекція через невиконане завдання",
-                created_at: "2025-08-10T18:00:00Z",
-            },
-        ],
-        withdraw_requests: [
-            {
-                id: "w1",
-                amount: 1000,
-                status: "paid",
-                created_at: "2025-09-30T10:00:00Z",
-            },
-            {
-                id: "w2",
-                amount: 1200,
-                status: "pending",
-                created_at: "2025-10-27T11:20:00Z",
-            },
-            {
-                id: "w3",
-                amount: 900,
-                status: "rejected",
-                reason: "Перевищення ліміту на вивід (max 1500 ₴)",
-                created_at: "2025-10-15T09:00:00Z",
-            },
-        ],
-    };
+    // const testData: BalanceData = {
+        // balance: 4210.75,
+        // withdrawable: 2000.0,
+        // withdrawn_total: 8700.0,
+        // transactions: [
+        //     {
+        //         id: "1",
+        //         type: "credit",
+        //         amount: 1500,
+        //         name: "Завдання: Дашборд HR модуль",
+        //         created_at: "2025-10-20T15:30:00Z",
+        //     },
+        //     {
+        //         id: "2",
+        //         type: "withdraw",
+        //         amount: 1000,
+        //         name: "Вивід на картку",
+        //         created_at: "2025-09-30T10:00:00Z",
+        //     },
+        //     {
+        //         id: "3",
+        //         type: "deduction",
+        //         amount: 400,
+        //         name: "Корекція через невиконане завдання",
+        //         created_at: "2025-08-10T18:00:00Z",
+        //     },
+        // ],
+        // withdraw_requests: [
+        //     {
+        //         id: "w1",
+        //         amount: 1000,
+        //         status: "paid",
+        //         created_at: "2025-09-30T10:00:00Z",
+        //     },
+        //     {
+        //         id: "w2",
+        //         amount: 1200,
+        //         status: "pending",
+        //         created_at: "2025-10-27T11:20:00Z",
+        //     },
+        //     {
+        //         id: "w3",
+        //         amount: 900,
+        //         status: "rejected",
+        //         reason: "Перевищення ліміту на вивід (max 1500 ₴)",
+        //         created_at: "2025-10-15T09:00:00Z",
+        //     },
+        // ],
+    // };
 
-    useEffect(() => {
-        setTimeout(() => setData(testData), 500);
-    }, []);
+    // useEffect(() => {
+    //     setTimeout(() => setData(testData), 500);
+    // }, []);
 
     if (!data)
         return <DefaultPage title="Моя зарплата" isLoading={true} />;
