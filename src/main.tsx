@@ -29,6 +29,8 @@ import OfferAgreementPage from "./components/Pages/auth/OfferAgreementPage/Offer
 import SalaryPage from "./components/Pages/Salary/SalaryPage.tsx";
 import NotFound from "./components/Layout/NotFound/NotFound.tsx";
 import FinancePage from "./components/Pages/Finance/FinancePage.tsx";
+import TransactionsList from "./components/Pages/Finance/TransactionsList.tsx";
+import CreateTransaction from "./components/Pages/Finance/CreateTransaction.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
@@ -77,6 +79,10 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
 
                     {/*finance*/}
                     <Route path="/finance" element={<ProtectedRoute><FinancePage /></ProtectedRoute>} />
+                    {/*transactions*/}
+                    <Route path="/finance/transactions" element={<ProtectedRoute><Navigate to="/finance/transactions/list" replace /></ProtectedRoute>} />
+                    <Route path="/finance/transactions/list" element={<ProtectedRoute><TransactionsList /></ProtectedRoute>} />
+                    <Route path="/finance/transactions/create" element={<ProtectedRoute><CreateTransaction /></ProtectedRoute>} />
 
                     <Route path="*" element={<NotFound />} />
                 </Routes>

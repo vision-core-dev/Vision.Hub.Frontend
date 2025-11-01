@@ -2,24 +2,41 @@ import React, { useState } from "react";
 import styles from "./SalaryPage.module.css";
 import Button from "../../basic/Button/Button.tsx";
 import KnowledgeCard from "../../basic/KnowledgeLink/KnowledgeCard.tsx";
+import {api} from "../../../utils/api.ts";
 
 interface Props {
     onClose: () => void;
+    onSuccess: () => void;
     withdrawLimit: number;
 }
 
-const SalaryWithdrawModal: React.FC<Props> = ({ onClose, withdrawLimit }) => {
+const SalaryWithdrawModal: React.FC<Props> = ({ onClose, onSuccess, withdrawLimit }) => {
     const [amount, setAmount] = useState<number>(0);
     const [comment, setComment] = useState("");
     const [error, setError] = useState("");
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (amount <= 0) return setError("Вкажіть суму більше 0 ₴");
         if (amount > withdrawLimit)
             return setError(`Максимум для одного виводу — ${withdrawLimit} ₴`);
 
-        alert(`✅ Запит на ${amount} ₴ відправлено!`);
-        onClose();
+        try {
+            const response = await api.post("/v1/Hub/Finance/CreateWithdrawalRequest", {
+                "amount": amount,
+                "comment": comment || null,
+            });
+            const result = await response.json();
+            if (!response.ok) {
+                throw new Error(result.message || "Помилка при відправці запиту");
+            }
+
+            onSuccess();
+            onClose();
+
+        }
+        catch {
+            return setError("Помилка при відправці запиту");
+        }
     };
 
     return (

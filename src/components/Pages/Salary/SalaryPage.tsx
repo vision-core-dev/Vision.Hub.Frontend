@@ -6,10 +6,11 @@ import Button from "../../basic/Button/Button.tsx";
 import Table from "../../basic/Table/Table.tsx";
 import DefaultPage from "../../basic/DefaultPage/DefaultPage.tsx";
 import {api} from "../../../utils/api.ts";
+import {safeDatetime} from "../../../utils/safeDate.ts";
 
-interface Transaction {
+export interface Transaction {
     id: string;
-    type: "credit" | "withdraw" | "deduction";
+    type: "income" | "withdraw" | "deduction";
     amount: number;
     name: string;
     created_at: string;
@@ -21,6 +22,7 @@ interface WithdrawRequest {
     status: "pending" | "approved" | "paid" | "rejected";
     description?: string | null;
     reason?: string | null;
+    comment?: string | null;
     created_at: string;
 }
 
@@ -38,6 +40,8 @@ const SalaryPage: React.FC = () => {
 
     const fetchBalanceData = async () => {
         try {
+            setData(null);
+
             const response = await api.get("/v1/Hub/Finance/GetSalaryInfo");
             const result = await response.json();
             if (response.ok) {
@@ -60,8 +64,8 @@ const SalaryPage: React.FC = () => {
     const withdrawColumns = [
         {
             key: "created_at",
-            label: "Дата",
-            render: (v: string) => new Date(v).toLocaleDateString("uk-UA"),
+            label: "Дата і час",
+            render: (v: string) => safeDatetime(v),
         },
         {
             key: "amount",
@@ -69,7 +73,7 @@ const SalaryPage: React.FC = () => {
             render: (v: number) => `${v.toFixed(2)} ₴`,
         },
         {
-            key: "description",
+            key: "comment",
             label: "Коментар",
             render: (v: string) => <span className={styles.requestDescription}>{v || "—"}</span>,
         },
@@ -91,13 +95,13 @@ const SalaryPage: React.FC = () => {
         {
             key: "reason",
             label: "Причина",
-            render: (v: string) => <span className={styles.requestDescription}>{v}</span>,
+            render: (v: string, row: WithdrawRequest) => <span className={styles.requestDescription}>{row.status == "pending" ? "—" : (row.status == "rejected" ? (v || "Не вказано") : "—")}</span>,
         },
     ];
 
     return (
         <DefaultPage title="Моя зарплата"
-            action={(
+            action={data.balance > 0 && (
                 <Button variant="primary" adaptive={true} onClick={() => setShowModal(true)}>
                     <HandCoins size={18} /> Вивести гроші
                 </Button>
@@ -126,7 +130,7 @@ const SalaryPage: React.FC = () => {
                                 <div
                                     key={t.id}
                                     className={`${styles.item} ${
-                                        t.type === "credit"
+                                        t.type === "income"
                                             ? styles.green
                                             : t.type === "withdraw"
                                                 ? styles.blue
@@ -134,7 +138,7 @@ const SalaryPage: React.FC = () => {
                                     }`}
                                 >
                                     <div className={styles.icon}>
-                                        {t.type === "credit"
+                                        {t.type === "income"
                                             ? <ArrowUpRight />
                                             : t.type === "withdraw"
                                                 ? <HandCoins />
@@ -144,11 +148,11 @@ const SalaryPage: React.FC = () => {
                                     <div className={styles.details}>
                                         <p className={styles.desc}>{t.name}</p>
                                         <span className={styles.date}>
-                                        {new Date(t.created_at).toLocaleDateString("uk-UA")}
+                                        {safeDatetime(t.transaction_at)}
                                     </span>
                                     </div>
                                     <span className={styles.amount}>
-                                    {t.type === "credit" ? "+" : "-"}
+                                    {t.type === "income" ? "+" : "-"}
                                         {t.amount.toFixed(2)} ₴
                                 </span>
                                 </div>
@@ -169,6 +173,7 @@ const SalaryPage: React.FC = () => {
                     <SalaryWithdrawModal
                         onClose={() => setShowModal(false)}
                         withdrawLimit={Math.min(data.balance, data.withdrawable)}
+                        onSuccess={() => fetchBalanceData()}
                     />
                 )}
             </div>

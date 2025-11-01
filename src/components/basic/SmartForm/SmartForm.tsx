@@ -5,6 +5,7 @@ import UserSelect from "../UserSelect/UserSelect.tsx";
 
 type FieldType =
     | "text"
+    | "number"
     | "email"
     | "password"
     | "select"
@@ -23,7 +24,7 @@ interface Field {
 }
 
 interface SmartFormProps {
-    title: string;
+    title?: string | null;
     fields: Field[];
     submitText?: string;
     onSubmit: (values: Record<string, any>) => Promise<void> | void;
@@ -69,7 +70,7 @@ const SmartForm: React.FC<SmartFormProps> = ({
 
     return (
         <form className={styles.form} onSubmit={handleSubmit}>
-            <h2 className={styles.title}>{title}</h2>
+            {title && <h2 className={styles.title}>{title}</h2>}
 
             {fields.map((field) => (
                 <div key={field.name} className={styles.field}>
