@@ -90,14 +90,14 @@ const TransactionsList: React.FC = () => {
             render: (v: string) => (
                 <span
                     className={`${styles.status} ${
-                        v === "credit"
+                        v === "income"
                             ? styles.green
                             : v === "withdrawal"
                                 ? styles.blue
                                 : styles.gray
                     }`}
                 >
-                    {v === "credit"
+                    {v === "income"
                         ? "Надходження"
                         : v === "withdrawal"
                             ? "Вивід"
