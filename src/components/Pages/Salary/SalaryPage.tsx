@@ -13,7 +13,7 @@ export interface Transaction {
     type: "income" | "withdraw" | "deduction";
     amount: number;
     name: string;
-    created_at: string;
+    transaction_at: string;
 }
 
 interface WithdrawRequest {
