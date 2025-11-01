@@ -152,7 +152,7 @@ const SalaryPage: React.FC = () => {
                                     </span>
                                     </div>
                                     <span className={styles.amount}>
-                                    {t.type === "income" ? "+" : "-"}
+                                    {t.type === "income" ? "+" : ""}
                                         {t.amount.toFixed(2)} ₴
                                 </span>
                                 </div>
