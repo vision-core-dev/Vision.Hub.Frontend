@@ -19,6 +19,7 @@ interface WithdrawRequest {
     id: string;
     amount: number;
     status: "pending" | "approved" | "paid" | "rejected";
+    description?: string | null;
     reason?: string | null;
     created_at: string;
 }
@@ -66,6 +67,11 @@ const SalaryPage: React.FC = () => {
             key: "amount",
             label: "Сума",
             render: (v: number) => `${v.toFixed(2)} ₴`,
+        },
+        {
+            key: "description",
+            label: "Коментар",
+            render: (v: string) => <span className={styles.requestDescription}>{v || "—"}</span>,
         },
         {
             key: "status",

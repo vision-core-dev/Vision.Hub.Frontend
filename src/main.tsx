@@ -28,6 +28,7 @@ import ModerateEventDetails from "./components/Pages/Events/EventDetails/Moderat
 import OfferAgreementPage from "./components/Pages/auth/OfferAgreementPage/OfferAgreementPage.tsx";
 import SalaryPage from "./components/Pages/Salary/SalaryPage.tsx";
 import NotFound from "./components/Layout/NotFound/NotFound.tsx";
+import FinancePage from "./components/Pages/Finance/FinancePage.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
@@ -75,7 +76,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                     <Route path="/salary" element={<ProtectedRoute><SalaryPage /></ProtectedRoute>} />
 
                     {/*finance*/}
-                    <Route path="/finance" element={<ProtectedRoute><div>Finance Page</div></ProtectedRoute>} />
+                    <Route path="/finance" element={<ProtectedRoute><FinancePage /></ProtectedRoute>} />
 
                     <Route path="*" element={<NotFound />} />
                 </Routes>
