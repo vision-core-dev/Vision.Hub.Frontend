@@ -8,6 +8,9 @@ import UserValue from "../../../basic/UserValue/UserValue.tsx";
 import DefaultPage from "../../../basic/DefaultPage/DefaultPage.tsx";
 import Button from "../../../basic/Button/Button.tsx";
 import {ArrowLeft} from "lucide-react";
+import TransactionsListSection, {
+    type TransactionItem
+} from "../../Finance/TransactionsListSection/TransactionsListSection.tsx";
 
 interface Badge {
     id: string;
@@ -30,6 +33,7 @@ interface Response {
     actions: string[];
     supervisors: SmallUser[];
     subordinates: SmallUser[];
+    transactions: TransactionItem[];
     badges: Badge[];
 }
 
@@ -43,6 +47,8 @@ const UserDetailsPage = () => {
     const [subordinates, setSubordinates] = useState<SmallUser[]>([]);
     const [badges, setBadges] = useState<Badge[]>([]);
     const [roles, setRoles] = useState<Role[]>([]);
+    const [transactions, setTransactions] = useState<TransactionItem[]>([]);
+
     const [selectedRole, setSelectedRole] = useState<string>("");
 
     const [allUsers, setAllUsers] = useState<SmallUser[]>([]);
@@ -71,6 +77,7 @@ const UserDetailsPage = () => {
             setSubordinates(data.subordinates);
             setBadges(data.badges);
             setActions(data.actions);
+            setTransactions(data.transactions || []);
             setLoading(false);
 
             if (data.user?.role?.id) {
@@ -350,6 +357,24 @@ const UserDetailsPage = () => {
                         </div>
                     </div>
                 )}
+
+
+                <div className={styles.info}>
+                    <div>
+                        <p className={styles.label}>Balance</p>
+                        <p className={styles.value}>{user.balance}</p>
+                    </div>
+                    <div>
+                        <p className={styles.label}>Withdrawn amount</p>
+                        <p className={styles.value}>{user.withdrawn_amount}</p>
+                    </div>
+                    <div>
+                        <p className={styles.label}>All earned</p>
+                        <p className={styles.value}>{user.balance + user.withdrawn_amount}</p>
+                    </div>
+                </div>
+
+                <TransactionsListSection transactions={transactions} />
             </div>
         </DefaultPage>
     );

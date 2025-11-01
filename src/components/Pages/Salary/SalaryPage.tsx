@@ -1,12 +1,13 @@
 import React, {useEffect, useState} from "react";
 import styles from "./SalaryPage.module.css";
-import {ArrowUpRight, ArrowDownRight, HandCoins} from "lucide-react";
+import {HandCoins} from "lucide-react";
 import SalaryWithdrawModal from "./SalaryWithdrawModal.tsx";
 import Button from "../../basic/Button/Button.tsx";
 import Table from "../../basic/Table/Table.tsx";
 import DefaultPage from "../../basic/DefaultPage/DefaultPage.tsx";
 import {api} from "../../../utils/api.ts";
 import {safeDatetime} from "../../../utils/safeDate.ts";
+import TransactionsListSection from "../Finance/TransactionsListSection/TransactionsListSection.tsx";
 
 export interface Transaction {
     id: string;
@@ -115,6 +116,12 @@ const SalaryPage: React.FC = () => {
                         <p className={styles.label}>Поточний баланс</p>
                         <h2 className={styles.green}>{data.balance.toFixed(2)} ₴</h2>
                     </div>
+
+                    <div className={styles.card}>
+                        <p className={styles.label}>Всього заробив</p>
+                        <h2 className={styles.green}>{(data.balance + data.withdrawn_total).toFixed(2)} ₴</h2>
+                    </div>
+
                     <div className={styles.card}>
                         <p className={styles.label}>Вже вивів</p>
                         <h2 className={styles.blue}>{data.withdrawn_total.toFixed(2)} ₴</h2>
@@ -122,44 +129,7 @@ const SalaryPage: React.FC = () => {
                 </section>
 
                 {/* Трансакції */}
-                {data.transactions.length > 0 && (
-                    <section className={styles.transactions}>
-                        <h3>Трансакції</h3>
-                        <div className={styles.list}>
-                            {data.transactions.map((t) => (
-                                <div
-                                    key={t.id}
-                                    className={`${styles.item} ${
-                                        t.type === "income"
-                                            ? styles.green
-                                            : t.type === "withdrawal"
-                                                ? styles.blue
-                                                : styles.red
-                                    }`}
-                                >
-                                    <div className={styles.icon}>
-                                        {t.type === "income"
-                                            ? <ArrowUpRight />
-                                            : t.type === "withdrawal"
-                                                ? <HandCoins />
-                                                : <ArrowDownRight />
-                                        }
-                                    </div>
-                                    <div className={styles.details}>
-                                        <p className={styles.desc}>{t.name}</p>
-                                        <span className={styles.date}>
-                                        {safeDatetime(t.transaction_at)}
-                                    </span>
-                                    </div>
-                                    <span className={styles.amount}>
-                                    {t.type === "income" ? "+" : ""}
-                                        {t.amount.toFixed(2)} ₴
-                                </span>
-                                </div>
-                            ))}
-                        </div>
-                    </section>
-                )}
+                <TransactionsListSection transactions={data.transactions} />
 
                 {/* Запити на вивід */}
                 {data.withdraw_requests.length > 0 && (

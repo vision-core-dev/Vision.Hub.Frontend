@@ -25,6 +25,8 @@ export interface UserRoleType {
 export interface UserType {
     id: string;
     email: string;
+    balance: number;
+    withdrawn_amount: number;
     first_name: string;
     last_name?: string;
     avatar_url?: string;
