@@ -10,7 +10,7 @@ import {safeDatetime} from "../../../utils/safeDate.ts";
 
 export interface Transaction {
     id: string;
-    type: "income" | "withdraw" | "deduction";
+    type: "income" | "withdrawal" | "deduction";
     amount: number;
     name: string;
     transaction_at: string;
@@ -132,7 +132,7 @@ const SalaryPage: React.FC = () => {
                                     className={`${styles.item} ${
                                         t.type === "income"
                                             ? styles.green
-                                            : t.type === "withdraw"
+                                            : t.type === "withdrawal"
                                                 ? styles.blue
                                                 : styles.red
                                     }`}
@@ -140,7 +140,7 @@ const SalaryPage: React.FC = () => {
                                     <div className={styles.icon}>
                                         {t.type === "income"
                                             ? <ArrowUpRight />
-                                            : t.type === "withdraw"
+                                            : t.type === "withdrawal"
                                                 ? <HandCoins />
                                                 : <ArrowDownRight />
                                         }
