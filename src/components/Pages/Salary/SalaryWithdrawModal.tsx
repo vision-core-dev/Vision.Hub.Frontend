@@ -27,7 +27,7 @@ const SalaryWithdrawModal: React.FC<Props> = ({ onClose, withdrawLimit }) => {
             <div className={styles.modal}>
                 <h2>Запит на вивід коштів</h2>
 
-                <KnowledgeCard html={`Ліміт на один вивід: ${withdrawLimit} ₴`} link="/knowledge" />
+                <KnowledgeCard html={`Індивідуальний ліміт на вивід в цьому місяці: ${withdrawLimit} ₴`} link="/knowledge" />
 
                 {/*<p className={styles.limit}>Ліміт на один вивід: {withdrawLimit} ₴</p>*/}
                 <input
