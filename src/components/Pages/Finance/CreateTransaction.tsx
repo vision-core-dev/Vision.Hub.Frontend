@@ -18,10 +18,11 @@ const TransactionsList: React.FC = () => {
                 <SmartForm
                     submitText="Створити подію"
                     fields={[
+                        { name: "transaction_at", label: "Дата транзакції", type: "datetime-local", required: true },
                         { name: "name", label: "Назва транзакції", type: "text", required: true },
                         { name: "type", label: "Тип транзакції", type: "select", options: ["income", "expense", "withdrawal", "deduction"], required: true },
                         { name: "amount", label: "Сума", type: "number", required: true },
-                        { name: "users", label: "Користувач", type: "user-select" },
+                        { name: "users", label: "Користувач", type: "user-select", required: true },
                     ]}
                     onSubmit={async (values) => {
                         const res = await api.post("/v1/Hub/Finance/CreateTransaction", values);
@@ -31,9 +32,6 @@ const TransactionsList: React.FC = () => {
                             const err = await res.json();
                             throw new Error(err.detail || "Не вдалося створити подію");
                         }
-                    }}
-                    onSuccess={() => {
-                        console.log("✅ Подія створена!");
                     }}
                 />
             </DefaultPage>

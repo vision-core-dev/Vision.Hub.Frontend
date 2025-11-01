@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import styles from "./Finance.module.css";
-import { Plus } from "lucide-react";
+import {Plus, Undo2} from "lucide-react";
 import Button from "../../basic/Button/Button.tsx";
 import Table from "../../basic/Table/Table.tsx";
 import DefaultPage from "../../basic/DefaultPage/DefaultPage.tsx";
@@ -45,8 +45,14 @@ const TransactionsList: React.FC = () => {
         fetchData();
     }, []);
 
+    const returnElement = () => {
+        return (<Button variant="secondary" adaptive={true}
+            onClick={() => navigate("/finance")}
+        ><Undo2 /> Повернутись</Button>);
+    }
+
     if (!data)
-        return <DefaultPage title="Транзакції" isLoading={true} />;
+        return <DefaultPage title="Транзакції" isLoading={true} action={returnElement()} />;
 
     // 🔎 Для зручності створимо мапу користувачів за id
     const userMap = new Map<string, UserType>();
@@ -110,13 +116,16 @@ const TransactionsList: React.FC = () => {
         <DefaultPage
             title="Транзакції акаунтів"
             action={
-                <Button
-                    variant="primary"
-                    adaptive={true}
-                    onClick={() => navigate("/finance/transactions/create")}
-                >
-                    <Plus size={18} /> Додати транзакцію
-                </Button>
+                <>
+                    {returnElement()}
+                    <Button
+                        variant="primary"
+                        adaptive={true}
+                        onClick={() => navigate("/finance/transactions/create")}
+                    >
+                        <Plus size={18} /> Додати транзакцію
+                    </Button>
+                </>
             }
         >
             <Table columns={columns} data={data.transactions} />

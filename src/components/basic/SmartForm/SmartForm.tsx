@@ -11,6 +11,7 @@ type FieldType =
     | "select"
     | "textarea"
     | "date"
+    | "datetime-local"
     | "time"
     | "user-select";
 

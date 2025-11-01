@@ -73,11 +73,6 @@ const SalaryPage: React.FC = () => {
             render: (v: number) => `${v.toFixed(2)} ₴`,
         },
         {
-            key: "comment",
-            label: "Коментар",
-            render: (v: string) => <span className={styles.requestDescription}>{v || "—"}</span>,
-        },
-        {
             key: "status",
             label: "Статус",
             render: (v: string) => (
@@ -93,8 +88,13 @@ const SalaryPage: React.FC = () => {
             ),
         },
         {
+            key: "comment",
+            label: "Коментар",
+            render: (v: string) => <span className={styles.requestDescription}>{v || "—"}</span>,
+        },
+        {
             key: "reason",
-            label: "Причина",
+            label: "Причина відхилення",
             render: (v: string, row: WithdrawRequest) => <span className={styles.requestDescription}>{row.status == "pending" ? "—" : (row.status == "rejected" ? (v || "Не вказано") : "—")}</span>,
         },
     ];
