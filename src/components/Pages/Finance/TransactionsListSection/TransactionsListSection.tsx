@@ -16,13 +16,17 @@ interface TransactionsListSectionProps {
 }
 
 const TransactionsListSection: React.FC<TransactionsListSectionProps> = ({ transactions }) => {
+    const sortedList = [...transactions].sort(
+        (a, b) => new Date(b.transaction_at).getTime() - new Date(a.transaction_at).getTime()
+    );
+
     if (!transactions || transactions.length === 0) return null;
 
     return (
         <section className={styles.transactions}>
             <h3>Трансакції</h3>
             <div className={styles.list}>
-                {transactions.map((t) => (
+                {sortedList.map((t) => (
                     <div
                         key={t.id}
                         className={`${styles.item} ${

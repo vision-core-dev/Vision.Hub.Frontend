@@ -128,7 +128,7 @@ const TransactionsList: React.FC = () => {
                 </>
             }
         >
-            <Table columns={columns} data={data.transactions} />
+            <Table columns={columns} data={data.transactions } />
         </DefaultPage>
     );
 };
