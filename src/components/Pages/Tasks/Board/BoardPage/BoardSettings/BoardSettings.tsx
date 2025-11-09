@@ -88,6 +88,10 @@ const BoardSettings: React.FC<Props> = ({ boardId }) => {
         }
     };
 
+    const availableUsers = allUsers
+        .filter(u => !Object.keys(members).includes(u.id));
+
+
     const refresh = async (res: Response) => {
         setError(null);
         if (res.ok) {
@@ -330,13 +334,11 @@ const BoardSettings: React.FC<Props> = ({ boardId }) => {
                             onChange={(e) => setNewMemberId(e.target.value)}
                         >
                             <option value="">Вибери користувача...</option>
-                            {allUsers
-                                .filter((u) => !members.some((m) => m.id === u.id)) // не показує вже доданих
-                                .map((u) => (
-                                    <option key={u.id} value={u.id}>
-                                        {u.first_name || "Без імені"}
-                                    </option>
-                                ))}
+                            {availableUsers.map(u => (
+                                <option key={u.id} value={u.id}>
+                                    {(u.first_name || "Без імені") + (u.last_name ? ` ${u.last_name}` : "")}
+                                </option>
+                            ))}
                         </select>
 
                         <select
