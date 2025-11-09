@@ -21,31 +21,60 @@ const UsersListPage = () => {
         });
     }, []);
 
-    return (
-        <DefaultPage
-            title="Події"
-            action={
-                <Button adaptive={true} onClick={() => navigate("/events/create-event")}
-                >
-                    <Plus strokeWidth={2.25} />Додати
-                </Button>
-            }
-            isLoading={loading}
+    const actionButton = (
+        <Button adaptive={true} onClick={() => navigate("/events/create-event")}
         >
-            {events.length === 0 ? (
+            <Plus strokeWidth={2.25} />Додати
+        </Button>
+    );
+
+    if (loading) {
+        return <DefaultPage title="Події" isLoading={true} />;
+    }
+
+    if (events.length === 0) {
+        return (
+            <DefaultPage
+                title="Події"
+                action={actionButton}
+            >
                 <p>Поки немає жодної події.</p>
-            ) : (
+            </DefaultPage>
+        );
+    }
+
+    return (
+        <>
+            <DefaultPage
+                title="Заплановані події"
+                action={actionButton}
+            >
+                {events.length === 0 ? (
+                    <p>Поки немає жодної події.</p>
+                ) : (
+                    <Table
+                        columns={[
+                            { key: "date", label: "Дата", render: (v) => safeDate(v) },
+                            { key: "time", label: "Час", render: (_v, row) => `${formatTime(row.time_from)} - ${formatTime(row.time_to)}` },
+                            { key: "name", label: "Назва події", render: (v) => v || "—" },
+                        ]}
+                        data={events.filter(e => !e.date || new Date(e.date) >= new Date())}
+                        onRowClick={(row) => navigate(`/events/e/${row.id}`)}
+                    />
+                )}
+            </DefaultPage>
+            <DefaultPage title="Архівні події">
                 <Table
                     columns={[
                         { key: "date", label: "Дата", render: (v) => safeDate(v) },
                         { key: "time", label: "Час", render: (_v, row) => `${formatTime(row.time_from)} - ${formatTime(row.time_to)}` },
                         { key: "name", label: "Назва події", render: (v) => v || "—" },
                     ]}
-                    data={events}
+                    data={events.filter(e => e.date && new Date(e.date) < new Date())}
                     onRowClick={(row) => navigate(`/events/e/${row.id}`)}
                 />
-            )}
-        </DefaultPage>
+            </DefaultPage>
+        </>
     );
 };
 
