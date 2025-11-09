@@ -1,0 +1,26 @@
+.item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #6b7280; /* gray-500 */
+}
+
+.value {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #111827; /* gray-900 */
+    word-break: break-word;
+}
+
+.left {
+    text-align: left;
+}
+
+.right {
+    text-align: right;
+}

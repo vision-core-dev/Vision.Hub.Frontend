@@ -7,20 +7,22 @@ interface UserLabelProps {
     avatar_url?: string | null;
     name: string;
     email?: string;
+    role?: string;
     tags?: string;
     outline?: boolean;
     user_id?: string;
 }
 
-const UserLabel: React.FC<UserLabelProps> = ({ avatar_url, name, email, user_id }) => {
+const UserLabel: React.FC<UserLabelProps> = ({ avatar_url, name, email, role, user_id }) => {
     const navigate = useNavigate();
     return (
         <div className={styles.userLabel}>
             <Avatar url={avatar_url} name={name} />
-            <div>
+            <div className={styles.details}>
                 <div className={`${styles.name} ${user_id ? styles.clickable : ""}`}
                     onClick={() => user_id && navigate(`/users/u/${user_id}`)}
                 >{name}</div>
+                {role && <div className={styles.role}>{role}</div>}
                 {email && <div className={styles.email}>{email}</div>}
             </div>
         </div>

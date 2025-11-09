@@ -1,9 +1,16 @@
 .userLabel {
+    width: 100%;
     display: flex;
     align-items: center;
     gap: 0.75rem;
     font-weight: bold;
     color: #333;
+}
+.details {
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    gap: 0.4rem;
 }
 
 .clickable {
@@ -43,4 +50,16 @@
 .email {
     font-size: 0.85rem;
     color: #6b7280;
+}
+
+
+.role {
+    /*margin-left: auto;*/
+    background: #eef2ff;
+    color: #4338ca;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.6rem;
+    border-radius: 8px;
+    text-transform: capitalize;
 }
