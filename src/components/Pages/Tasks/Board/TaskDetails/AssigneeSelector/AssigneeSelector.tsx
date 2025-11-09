@@ -4,7 +4,6 @@ import { Plus, X, Search } from "lucide-react";
 import { api } from "../../../../../../utils/api.ts";
 import Button from "../../../../../basic/Button/Button.tsx";
 import UserLabel from "../../../../../basic/User/UserLabel.tsx";
-import Avatar from "../../../../../basic/User/Avatar.tsx";
 
 interface User {
     id: string;
@@ -81,8 +80,9 @@ const AssigneeSelector: React.FC<Props> = ({ taskId, assignees, onUpdate }) => {
             <div className={styles.assigneesList}>
                 {assignees.map((a) => (
                     <div key={a.id} className={styles.assignee}>
-                        <Avatar className={styles.avatar} url={a.avatar_url} name={a.first_name} />
-                        <span>{a.first_name}</span>
+                        <UserLabel user_id={a.id} avatar_url={a.avatar_url} name={a.first_name} />
+                        {/*<Avatar className={styles.avatar} url={a.avatar_url} name={a.first_name} />*/}
+                        {/*<span>{a.first_name}</span>*/}
                         <X onClick={() => handleRemoveAssignee(a.id)}
                            className={styles.removeBtn}
                            size={16} />

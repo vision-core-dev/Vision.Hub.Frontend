@@ -168,6 +168,7 @@ const TaskDetailsModal: React.FC<Props> = ({ taskId, onClose, boardLists, boardT
 
 
 
+
     useEffect(() => {
         if (taskId) fetchTaskDetails();
     }, [taskId]);
@@ -390,7 +391,25 @@ const TaskDetailsModal: React.FC<Props> = ({ taskId, onClose, boardLists, boardT
                             }}
                         />
 
-                        {/*<SubtaskSection taskId={task.id} />*/}
+                        {/*<SubtasksSection taskId={task.id} users={[]} />*/}
+
+                        {/*<section className={styles.descriptionSection}>*/}
+                        {/*    <h3>Нарахування</h3>*/}
+
+                        {/*    {task.assignees.length === 0 && (*/}
+                        {/*        <p style={{opacity: 0.6}}>Немає учасників — нема кому нараховувати 🫠</p>*/}
+                        {/*    )}*/}
+
+                        {/*    <div className={styles.accrualList}>*/}
+                        {/*        <AccrualItem user={{*/}
+                        {/*            id: "1",*/}
+                        {/*            first_name: "Test",*/}
+                        {/*            last_name: undefined,*/}
+                        {/*            avatar_url: undefined*/}
+                        {/*        }} amount={100} />*/}
+                        {/*    </div>*/}
+                        {/*</section>*/}
+
 
                     </main>
 
