@@ -126,3 +126,51 @@
 .deadline > span {
     color: #656565;
 }
+
+/* ✅ Готова задача — повноекранний банер */
+.bannerDone {
+    height: 180px;
+    position: relative;
+}
+
+.doneTask {
+    background: transparent;
+    outline: none !important;
+}
+
+/* Темна підкладка */
+.doneOverlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.75) 100%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.doneIcon {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background-color: #00a86b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.doneIcon svg {
+    width: 14px;
+    height: 14px;
+    color: #fff;
+}
+
+.doneTitle {
+    font-size: 15px;
+    font-weight: 600;
+    color: #ffffff;
+    margin: 0;
+    padding: 0;
+}

@@ -12,84 +12,83 @@ type TaskProps = {
 };
 
 const TaskItem = ({ task, boardTags, users }: TaskProps) => {
-    // 🎯 Отримати повні теги
     const taskTags =
         task.tags && task.tags.length > 0
             ? boardTags.filter((t) => task.tags.includes(t.id))
             : [];
 
-    // 👥 Отримати користувачів-асайнів
     const taskAssignees =
         task.assignees && task.assignees.length > 0
             ? users.filter((u) => task.assignees.includes(u.id))
             : [];
 
+    const isDone = task.status === "done";
+
     return (
-        <div className={styles.task}>
+        <div className={`${styles.task} ${isDone ? styles.doneTask : ""}`}>
+
             {/* 🖼️ Банер */}
             {task.banner_url && (
-                <div className={styles.banner}>
+                <div className={`${styles.banner} ${isDone ? styles.bannerDone : ""}`}>
                     <img src={task.banner_url} alt="Banner" />
+
+                    {/* ✅ Готова задача — показати темну підкладку і текст */}
+                    {isDone && (
+                        <div className={styles.doneOverlay}>
+                            <div className={styles.doneIcon}>
+                                <Check strokeWidth={3} />
+                            </div>
+                            <h3 className={styles.doneTitle}>{task.name}</h3>
+                        </div>
+                    )}
                 </div>
             )}
 
-            <div className={styles.content}>
-                {/* 🏷️ Теги */}
-                {taskTags.length > 0 && (
-                    <div className={styles.tags}>
-                        {taskTags.map((tag) => (
-                            <span
-                                key={tag.id}
-                                className={styles.tag}
-                                style={{
-                                    backgroundColor: tag.color,
-                                    color: getTextColor(tag.color),
-                                }}
-                            >
-                                {tag.name}
-                            </span>
-                        ))}
-                    </div>
-                )}
-
-                {/* 📋 Назва задачі */}
-                <div className={styles.taskTitle}>
-                    {task.status === "done" && (
-                        <div className={styles.done}>
-                            <Check strokeWidth={3} />
+            {/* Якщо задача НЕ готова — показуємо інфо */}
+            {!isDone && (
+                <div className={styles.content}>
+                    {taskTags.length > 0 && (
+                        <div className={styles.tags}>
+                            {taskTags.map((tag) => (
+                                <span
+                                    key={tag.id}
+                                    className={styles.tag}
+                                    style={{
+                                        backgroundColor: tag.color,
+                                        color: getTextColor(tag.color),
+                                    }}
+                                >
+                                    {tag.name}
+                                </span>
+                            ))}
                         </div>
                     )}
-                    <h3 className={styles.title}>{task.name}</h3>
+
+                    <div className={styles.taskTitle}>
+                        <h3 className={styles.title}>{task.name}</h3>
+                    </div>
+
+                    {(task.deadline_at || task.started_at) && (
+                        <div className={styles.deadline}>
+                            <Clock /><span>{safeDate(task.deadline_at)}</span>
+                        </div>
+                    )}
+
+                    {taskAssignees.length > 0 && (
+                        <div className={styles.assignees}>
+                            {taskAssignees.map((a) => (
+                                <div key={a.id} className={styles.avatar}>
+                                    {a.avatar_url ? (
+                                        <img src={a.avatar_url} />
+                                    ) : (
+                                        <span>{a.first_name[0]}{a.last_name?.[0]}</span>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
-
-                {(task.deadline_at || task.started_at) && (
-                    <div className={styles.deadline}>
-                        {(task.deadline_at || task.started_at) && (
-                            <>
-                                <Clock /><span>{task.started_at && safeDate(task.started_at)} {(task.started_at && task.deadline_at) && "–"} {task.deadline_at && safeDate(task.deadline_at)}</span>
-                            </>
-                        )}
-                    </div>
-                )}
-
-                {/* 👥 Виконавці */}
-                {taskAssignees.length > 0 && (
-                    <div className={styles.assignees}>
-                        {taskAssignees.map((a) => (
-                            <div key={a.id} className={styles.avatar}>
-                                {a.avatar_url ? (
-                                    <img src={a.avatar_url} alt={a.first_name} />
-                                ) : (
-                                    <span>
-                                        {a.first_name[0]}
-                                        {a.last_name ? a.last_name[0] : ""}
-                                    </span>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                )}
-            </div>
+            )}
         </div>
     );
 };
