@@ -174,3 +174,19 @@
     margin: 0;
     padding: 0;
 }
+
+.doneContent {
+    padding: 10px 12px;
+    display: flex;
+    gap: 8px;
+    flex-direction: row;
+    align-items: center;
+}
+
+.doneTitleNoImage {
+    font-size: 15px;
+    font-weight: 600;
+    color: #000000;
+    margin: 0;
+    padding: 0;
+}

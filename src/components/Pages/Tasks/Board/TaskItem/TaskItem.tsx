@@ -25,14 +25,12 @@ const TaskItem = ({ task, boardTags, users }: TaskProps) => {
     const isDone = task.status === "done";
 
     return (
-        <div className={`${styles.task} ${isDone ? styles.doneTask : ""}`}>
+        <div className={`${styles.task} ${(isDone && task.banner_url) ? styles.doneTask : ""}`}>
 
             {/* 🖼️ Банер */}
-            {task.banner_url && (
+            {task.banner_url ? (
                 <div className={`${styles.banner} ${isDone ? styles.bannerDone : ""}`}>
                     <img src={task.banner_url} alt="Banner" />
-
-                    {/* ✅ Готова задача — показати темну підкладку і текст */}
                     {isDone && (
                         <div className={styles.doneOverlay}>
                             <div className={styles.doneIcon}>
@@ -42,6 +40,15 @@ const TaskItem = ({ task, boardTags, users }: TaskProps) => {
                         </div>
                     )}
                 </div>
+            ) : (
+                isDone ? (
+                    <div className={styles.doneContent}>
+                        <div className={styles.doneIcon}>
+                            <Check strokeWidth={3} />
+                        </div>
+                        <h3 className={styles.doneTitleNoImage}>{task.name}</h3>
+                    </div>
+                ) : null
             )}
 
             {/* Якщо задача НЕ готова — показуємо інфо */}
