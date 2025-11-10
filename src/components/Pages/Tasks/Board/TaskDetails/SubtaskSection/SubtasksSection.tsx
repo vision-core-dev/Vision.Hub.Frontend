@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import styles from "./SubtasksSection.module.css";
-import { CheckCircle2, Circle, Plus, Trash2 } from "lucide-react";
+import {Check, Circle, Ellipsis, Plus, Trash2} from "lucide-react";
 import { api } from "../../../../../../utils/api.ts";
 import Button from "../../../../../basic/Button/Button.tsx";
 import type { UserType } from "../../../../../../types/Users.ts";
+import Input from "../../../../../basic/Input/Input.tsx";
+import DropdownMenu from "../../../../../basic/DropdownMenu/DropdownMenu.tsx";
 
 export interface Subtask {
     id: string;
@@ -16,15 +18,25 @@ export interface Subtask {
 interface Props {
     taskId: string;
     users: UserType[];
+    initialSubtasks?: Subtask[];
 }
 
-const SubtasksSection: React.FC<Props> = ({ taskId, users }) => {
-    const [subtasks, setSubtasks] = useState<Subtask[]>([]);
+const SubtasksSection: React.FC<Props> = ({ taskId, initialSubtasks }) => {
+    const [subtasks, setSubtasks] = useState<Subtask[]>(initialSubtasks ?? []);
     const [newName, setNewName] = useState("");
 
+    const [editingId, setEditingId] = useState<string | null>(null);
+    const [editingValue, setEditingValue] = useState("");
+
+    const completedCount = subtasks.filter((s) => s.status === "completed").length;
+    const progress = subtasks.length > 0 ? Math.round((completedCount / subtasks.length) * 100) : 0;
+
     const fetchSubtasks = async () => {
+        // 🔥 Якщо initialSubtasks є — то не фетчимо
+        if (initialSubtasks && initialSubtasks.length > 0) return;
+
         try {
-            const res = await api.get(`/v1/Hub/Tasks/${taskId}/Subtasks`);
+            const res = await api.get(`/v1/Hub/Tasks/${taskId}/Subtasks/Get`);
             const data = await res.json();
             if (res.ok) setSubtasks(data);
         } catch (err) {
@@ -38,107 +50,125 @@ const SubtasksSection: React.FC<Props> = ({ taskId, users }) => {
 
     const handleAdd = async () => {
         if (!newName.trim()) return;
-        try {
-            const res = await api.post(`/v1/Hub/Tasks/${taskId}/Subtasks/Create`, {
-                name: newName,
-            });
-            const data = await res.json();
-            if (res.ok) {
-                setSubtasks((prev) => [...prev, data]);
-                setNewName("");
-            }
-        } catch (err) {
-            console.error("❌ Не вдалося створити підзадачу:", err);
+        const res = await api.post(`/v1/Hub/Tasks/${taskId}/Subtasks/Create`, { name: newName });
+        const data = await res.json();
+        if (res.ok) {
+            setSubtasks((prev) => [...prev, data]);
+            setNewName("");
         }
     };
 
     const handleToggle = async (subtask: Subtask) => {
-        const newStatus =
-            subtask.status === "completed" ? "in_progress" : "completed";
-        try {
-            await api.post(`/v1/Hub/Subtasks/${subtask.id}/UpdateStatus`, {
-                status: newStatus,
-            });
-            setSubtasks((prev) =>
-                prev.map((s) =>
-                    s.id === subtask.id ? { ...s, status: newStatus } : s
-                )
-            );
-        } catch (err) {
-            console.error("❌ Не вдалося оновити статус:", err);
-        }
+        const newStatus = subtask.status === "completed" ? "in_progress" : "completed";
+        await api.post(`/v1/Hub/Tasks/${taskId}/Subtasks/${subtask.id}/SetCompleted`, { is_completed: newStatus === "completed" });
+        setSubtasks((prev) => prev.map((s) => (s.id === subtask.id ? { ...s, status: newStatus } : s)));
     };
 
-    const handleUpdateAssignee = async (id: string, assignee_id: string) => {
-        await api.post(`/v1/Hub/Subtasks/${id}/UpdateAssignee`, { assignee_id });
-        setSubtasks((prev) =>
-            prev.map((s) => (s.id === id ? { ...s, assignee_id } : s))
-        );
+    const handleRename = async (id: string) => {
+        const name = editingValue.trim();
+        setEditingId(null);
+        if (!name) return;
+        await api.post(`/v1/Hub/Tasks/${taskId}/Subtasks/${id}/Rename`, { "new_name": name });
+        setSubtasks((prev) => prev.map((s) => (s.id === id ? { ...s, name } : s)));
     };
 
-    const handleUpdateDeadline = async (id: string, deadline_at: string) => {
-        await api.post(`/v1/Hub/Subtasks/${id}/UpdateDeadline`, { deadline_at });
-        setSubtasks((prev) =>
-            prev.map((s) => (s.id === id ? { ...s, deadline_at } : s))
-        );
-    };
+    // const handleUpdateDeadline = async (id: string, deadline_at: string) => {
+    //     await api.post(`/v1/Hub/Tasks/${taskId}/Subtasks/${id}/UpdateDeadline`, { deadline_at });
+    //     setSubtasks((prev) => prev.map((s) => (s.id === id ? { ...s, deadline_at } : s)));
+    // };
 
     const handleDelete = async (id: string) => {
-        try {
-            const res = await api.post(`/v1/Hub/Subtasks/${id}/Delete`);
-            if (res.ok) setSubtasks((prev) => prev.filter((s) => s.id !== id));
-        } catch (err) {
-            console.error("❌ Не вдалося видалити:", err);
-        }
+        await api.post(`/v1/Hub/Tasks/${taskId}/Subtasks/${id}/Delete`);
+        setSubtasks((prev) => prev.filter((s) => s.id !== id));
     };
 
     return (
         <section className={styles.section}>
             <h3>Підзадачі</h3>
+
+            {subtasks.length > 0 && (
+                <div className={styles.progressContainer}>
+                    <div className={styles.progressText}>{progress}%</div>
+                    <div className={styles.progressBar}>
+                        <div className={styles.progressFill} style={{ width: `${progress}%` }} />
+                    </div>
+                </div>
+            )}
+
             <div className={styles.list}>
                 {subtasks.map((s) => (
-                    <div
-                        key={s.id}
-                        className={`${styles.item} ${
-                            s.status === "completed" ? styles.completed : ""
-                        }`}
-                    >
-                        <button onClick={() => handleToggle(s)} className={styles.statusBtn}>
-                            {s.status === "completed" ? <CheckCircle2 /> : <Circle />}
-                        </button>
-
-                        <span className={styles.name}>{s.name}</span>
-
-                        <div className={styles.meta}>
-                            <select
-                                value={s.assignee_id || ""}
-                                onChange={(e) => handleUpdateAssignee(s.id, e.target.value)}
-                                className={styles.select}
-                            >
-                                <option value="">Без виконавця</option>
-                                {users.map((u) => (
-                                    <option key={u.id} value={u.id}>
-                                        {u.first_name} {u.last_name || ""}
-                                    </option>
-                                ))}
-                            </select>
-
-                            <input
-                                type="date"
-                                value={s.deadline_at ? s.deadline_at.split("T")[0] : ""}
-                                onChange={(e) => handleUpdateDeadline(s.id, e.target.value)}
-                                className={styles.dateInput}
-                            />
+                    <label key={s.id} className={styles.item}>
+                        <div
+                            className={styles.checkbox}
+                            // checked={s.status === "completed"}
+                            onClick={() => handleToggle(s)}
+                        >
+                            {s.status === "completed" ? (
+                                <div className={styles.done}>
+                                    <Check strokeWidth={3} />
+                                </div>
+                            ) : (
+                                <Circle size={20} color="#9ca3af" className={styles.uncheckedIcon} />
+                            )}
                         </div>
 
-                        <button onClick={() => handleDelete(s.id)} className={styles.deleteBtn}>
-                            <Trash2 size={16} />
-                        </button>
-                    </div>
+                        {editingId === s.id ? (
+                            <input
+                                className={styles.editInput}
+                                value={editingValue}
+                                autoFocus
+                                onChange={(e) => setEditingValue(e.target.value)}
+                                onBlur={() => handleRename(s.id)}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") handleRename(s.id);
+                                    if (e.key === "Escape") setEditingId(null);
+                                }}
+                            />
+                        ) : (
+                            <span
+                                className={`${styles.name} ${s.status === "completed" ? styles.completedText : ""}`}
+                                onClick={() => {
+                                    setEditingId(s.id);
+                                    setEditingValue(s.name);
+                                }}
+                            >
+                                {s.name}
+                            </span>
+                        )}
+
+                        <DropdownMenu
+                            trigger={
+                                <div className={styles.menuTrigger}>
+                                    <Ellipsis size={20} />
+                                </div>
+                            }
+                            items={[
+                                // {
+                                //     label: "Призначити виконавця",
+                                //     icon: <UserRound size={16} />,
+                                //     onClick: () => alert("TODO: модалка виконавця"),
+                                // },
+                                // {
+                                //     label: "Призначити дедлайн",
+                                //     icon: <Calendar size={16} />,
+                                //     onClick: () => {
+                                //         const date = prompt("Введи дату (YYYY-MM-DD):", "");
+                                //         if (date) handleUpdateDeadline(s.id, date);
+                                //     },
+                                // },
+                                {
+                                    label: "Видалити",
+                                    icon: <Trash2 size={16} />,
+                                    danger: true,
+                                    onClick: () => handleDelete(s.id),
+                                }
+                            ]}
+                        />
+                    </label>
                 ))}
 
                 <div className={styles.addRow}>
-                    <input
+                    <Input
                         type="text"
                         value={newName}
                         placeholder="Нова підзадача..."

@@ -10,6 +10,8 @@ import TaskNameInput from "./TaskNameInput/TaskNameInput.tsx";
 import TagSelector from "./TagSelector/TagSelector.tsx";
 import TextEditor from "../../../../basic/TextEditor/TextEditor.tsx";
 import AttachmentsSection, {type Attachment} from "./AttachmentsSection/AttachmentsSection.tsx";
+import SubtasksSection, {type Subtask} from "./SubtaskSection/SubtasksSection.tsx";
+import DropdownMenu from "../../../../basic/DropdownMenu/DropdownMenu.tsx";
 
 
 interface User {
@@ -41,6 +43,7 @@ export interface TaskDetails {
     tags: Tag[];
     assignees: User[];
     attachments: Attachment[];
+    subtasks: Subtask[];
     comments: Comment[];
     started_at?: string | null;
     deadline_at?: string | null;
@@ -60,7 +63,7 @@ const TaskDetailsModal: React.FC<Props> = ({ taskId, onClose, boardLists, boardT
     const [task, setTask] = useState<TaskDetails | null>(null);
     const [loading, setLoading] = useState(true);
     const [error] = useState<string | null>(null);
-    const [showMenu, setShowMenu] = useState(false);
+    const [, setShowMenu] = useState(false);
     const menuRef = useRef<HTMLDivElement | null>(null);
 
     // 🧠 Фетч деталей задачі
@@ -234,31 +237,27 @@ const TaskDetailsModal: React.FC<Props> = ({ taskId, onClose, boardLists, boardT
 
 
                     <div className={styles.actions}>
-                        <div className={styles.menuWrapper} ref={menuRef}>
-                            <Button variant="secondary" onClick={() => setShowMenu((s) => !s)}>
-                                <Ellipsis size={18} />
-                            </Button>
-                            {showMenu && (
-                                <div className={styles.dropdownMenu}>
-
-                                    <div className={styles.dropdownItem} onClick={handleBannerChange}>
-                                        <Image size={16} />
-                                        Загрузити банер
-                                    </div>
-
-                                    <div className={styles.dropdownItem} onClick={handleBannerByUrl}>
-                                        <Link size={16} />
-                                        Встановити банер
-                                    </div>
-
-                                    <div className={styles.dropdownItem} onClick={handleArchive}>
-                                        <Archive size={16} />
-                                        Архівувати задачу
-                                    </div>
-
-                                </div>
-                            )}
-                        </div>
+                        <DropdownMenu
+                            trigger={<Button variant="secondary"><Ellipsis size={18} /></Button>}
+                            items={[
+                                {
+                                    label: "Завантажити банер",
+                                    icon: <Image size={16} />,
+                                    onClick: handleBannerChange
+                                },
+                                {
+                                    label: "Встановити банер по URL",
+                                    icon: <Link size={16} />,
+                                    onClick: handleBannerByUrl
+                                },
+                                {
+                                    label: "Архівувати задачу",
+                                    icon: <Archive size={16} />,
+                                    danger: true,
+                                    onClick: handleArchive
+                                }
+                            ]}
+                        />
 
                         <Button variant="secondary" onClick={onClose}>
                             <X size={18} />
@@ -391,7 +390,7 @@ const TaskDetailsModal: React.FC<Props> = ({ taskId, onClose, boardLists, boardT
                             }}
                         />
 
-                        {/*<SubtasksSection taskId={task.id} users={[]} />*/}
+                        <SubtasksSection taskId={task.id} initialSubtasks={task.subtasks} users={[]} />
 
                         {/*<section className={styles.descriptionSection}>*/}
                         {/*    <h3>Нарахування</h3>*/}
