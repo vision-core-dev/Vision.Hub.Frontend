@@ -23,9 +23,12 @@ const TaskItem = ({ task, boardTags, users }: TaskProps) => {
             : [];
 
     const isDone = task.status === "done";
+    const isOverdue = !isDone && task.deadline_at && new Date(task.deadline_at) < new Date();
 
     return (
-        <div className={`${styles.task} ${(isDone && task.banner_url) ? styles.doneTask : ""}`}>
+        <div className={`${styles.task} 
+            ${(isDone && task.banner_url) ? styles.doneTask : ""} 
+            ${isOverdue ? styles.overdue : ""}`}>
 
             {/* 🖼️ Банер */}
             {task.banner_url ? (

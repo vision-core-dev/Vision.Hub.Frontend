@@ -196,3 +196,20 @@
     gap: 6px;
     align-items: center;
 }
+
+
+
+/* 🔥 Прострочена задача */
+.overdue {
+    outline-color: #e11d48 !important; /* червона рамка */
+    background: #fff5f5; /* легкий червонуватий фон */
+}
+
+.overdue .title {
+    color: #e11d48 !important; /* заголовок червоним */
+}
+
+.overdue .deadline svg,
+.overdue .deadline span {
+    color: #e11d48 !important; /* індикатор часу червоним */
+}
