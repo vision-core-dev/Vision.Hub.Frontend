@@ -190,3 +190,9 @@
     margin: 0;
     padding: 0;
 }
+
+.miniDetails {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}

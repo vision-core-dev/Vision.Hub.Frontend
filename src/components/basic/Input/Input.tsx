@@ -10,9 +10,10 @@ interface InputProps {
     required?: boolean;
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
     onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+    disabled?: boolean;
 }
 
-const Input: React.FC<InputProps> = ({ name, type, id, value, placeholder, required, onChange, onKeyDown, ...props }) => {
+const Input: React.FC<InputProps> = ({ name, type, id, value, placeholder, required, onChange, onKeyDown, disabled, ...props }) => {
     return (
         <input
             className={styles.input}
@@ -24,6 +25,7 @@ const Input: React.FC<InputProps> = ({ name, type, id, value, placeholder, requi
             required={required}
             onChange={onChange}
             onKeyDown={onKeyDown}
+            disabled={disabled}
             {...props}
         />
     );

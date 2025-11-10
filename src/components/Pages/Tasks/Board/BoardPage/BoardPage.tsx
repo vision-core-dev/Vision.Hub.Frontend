@@ -22,6 +22,8 @@ export type Task = {
     deadline_at?: string;
     assignees: string[];
     tags: string[];
+    subtasks_total?: number,
+    subtasks_completed?: number
 };
 
 export type List = {

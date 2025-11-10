@@ -25,6 +25,8 @@ const SubtasksSection: React.FC<Props> = ({ taskId, initialSubtasks }) => {
     const [subtasks, setSubtasks] = useState<Subtask[]>(initialSubtasks ?? []);
     const [newName, setNewName] = useState("");
 
+    const [isAdding, setIsAdding] = useState(false);
+
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editingValue, setEditingValue] = useState("");
 
@@ -49,14 +51,24 @@ const SubtasksSection: React.FC<Props> = ({ taskId, initialSubtasks }) => {
     }, [taskId]);
 
     const handleAdd = async () => {
-        if (!newName.trim()) return;
-        const res = await api.post(`/v1/Hub/Tasks/${taskId}/Subtasks/Create`, { name: newName });
-        const data = await res.json();
-        if (res.ok) {
-            setSubtasks((prev) => [...prev, data]);
-            setNewName("");
+        if (!newName.trim() || isAdding) return;
+
+        setIsAdding(true);
+
+        try {
+            const res = await api.post(`/v1/Hub/Tasks/${taskId}/Subtasks/Create`, { name: newName });
+            const data = await res.json();
+            if (res.ok) {
+                setSubtasks((prev) => [...prev, data]);
+                setNewName("");
+            }
+        } catch (err) {
+            console.error("❌ Не вдалося додати підзадачу:", err);
         }
+
+        setIsAdding(false);
     };
+
 
     const handleToggle = async (subtask: Subtask) => {
         const newStatus = subtask.status === "completed" ? "in_progress" : "completed";
@@ -174,8 +186,9 @@ const SubtasksSection: React.FC<Props> = ({ taskId, initialSubtasks }) => {
                         placeholder="Нова підзадача..."
                         onChange={(e) => setNewName(e.target.value)}
                         onKeyDown={(e) => e.key === "Enter" && handleAdd()}
+                        disabled={isAdding}
                     />
-                    <Button variant="secondary" onClick={handleAdd}>
+                    <Button variant="secondary" onClick={handleAdd} disabled={isAdding}>
                         <Plus strokeWidth={2.25} />
                     </Button>
                 </div>

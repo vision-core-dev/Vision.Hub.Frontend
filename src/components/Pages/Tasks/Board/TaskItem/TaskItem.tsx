@@ -1,5 +1,5 @@
 import styles from "./TaskItem.module.css";
-import {Check, Clock} from "lucide-react";
+import {Check, Clock, SquareCheckBig} from "lucide-react";
 import type { Task, TaskTag } from "../BoardPage/BoardPage.tsx";
 import { getTextColor } from "../../../../../utils/colors.ts";
 import type { UserType } from "../../../../../types/Users.ts";
@@ -75,11 +75,19 @@ const TaskItem = ({ task, boardTags, users }: TaskProps) => {
                         <h3 className={styles.title}>{task.name}</h3>
                     </div>
 
-                    {(task.deadline_at || task.started_at) && (
-                        <div className={styles.deadline}>
-                            <Clock /><span>{safeDate(task.deadline_at)}</span>
-                        </div>
-                    )}
+                    <div className={styles.miniDetails}>
+                        {(task.deadline_at || task.started_at) && (
+                            <div className={styles.deadline}>
+                                <Clock /><span>{safeDate(task.deadline_at)}</span>
+                            </div>
+                        )}
+
+                        {(task.subtasks_total && task.subtasks_total > 0) ? (
+                            <div className={styles.deadline}>
+                                <SquareCheckBig /><span>{task.subtasks_completed || 0}/{task.subtasks_total || 0}</span>
+                            </div>
+                        ) : null}
+                    </div>
 
                     {taskAssignees.length > 0 && (
                         <div className={styles.assignees}>
