@@ -78,7 +78,12 @@ const TaskItem = ({ task, boardTags, users }: TaskProps) => {
                     <div className={styles.miniDetails}>
                         {(task.deadline_at || task.started_at) && (
                             <div className={styles.deadline}>
-                                <Clock /><span>{safeDate(task.deadline_at)}</span>
+                                <Clock />
+                                <span>
+                                    {task.started_at && safeDate(task.started_at)}
+                                    {task.started_at && task.deadline_at ? " – " : ""}
+                                    {task.deadline_at && safeDate(task.deadline_at)}
+                                </span>
                             </div>
                         )}
 
