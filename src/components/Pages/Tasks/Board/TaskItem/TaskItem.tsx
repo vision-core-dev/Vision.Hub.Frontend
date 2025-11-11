@@ -78,24 +78,26 @@ const TaskItem = ({ task, boardTags, users }: TaskProps) => {
                         <h3 className={styles.title}>{task.name}</h3>
                     </div>
 
-                    <div className={styles.miniDetails}>
-                        {(task.deadline_at || task.started_at) && (
-                            <div className={styles.deadline}>
-                                <Clock />
-                                <span>
-                                    {task.started_at && safeDate(task.started_at)}
-                                    {task.started_at && task.deadline_at ? " – " : ""}
-                                    {task.deadline_at && safeDate(task.deadline_at)}
-                                </span>
-                            </div>
-                        )}
+                    {((task.deadline_at || task.started_at || (task.subtasks_total && task.subtasks_total > 0)) ) && (
+                        <div className={styles.miniDetails}>
+                            {(task.deadline_at || task.started_at) && (
+                                <div className={styles.deadline}>
+                                    <Clock />
+                                    <span>
+                                {task.started_at && safeDate(task.started_at)}
+                                        {task.started_at && task.deadline_at ? " – " : ""}
+                                        {task.deadline_at && safeDate(task.deadline_at)}
+                            </span>
+                                </div>
+                            )}
 
-                        {(task.subtasks_total && task.subtasks_total > 0) ? (
-                            <div className={styles.deadline}>
-                                <SquareCheckBig /><span>{task.subtasks_completed || 0}/{task.subtasks_total || 0}</span>
-                            </div>
-                        ) : null}
-                    </div>
+                            {(task.subtasks_total && task.subtasks_total > 0) ? (
+                                <div className={styles.deadline}>
+                                    <SquareCheckBig /><span>{task.subtasks_completed || 0}/{task.subtasks_total || 0}</span>
+                                </div>
+                            ) : null}
+                        </div>
+                    )}
 
                     {taskAssignees.length > 0 && (
                         <div className={styles.assignees}>
