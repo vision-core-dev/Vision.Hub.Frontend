@@ -537,19 +537,17 @@ const CodeEditor: React.FC<Props> = ({ value, onChange }) => {
             onChange={(code) => onChange(code || "")}
             onMount={handleMount}
             options={{
-                minimap: { enabled: false },
+                fontFamily: "JetBrains Mono",
+                fontLigatures: true,
                 fontSize: 14,
+                minimap: { enabled: false },
                 automaticLayout: true,
                 scrollBeyondLastLine: false,
                 tabSize: 4,
                 wordWrap: "on",
-                insertSpaces: true,
-                autoIndent: "full" as const,
-                formatOnType: true,
-                formatOnPaste: true,
             }}
             theme="visionbot-dark"
-        />
+        />        
     );
 };
 

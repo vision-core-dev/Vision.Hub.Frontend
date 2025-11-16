@@ -1,7 +1,0 @@
-/* src/styles/monaco-extra.css */
-.monaco-editor .mtk5.tab,
-.monaco-editor .token.tab,
-.monaco-editor .mtkw.tab,
-.monaco-editor .view-line span.mtkw.tab {
-    width: 32px !important;   /* дефолт ~8-12px → робимо в 2–3 рази ширше */
-}

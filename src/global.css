@@ -31,3 +31,22 @@ input[type="checkbox"] {
 input {
     font-size: 0.95rem;
 }
+
+
+
+
+
+
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap");
+
+.monaco-editor, .monaco-editor * {
+    font-family: "JetBrains Mono", monospace !important;
+}
+
+
+.monaco-editor .mtk5.tab,
+.monaco-editor .token.tab,
+.monaco-editor .mtkw.tab,
+.monaco-editor .view-line span.mtkw.tab {
+    width: 32px !important;   /* дефолт ~8-12px → робимо в 2–3 рази ширше */
+}
