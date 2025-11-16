@@ -78,7 +78,7 @@ const TaskItem = ({ task, boardTags, users }: TaskProps) => {
                         <h3 className={styles.title}>{task.name}</h3>
                     </div>
 
-                    {((task.deadline_at || task.started_at || (task.subtasks_total && task.subtasks_total > 0)) ) && (
+                    {(task.deadline_at || task.started_at || (task.subtasks_total && task.subtasks_total > 0)) ? (
                         <div className={styles.miniDetails}>
                             {(task.deadline_at || task.started_at) && (
                                 <div className={styles.deadline}>
@@ -97,7 +97,7 @@ const TaskItem = ({ task, boardTags, users }: TaskProps) => {
                                 </div>
                             ) : null}
                         </div>
-                    )}
+                    ) : null}
 
                     {taskAssignees.length > 0 && (
                         <div className={styles.assignees}>

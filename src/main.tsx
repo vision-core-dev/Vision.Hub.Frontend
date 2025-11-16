@@ -31,6 +31,9 @@ import NotFound from "./components/Layout/NotFound/NotFound.tsx";
 import FinancePage from "./components/Pages/Finance/FinancePage.tsx";
 import TransactionsList from "./components/Pages/Finance/TransactionsList.tsx";
 import CreateTransaction from "./components/Pages/Finance/CreateTransaction.tsx";
+import ServersListPage from "./components/Pages/vision-bot/ServersList/ServersListPage.tsx";
+import ServerViewPage from "./components/Pages/vision-bot/ServerView/ServerViewPage.tsx";
+import ModuleEditorPage from "./components/Pages/vision-bot/ModuleEditor/ModuleEditorPage.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
@@ -83,6 +86,12 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                     <Route path="/finance/transactions" element={<ProtectedRoute><Navigate to="/finance/transactions/list" replace /></ProtectedRoute>} />
                     <Route path="/finance/transactions/list" element={<ProtectedRoute><TransactionsList /></ProtectedRoute>} />
                     <Route path="/finance/transactions/create" element={<ProtectedRoute><CreateTransaction /></ProtectedRoute>} />
+
+                    {/*vision-bot*/}
+                    <Route path="/vision-bot" element={<ProtectedRoute><Navigate to="/vision-bot/servers" replace /></ProtectedRoute>} />
+                    <Route path="/vision-bot/servers" element={<ProtectedRoute><ServersListPage /></ProtectedRoute>} />
+                    <Route path="/vision-bot/s/:guildId" element={<ProtectedRoute><ServerViewPage /></ProtectedRoute>} />
+                    <Route path="/vision-bot/s/:guildId/m/:moduleId" element={<ProtectedRoute><ModuleEditorPage /></ProtectedRoute>} />
 
                     <Route path="*" element={<NotFound />} />
                 </Routes>
