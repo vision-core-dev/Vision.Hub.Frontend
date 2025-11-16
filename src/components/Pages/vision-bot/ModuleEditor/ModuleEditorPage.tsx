@@ -68,7 +68,7 @@ const ModuleEditorPage: React.FC = () => {
                     >
                         {saving ? "Збереження..." : "Зберегти"}
                     </Button>
-                    returnElement()
+                    {returnElement()}
                 </>
             )}
         >
