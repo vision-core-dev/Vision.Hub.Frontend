@@ -49,12 +49,12 @@ const ServersListPage: React.FC = () => {
         {
             key: "language",
             label: "Мова",
-            render: (v) => v || "—",
+            render: (v: string | null) => v || "—",
         },
         {
             key: "logs_channel_id",
             label: "Канал логів",
-            render: (v) => v || "—",
+            render: (v: string | null) => v || "—",
         },
         {
             key: "modules_count",

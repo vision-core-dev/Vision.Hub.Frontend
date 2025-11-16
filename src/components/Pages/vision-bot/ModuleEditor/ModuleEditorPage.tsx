@@ -45,19 +45,30 @@ const ModuleEditorPage: React.FC = () => {
         }
     };
 
+    const returnElement = () => {
+        return (<Button variant="secondary" adaptive={true}
+                        onClick={() => navigate("/finance")}
+        ><Undo2 /> Повернутись</Button>);
+    }
+
+    const titlePage = moduleData ? `Модуль: ${moduleData.name}` : "Модуль";
+
     if (!moduleId) {
-        return <div className={styles.page}>Невірний ID модуля.</div>;
+        return <DefaultPage title={titlePage} action={returnElement()}>Невірний ID модуля.</DefaultPage>;
     }
 
     return (
-        <DefaultPage title={moduleData ? `Модуль: ${moduleData.name}` : "Модуль"}
+        <DefaultPage title={titlePage}
             action={(
-                <Button
-                    onClick={handleSave}
-                    disabled={saving}
-                >
-                    {saving ? "Збереження..." : "Зберегти"}
-                </Button>
+                <>
+                    <Button
+                        onClick={handleSave}
+                        disabled={saving}
+                    >
+                        {saving ? "Збереження..." : "Зберегти"}
+                    </Button>
+                    returnElement()
+                </>
             )}
         >
             <div className={styles.card}>
