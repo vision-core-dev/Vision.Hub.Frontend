@@ -7,6 +7,7 @@ import {visionBotApi} from "../../../../api/visionBot.ts";
 import DefaultPage from "../../../basic/DefaultPage/DefaultPage.tsx";
 import CodeEditor from "../CodeEditor/CodeEditor.tsx";
 import Button from "../../../basic/Button/Button.tsx";
+import {Undo2} from "lucide-react";
 
 const ModuleEditorPage: React.FC = () => {
     const { moduleId } = useParams<{ moduleId: string }>();
