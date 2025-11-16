@@ -31,7 +31,7 @@ export const visionBotApi = {
         parse<VisionBotServer>(await api.get(`${API_BASE}/Servers/${guildId}/Get`)),
 
     getGuildSettings: async (guildId: string) =>
-        parse<GuildSettings>(await api.get(`${API_BASE}/Servers/${guildId}/GetSettings`)),
+        parse<GuildSettings>(await api.get(`${API_BASE}/Servers/${guildId}/Get`)),
 
     updateGuildSettings: async (guildId: string, body: Partial<GuildSettings>) =>
         parse<GuildSettings>(await api.post(`${API_BASE}/Servers/${guildId}/UpdateSettings`, body)),

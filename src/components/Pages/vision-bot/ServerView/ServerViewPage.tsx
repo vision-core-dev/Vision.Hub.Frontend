@@ -168,8 +168,8 @@ const OverviewTab: React.FC<OverviewProps> = ({ server, modules, logs }) => {
                     <div>
                         <span className={styles.infoLabel}>Канал логів</span>
                         <span className={styles.infoValue}>
-              {server.logs_channel_id || "Не налаштовано"}
-            </span>
+                          {server.logs_channel_id || "Не налаштовано"}
+                        </span>
                     </div>
                     <div>
                         <span className={styles.infoLabel}>Активних модулів</span>
@@ -186,13 +186,13 @@ const OverviewTab: React.FC<OverviewProps> = ({ server, modules, logs }) => {
                 <ul className={styles.logsList}>
                     {lastLogs.map((l) => (
                         <li key={l.id} className={styles.logRow}>
-              <span className={`${styles.logLevel} ${styles[`log_${l.level}`]}`}>
-                {l.level.toUpperCase()}
-              </span>
+                            <span className={`${styles.logLevel} ${styles[`log_${l.level}`]}`}>
+                                {l.level.toUpperCase()}
+                            </span>
                             <span className={styles.logMessage}>{l.message}</span>
                             <span className={styles.logTime}>
-                {new Date(l.timestamp).toLocaleString()}
-              </span>
+                                {new Date(l.timestamp).toLocaleString()}
+                            </span>
                         </li>
                     ))}
                 </ul>
@@ -209,11 +209,11 @@ type SettingsTabProps = {
 };
 
 const SettingsTab: React.FC<SettingsTabProps> = ({
-                                                     settings,
-                                                     setSettings,
-                                                     onSave,
-                                                     saving,
-                                                 }) => {
+    settings,
+    setSettings,
+    onSave,
+    saving,
+}) => {
     const handleChange = <K extends keyof GuildSettings>(
         field: K,
         value: GuildSettings[K]
