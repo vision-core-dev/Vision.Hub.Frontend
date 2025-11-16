@@ -9,7 +9,7 @@ import Button from "../../../basic/Button/Button.tsx";
 import { Undo2 } from "lucide-react";
 
 const ModuleEditorPage: React.FC = () => {
-    const { moduleId } = useParams<{ moduleId: string }>();
+    const { guildId, moduleId } = useParams<{ guildId: string,  moduleId: string }>();
     const navigate = useNavigate();
 
     const [moduleData, setModuleData] = useState<VisionBotModule | null>(null);
@@ -64,7 +64,7 @@ const ModuleEditorPage: React.FC = () => {
         <Button
             variant="secondary"
             adaptive={true}
-            onClick={() => navigate("/finance")}
+            onClick={() => navigate(`/vision-bot/s/${guildId}`)}
         >
             <Undo2 /> Повернутись
         </Button>

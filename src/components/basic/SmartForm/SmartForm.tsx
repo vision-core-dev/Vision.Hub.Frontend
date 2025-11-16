@@ -15,7 +15,7 @@ type FieldType =
     | "time"
     | "user-select";
 
-interface Field {
+export interface Field {
     name: string;
     label: string;
     type: FieldType;

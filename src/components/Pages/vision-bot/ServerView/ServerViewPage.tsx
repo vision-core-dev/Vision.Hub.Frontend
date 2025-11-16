@@ -12,6 +12,8 @@ import type {
 import {visionBotApi} from "../../../../api/visionBot.ts";
 import DefaultPage from "../../../basic/DefaultPage/DefaultPage.tsx";
 import Button from "../../../basic/Button/Button.tsx";
+import Table from "../../../basic/Table/Table.tsx";
+import SmartForm, {type Field} from "../../../basic/SmartForm/SmartForm.tsx";
 import {Undo2} from "lucide-react";
 
 type TabId = "overview" | "settings" | "modules" | "logs" | "store";
@@ -116,7 +118,7 @@ const ServerViewPage: React.FC = () => {
             {loading && <div className={styles.state}>Завантаження...</div>}
 
             {!loading && server && (
-                <div className={styles.content}>
+                <>
                     {tab === "overview" && (
                         <OverviewTab server={server} modules={modules} logs={logs} />
                     )}
@@ -137,7 +139,7 @@ const ServerViewPage: React.FC = () => {
                     {tab === "logs" && <LogsTab logs={logs} modules={modules} />}
 
                     {tab === "store" && <StoreTab items={storeItems} />}
-                </div>
+                </>
             )}
         </DefaultPage>
     );
@@ -214,232 +216,196 @@ const SettingsTab: React.FC<SettingsTabProps> = ({
     onSave,
     saving,
 }) => {
-    const handleChange = <K extends keyof GuildSettings>(
-        field: K,
-        value: GuildSettings[K]
-    ) => {
-        setSettings({
+
+    const fields = [
+        {
+            name: "language",
+            label: "Мова",
+            type: "select",
+            required: true,
+            options: ["uk", "en"],
+        }
+    ] satisfies Field[];
+
+    const handleSubmit = async (values: Record<string, any>) => {
+        // Конвертуємо строку ролей назад у масив
+        const prepared = {
             ...settings,
-            [field]: value,
-        });
+            ...values,
+            on_member_added_roles: values.on_member_added_roles
+                ? values.on_member_added_roles
+                      .split(",")
+                      .map((s: string) => s.trim())
+                      .filter(Boolean)
+                : [],
+        };
+
+        setSettings(prepared);
+        await onSave();
     };
 
     return (
         <div className={styles.card}>
-            <h2 className={styles.cardTitle}>Налаштування сервера</h2>
-
-            <div className={styles.formGrid}>
-                <label className={styles.field}>
-                    <span className={styles.fieldLabel}>Мова</span>
-                    <select
-                        className={styles.select}
-                        value={settings.language}
-                        onChange={(e) => handleChange("language", e.target.value)}
-                    >
-                        <option value="uk">Українська</option>
-                        <option value="en">English</option>
-                    </select>
-                </label>
-
-                <label className={styles.field}>
-                    <span className={styles.fieldLabel}>Канал логів (ID)</span>
-                    <input
-                        className={styles.input}
-                        value={settings.logs_channel_id ?? ""}
-                        onChange={(e) =>
-                            handleChange(
-                                "logs_channel_id",
-                                e.target.value.trim() === "" ? null : e.target.value
-                            )
-                        }
-                    />
-                </label>
-
-                <label className={styles.field}>
-                    <span className={styles.fieldLabel}>Ролі при вході (IDs через кому)</span>
-                    <input
-                        className={styles.input}
-                        value={settings.on_member_added_roles.join(",")}
-                        onChange={(e) =>
-                            handleChange(
-                                "on_member_added_roles",
-                                e.target.value
-                                    .split(",")
-                                    .map((v) => v.trim())
-                                    .filter(Boolean)
-                            )
-                        }
-                    />
-                </label>
-            </div>
-
-            <div className={styles.actions}>
-                <Button
-                    onClick={onSave}
-                    disabled={saving}
-                >
-                    {saving ? "Збереження..." : "Зберегти"}
-                </Button>
-            </div>
+            <SmartForm
+                title="Налаштування сервера"
+                fields={fields}
+                submitText={saving ? "Збереження..." : "Зберегти"}
+                onSubmit={handleSubmit}
+            />
         </div>
     );
 };
+
 
 type ModulesTabProps = {
     guildId: string;
     modules: VisionBotModule[];
 };
 
-const ModulesTab: React.FC<ModulesTabProps> = ({modules }) => {
+const ModulesTab: React.FC<ModulesTabProps> = ({ modules }) => {
     const { guildId } = useParams<{ guildId: string }>();
     const navigate = useNavigate();
-    return (
-        <div className={styles.card}>
-            <div className={styles.cardHeader}>
-                <h2 className={styles.cardTitle}>Модулі</h2>
-            </div>
 
-            <table className={styles.table}>
-                <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Назва</th>
-                    <th>Статус</th>
-                    <th>Тип</th>
-                    <th />
-                </tr>
-                </thead>
-                <tbody>
-                {modules.map((m) => (
-                    <tr key={m.id}>
-                        <td>{m.id}</td>
-                        <td>{m.name}</td>
-                        <td>
+    const columns = [
+        {
+            key: "id",
+            label: "ID",
+        },
+        {
+            key: "name",
+            label: "Назва",
+        },
+        {
+            key: "status",
+            label: "Статус",
+            render: (value: boolean) => (
                 <span
                     className={`${styles.statusBadge} ${
-                        m.status ? styles.statusActive : styles.statusInactive
+                        value ? styles.statusActive : styles.statusInactive
                     }`}
                 >
-                  {m.status ? "Активний" : "Вимкнений"}
+                    {value ? "Активний" : "Вимкнений"}
                 </span>
-                        </td>
-                        <td>{m.code.trim().startsWith("event(") ? "Event" : "Local cmd"}</td>
-                        <td>
-                            <Button
-                                onClick={() => navigate(`/vision-bot/s/${guildId}/m/${m.id}`)}
-                            >
-                                Редагувати
-                            </Button>
-                        </td>
-                    </tr>
-                ))}
+            ),
+        },
+        {
+            key: "type",
+            label: "Тип",
+            render: (_: any, row: VisionBotModule) =>
+                row.code.trim().includes("event(") ? "Event" : "Local cmd",
+        },
+        {
+            key: "actions",
+            label: "",
+            render: (_: any, row: VisionBotModule) => (
+                <Button onClick={() =>
+                    navigate(`/vision-bot/s/${guildId}/m/${row.id}`)
+                }>
+                    Редагувати
+                </Button>
+            ),
+        },
+    ];
 
-                {modules.length === 0 && (
-                    <tr>
-                        <td colSpan={5} className={styles.empty}>
-                            Модулів поки немає.
-                        </td>
-                    </tr>
-                )}
-                </tbody>
-            </table>
-        </div>
+    return (
+        <Table
+            columns={columns}
+            data={modules}
+            emptyText="Модулів поки немає."
+            maxWidth="100%"
+        />
     );
 };
+
 
 type LogsTabProps = {
     logs: ModuleLog[];
     modules: VisionBotModule[];
 };
 
+// LogsTab.tsx
 const LogsTab: React.FC<LogsTabProps> = ({ logs, modules }) => {
     const moduleById = new Map(modules.map((m) => [m.id, m.name]));
-    return (
-        <div className={styles.card}>
-            <h2 className={styles.cardTitle}>Логи</h2>
 
-            <table className={styles.table}>
-                <thead>
-                <tr>
-                    <th>Час</th>
-                    <th>Модуль</th>
-                    <th>Рівень</th>
-                    <th>Повідомлення</th>
-                </tr>
-                </thead>
-                <tbody>
-                {logs.map((l) => (
-                    <tr key={l.id}>
-                        <td>{new Date(l.timestamp).toLocaleString()}</td>
-                        <td>{moduleById.get(l.module_id) ?? l.module_id}</td>
-                        <td>
-                <span
-                    className={`${styles.logLevel} ${styles[`log_${l.level}`]}`}
-                >
-                  {l.level.toUpperCase()}
+    const columns = [
+        {
+            key: "timestamp",
+            label: "Час",
+            render: (value: string) => new Date(value).toLocaleString(),
+        },
+        {
+            key: "module_id",
+            label: "Модуль",
+            render: (value: number) => moduleById.get(value) ?? value,
+        },
+        {
+            key: "level",
+            label: "Рівень",
+            render: (value: string) => (
+                <span className={`${styles.logLevel} ${styles[`log_${value}`]}`}>
+                    {value.toUpperCase()}
                 </span>
-                        </td>
-                        <td>{l.message}</td>
-                    </tr>
-                ))}
+            ),
+        },
+        {
+            key: "message",
+            label: "Повідомлення",
+        },
+    ];
 
-                {logs.length === 0 && (
-                    <tr>
-                        <td colSpan={4} className={styles.empty}>
-                            Логів поки немає.
-                        </td>
-                    </tr>
-                )}
-                </tbody>
-            </table>
-        </div>
+    return (
+        <Table
+            columns={columns}
+            data={logs}
+            emptyText="Логів поки немає."
+            maxWidth="100%"
+        />
     );
 };
+
 
 type StoreTabProps = {
     items: UniversalStoreItem[];
 };
 
 const StoreTab: React.FC<StoreTabProps> = ({ items }) => {
+    const columns = [
+        {
+            key: "id",
+            label: "ID",
+        },
+        {
+            key: "scope",
+            label: "Scope",
+        },
+        {
+            key: "key",
+            label: "Key",
+        },
+        {
+            key: "data_type",
+            label: "Тип даних",
+        },
+        {
+            key: "value",
+            label: "Значення",
+            render: (value: any) => (
+                <code>
+                    {JSON.stringify(value)?.length > 80
+                        ? JSON.stringify(value).slice(0, 80) + "…"
+                        : JSON.stringify(value)}
+                </code>
+            ),
+        },
+    ];
+
     return (
-        <div className={styles.card}>
-            <h2 className={styles.cardTitle}>Universal Store</h2>
-
-            <table className={styles.table}>
-                <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Scope</th>
-                    <th>Key</th>
-                    <th>Тип даних</th>
-                    <th>Значення</th>
-                </tr>
-                </thead>
-                <tbody>
-                {items.map((i) => (
-                    <tr key={i.id}>
-                        <td>{i.id}</td>
-                        <td>{i.scope}</td>
-                        <td>{i.key}</td>
-                        <td>{i.data_type}</td>
-                        <td>
-                            <code className={styles.codeCell}>
-                                {JSON.stringify(i.value)?.slice(0, 80)}
-                                {JSON.stringify(i.value)?.length > 80 && "…"}
-                            </code>
-                        </td>
-                    </tr>
-                ))}
-
-                {items.length === 0 && (
-                    <tr>
-                        <td colSpan={5} className={styles.empty}>
-                            Записів поки немає.
-                        </td>
-                    </tr>
-                )}
-                </tbody>
-            </table>
-        </div>
+        <Table
+            columns={columns}
+            data={items}
+            emptyText="Записів поки немає."
+            maxWidth="100%"
+        />
     );
 };
+
