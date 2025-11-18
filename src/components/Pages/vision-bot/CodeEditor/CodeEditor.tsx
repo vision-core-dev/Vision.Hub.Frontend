@@ -30,25 +30,15 @@ const CodeEditor: React.FC<Props> = ({ value, onChange }) => {
 
                     [/\b(true|false|nil)\b/, "constant"],
 
-                    // ⭐ METHOD: object.method(
                     [
                       /([a-zA-Z_]\w*)(\.)([a-zA-Z_]\w*)(?=\()/,
-                      [
-                        "identifier",     // object
-                        "delimiter",      // .
-                        "vision-method"   // method (only if followed by "(")
-                      ]
+                      ["identifier","delimiter","vision-method"]
                     ],
-
-                    // ⭐ VALUE: object.value  (НЕ метод)
                     [
                       /([a-zA-Z_]\w*)(\.)([a-zA-Z_]\w*)/,
-                      [
-                        "identifier",     // object
-                        "delimiter",      // .
-                        "vision-value"    // value/property (no "(" after)
-                      ]
+                      ["identifier","delimiter","vision-value"]
                     ],
+
 
                     // ⭐ FUNCTION DECLARATION: local function foo(...)
                     [

@@ -18,7 +18,7 @@ export const VISIONBOT_EVENTS = [
 ];
 
 export const VISIONBOT_API = {
-    globals: ["http", "logger", "guild", "member", "message", "reaction", "vars", "store", "await"],
+    globals: ["http", "logger", "guild", "member", "message", "reaction", "vars", "store", "await", "event"],
 
     event: { params: ["event_name: string", "callback: function"], doc: "Виконує певну подію." },
 
@@ -123,6 +123,25 @@ export const VISIONBOT_API = {
 // Utils
 // ------------------------------
 
+function getGlobalFunction(model: Model, position: Position) {
+    const line = model.getValueInRange({
+        startLineNumber: position.lineNumber,
+        endLineNumber: position.lineNumber,
+        startColumn: 1,
+        endColumn: position.column,
+    });
+
+    const match = line.match(/([a-zA-Z_]\w*)\s*\($/);
+    if (!match) return null;
+
+    const fn = match[1];
+    if ((VISIONBOT_API as any)[fn] && typeof (VISIONBOT_API as any)[fn] === "object") {
+        return fn;
+    }
+
+    return null;
+}
+
 export function getFullCall(model: Model, position: Position) {
     const line = model.getValueInRange({
         startLineNumber: position.lineNumber,
@@ -131,7 +150,7 @@ export function getFullCall(model: Model, position: Position) {
         endColumn: position.column,
     });
 
-    const match = line.match(/([a-zA-Z0-9_\.]+)\s*\($/);
+    const match = line.match(/([a-zA-Z_]\w*(?:\.[a-zA-Z_]\w*)+)\s*\($/);
     if (!match) return null;
 
     const parts = match[1].split(".");
@@ -143,13 +162,69 @@ export function getFullCall(model: Model, position: Position) {
     };
 }
 
+function findMethodByName(name: string) {
+    for (const obj of Object.keys(VISIONBOT_API)) {
+        if (obj === "globals") continue;
+
+        const group = (VISIONBOT_API as any)[obj];
+        if (typeof group !== "object") continue;
+
+        if (group[name]) {
+            return {
+                object: obj,
+                member: name,
+                meta: group[name]
+            };
+        }
+    }
+    return null;
+}
+
+function findCallAtPosition(model: Model, position: Position) {
+    const full = model.getValueInRange({
+        startLineNumber: position.lineNumber,
+        endLineNumber: position.lineNumber,
+        startColumn: 1,
+        endColumn: model.getLineLength(position.lineNumber)
+    });
+
+    // шукаємо найближчу '(' перед курсором
+    const before = full.substring(0, position.column);
+    const openIndex = before.lastIndexOf("(");
+    if (openIndex === -1) return null;
+
+    // шукаємо назву методу: object.method
+    const callMatch = before.substring(0, openIndex).match(/([a-zA-Z_]\w*(?:\.[a-zA-Z_]\w*)+)$/);
+    if (!callMatch) return null;
+
+    const parts = callMatch[1].split(".");
+    return {
+        object: parts[parts.length - 2],
+        member: parts[parts.length - 1],
+        argIndex: before.substring(openIndex + 1).split(",").length - 1
+    };
+}
+
+function getActiveParameter(model: Model, position: Position) {
+    const line = model.getLineContent(position.lineNumber);
+    const before = line.substring(0, position.column);
+
+    // рахуємо скільки ком ПІСЛЯ відкритої дужки
+    const openIndex = before.lastIndexOf("(");
+    if (openIndex === -1) return 0;
+
+    const argsPart = before.substring(openIndex + 1);
+    const commas = argsPart.split(",").length - 1;
+
+    return commas < 0 ? 0 : commas;
+}
+
 export function extractObjectMember(model: Model, position: Position) {
     const line = model.getLineContent(position.lineNumber);
-    const textBeforeCursor = line.substring(0, position.column - 1);
+    const text = line.substring(0, position.column);
 
-    const match = textBeforeCursor.match(
-        /([a-zA-Z_][a-zA-Z0-9_]*)\.([a-zA-Z_][a-zA-Z0-9_]*)$/
-    );
+    // ⚡ Дозволяємо будь-які токени: vision-method, vision-value, identifier
+    const match = text.match(/([a-zA-Z_]\w*)\s*\.\s*([a-zA-Z_]\w*)$/);
 
     if (!match) return { object: null, member: null };
 
@@ -195,42 +270,71 @@ export function registerVisionbotDocs(m: typeof Monaco) {
     // Hover Provider
     // ------------------------------
     m.languages.registerHoverProvider("lua", {
-        provideHover(model: Model, position: Position) {
+        provideHover(model, position) {
+            // -------- 1) object.method --------
             const { object, member } = extractObjectMember(model, position);
-            if (!object || !member) return null;
+            if (object && member) {
+                const api = (VISIONBOT_API as any)[object]?.[member];
+                if (api) {
+                    return {
+                        contents: [
+                            { value: `### ${object}.${member}` },
+                            api.doc && { value: api.doc },
+                            api.params && { value: "**Параметри:** " + api.params.join(", ") },
+                            api.returns && { value: "**Повертає:** `" + api.returns + "`" }
+                        ].filter(Boolean) as IMarkdownString[]
+                    };
+                }
+            }
 
-            const api = (VISIONBOT_API as any)[object]?.[member];
-            if (!api) return null;
+            // -------- 2) globalFunction(...) --------
+            const globalFn = getGlobalFunction(model, position);
+            if (globalFn) {
+                const api = (VISIONBOT_API as any)[globalFn];
+                if (api) {
+                    return {
+                        contents: [
+                            { value: `### ${globalFn}()` },
+                            api.doc && { value: api.doc },
+                            api.params && { value: "**Параметри:** " + api.params.join(", ") }
+                        ].filter(Boolean) as IMarkdownString[]
+                    };
+                }
+            }
 
-            const contents: IMarkdownString[] = [
-                { value: `### ${object}.${member}` },
-            ];
+            // -------- 🆕 3) "answer" → знайти в API --------
+            const wordInfo = model.getWordAtPosition(position);
+            if (wordInfo) {
+                const name = wordInfo.word;
 
-            if (api.doc)
-                contents.push({ value: api.doc });
+                const found = findMethodByName(name);
+                if (found) {
+                    const { object, member, meta } = found;
 
-            if (api.params)
-                contents.push({
-                    value: "**Параметри:** " + api.params.join(", "),
-                });
+                    return {
+                        contents: [
+                            { value: `### ${object}.${member}` },
+                            meta.doc && { value: meta.doc },
+                            meta.params && { value: "**Параметри:** " + meta.params.join(", ") },
+                            meta.returns && { value: "**Повертає:** `" + meta.returns + "`" }
+                        ].filter(Boolean) as IMarkdownString[]
+                    };
+                }
+            }
 
-            if (api.returns)
-                contents.push({
-                    value: "**Повертає:** `" + api.returns + "`",
-                });
-
-            return { contents };
-        },
+            return null;
+        }
     });
+
 
     // ------------------------------
     // Signature Help
     // ------------------------------
     m.languages.registerSignatureHelpProvider("lua", {
-        signatureHelpTriggerCharacters: ["(", ","],
+        signatureHelpTriggerCharacters: ["(", ",", " ", '"', "'"],
 
-        provideSignatureHelp(model: Model, position: Position) {
-            const call = getFullCall(model, position);
+        provideSignatureHelp(model, position) {
+            const call = findCallAtPosition(model, position);
             if (!call) return null;
 
             const api = (VISIONBOT_API as any)[call.object]?.[call.member];
@@ -240,22 +344,20 @@ export function registerVisionbotDocs(m: typeof Monaco) {
                 value: {
                     signatures: [
                         {
-                            label: `${call.object}.${call.member}(${api.params.join(
-                                ", "
-                            )})`,
-                            parameters: api.params.map((p: string) => ({
-                                label: p,
-                            })),
-                            documentation: api.doc || "",
-                        },
+                            label: `${call.object}.${call.member}(${api.params.join(", ")})`,
+                            parameters: api.params.map(p => ({ label: p })),
+                            documentation: api.doc || ""
+                        }
                     ],
                     activeSignature: 0,
-                    activeParameter: 0,
+                    activeParameter: Math.min(call.argIndex, api.params.length - 1)
                 },
-                dispose() {},
+                dispose() {}
             };
-        },
+        }
     });
+
+
 
     // ------------------------------
     // Autocomplete
@@ -263,9 +365,9 @@ export function registerVisionbotDocs(m: typeof Monaco) {
     m.languages.registerCompletionItemProvider("lua", {
         triggerCharacters: [".", '"', "'", "("],
 
-        provideCompletionItems(model: Model, position: Position) {
+        provideCompletionItems(model, position) {
             const word = model.getWordUntilPosition(position);
-            const range: Monaco.IRange = {
+            const range = {
                 startLineNumber: position.lineNumber,
                 endLineNumber: position.lineNumber,
                 startColumn: word.startColumn,
@@ -274,23 +376,20 @@ export function registerVisionbotDocs(m: typeof Monaco) {
 
             const suggestions: languages.CompletionItem[] = [];
 
-            const textBefore = model.getValueInRange({
-                startLineNumber: position.lineNumber,
-                endLineNumber: position.lineNumber,
-                startColumn: 1,
-                endColumn: position.column
-            });
+            const textBefore = model.getLineContent(position.lineNumber).slice(0, position.column);
 
+            // global objects & global functions
             VISIONBOT_API.globals.forEach(g =>
                 suggestions.push({
                     label: g,
                     kind: m.languages.CompletionItemKind.Module,
                     insertText: g,
                     range,
-                    detail: "📦 Global object"
+                    detail: "Global object/function"
                 })
             );
 
+            // object.
             const before = getWordBefore(model, position);
 
             if (before.endsWith(".")) {
@@ -310,6 +409,7 @@ export function registerVisionbotDocs(m: typeof Monaco) {
                 }
             }
 
+            // event("...")
             if (textBefore.includes('event("')) {
                 VISIONBOT_EVENTS.forEach(e =>
                     suggestions.push({
@@ -324,7 +424,6 @@ export function registerVisionbotDocs(m: typeof Monaco) {
 
             return { suggestions };
         }
-
     });
 
 }
