@@ -205,20 +205,6 @@ function findCallAtPosition(model: Model, position: Position) {
     };
 }
 
-function getActiveParameter(model: Model, position: Position) {
-    const line = model.getLineContent(position.lineNumber);
-    const before = line.substring(0, position.column);
-
-    // рахуємо скільки ком ПІСЛЯ відкритої дужки
-    const openIndex = before.lastIndexOf("(");
-    if (openIndex === -1) return 0;
-
-    const argsPart = before.substring(openIndex + 1);
-    const commas = argsPart.split(",").length - 1;
-
-    return commas < 0 ? 0 : commas;
-}
-
 export function extractObjectMember(model: Model, position: Position) {
     const line = model.getLineContent(position.lineNumber);
     const text = line.substring(0, position.column);
@@ -345,7 +331,7 @@ export function registerVisionbotDocs(m: typeof Monaco) {
                     signatures: [
                         {
                             label: `${call.object}.${call.member}(${api.params.join(", ")})`,
-                            parameters: api.params.map(p => ({ label: p })),
+                            parameters: api.params.map((p: string) => ({ label: p })),
                             documentation: api.doc || ""
                         }
                     ],
