@@ -3,13 +3,21 @@ import styles from "./KnowledgeContent.module.css";
 import { Calendar, User } from "lucide-react";
 import { api } from "../../../../utils/api.ts";
 import LoaderDots from "../../../basic/LoaderDots/LoaderDots.tsx";
+import UserLabel from "../../../basic/User/UserLabel.tsx";
 import {safeDatetime} from "../../../../utils/safeDate.ts";
+import type {UserType} from "../../../../types/Users.ts";
+
+//interface DocumentAuthor {
+//    id: string;
+//    first_name: string;
+//    last_name: string;
+//}
 
 interface DocumentData {
     id: string;
     title: string;
     content: string;
-    author: string;
+    author: UserType;
     updated_at: string;
 }
 
@@ -70,8 +78,8 @@ const KnowledgeContent: React.FC<Props> = ({ documentId, sidebarButton, sidebarC
                     <h1 className={styles.title}>{doc.title}</h1>
 
                     <div className={styles.meta}>
-                        <span><User size={16} /> {doc.author}</span>
-                        <span><Calendar size={16} /> {safeDatetime(doc.updated_at)}</span>
+                        <div><UserLabel avatar_url={doc.author.avatar_url} name={`${doc.author.first_name} ${doc.author.last_name || ""}`} user_id={doc.author.id} /></div>
+                        <div><Calendar size={20} /><span>{safeDatetime(doc.updated_at)}</span></div>
                     </div>
                 </div>
             </div>

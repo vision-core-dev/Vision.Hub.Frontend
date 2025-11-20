@@ -15,9 +15,20 @@
     }
 }
 
+.info {
+    display: flex;
+    flex-direction: column;
+}
+
+.info > button {
+    width: 38px;
+}
+
 /* ==== TITLE ==== */
 
 .title {
+    display: flex;
+
     font-size: 1.75rem;
     font-weight: 600;
     color: #0f172a;
@@ -33,6 +44,11 @@
     font-size: 0.9rem;
     color: #6b7280;
     margin-bottom: 1.5rem;
+}
+
+.meta > div {
+    display: flex;
+    flex-direction: row;
 }
 
 .meta svg {
