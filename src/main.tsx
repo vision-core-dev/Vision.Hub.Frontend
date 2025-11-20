@@ -76,6 +76,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                     {/*knowledge*/}
                     <Route path="/knowledge" element={<ProtectedRoute><KnowledgeLayout /></ProtectedRoute>} />
                     <Route path="/knowledge/d/:id" element={<ProtectedRoute><KnowledgeLayout /></ProtectedRoute>} />
+                    <Route path="/knowledge/d/:id/edit" element={<ProtectedRoute><KnowledgeLayout /></ProtectedRoute>} />
 
                     {/*salary*/}
                     <Route path="/salary" element={<ProtectedRoute><SalaryPage /></ProtectedRoute>} />

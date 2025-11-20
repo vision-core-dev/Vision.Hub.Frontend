@@ -88,3 +88,45 @@
     color: #00a86b;
     font-weight: 600;
 }
+
+
+
+.topBar {
+    margin-bottom: 1rem;
+}
+
+.addButton {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.7rem 1rem;
+    border-radius: 10px;
+    background: #e6f8ef;
+    color: #00a86b;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+.addButton:hover {
+    background: #d0f5e4;
+}
+
+
+.actions {
+    margin-left: auto;
+    opacity: 0;
+    transition: 0.2s;
+}
+
+.folderHeader:hover .actions,
+.document:hover .actions {
+    opacity: 1;
+}
+
+.actions svg {
+    cursor: pointer;
+    color: #6b7280;
+}

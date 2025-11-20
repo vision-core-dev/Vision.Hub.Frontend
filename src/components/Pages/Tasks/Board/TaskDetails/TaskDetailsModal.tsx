@@ -374,7 +374,7 @@ const TaskDetailsModal: React.FC<Props> = ({ taskId, onClose, boardLists, boardT
                                     // 🔄 логіка кастомного аплоаду (можеш винести в util)
                                     const formData = new FormData();
                                     formData.append("file", file);
-                                    const res = await api.post(`/v1/Hub/Tasks/${task.id}/UploadFileAttachment`, formData);
+                                    const res = await api.post(`/v1/Hub/Tasks/${task.id}/Attachments/UploadFile`, formData);
                                     const { url } = await res.json();
                                     // якщо потрібно вставити у текст:
                                     document.execCommand("insertHTML", false, `<img src="${url}" alt=""/>`);

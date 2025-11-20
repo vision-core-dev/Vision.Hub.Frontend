@@ -1,9 +1,12 @@
+/* ====  BASE  ==== */
+
 .content {
     flex: 1;
     padding: 2rem 3rem;
-    color: #111827;
     font-family: "Inter", system-ui, sans-serif;
-    line-height: 1.7;
+    color: #111827;
+    line-height: 1.75;
+    font-size: 1rem;
 }
 
 @media (max-width: 768px) {
@@ -12,13 +15,16 @@
     }
 }
 
-/* Заголовок документа */
+/* ==== TITLE ==== */
+
 .title {
     font-size: 1.75rem;
     font-weight: 600;
     color: #0f172a;
-    margin-bottom: 0.3rem;
+    margin-bottom: .3rem;
 }
+
+/* ==== META ==== */
 
 .meta {
     display: flex;
@@ -33,32 +39,36 @@
     margin-right: 4px;
 }
 
-/* Основний текст */
+/* ==== BODY TEXT ==== */
+
 .body {
     line-height: 1.75;
     font-size: 1rem;
+    animation: fadeIn 0.2s ease-in-out;
 }
 
-/* Секції документа */
-.body .section {
-    margin-bottom: 2.2rem;
-}
-
-.body .section h2 {
-    font-size: .8rem;
+/* Заголовки */
+.body h1,
+.body h2,
+.body h3,
+.body h4 {
+    font-family: "Inter", system-ui, sans-serif;
     font-weight: 600;
-    color: #0f172a;
-    margin-bottom: 0.8rem;
-    padding-bottom: 0.3rem;
-    border-bottom: 1px solid #e5e7eb;
 }
 
-.body .section h3 {
-    font-size: 1.05rem;
-    font-weight: 600;
-    color: #1e3a8a;
-    margin-top: 1.2rem;
-    margin-bottom: 0.5rem;
+.body h1 {
+    font-size: 1.75rem;
+    margin: 1rem 0 .5rem 0;
+}
+
+.body h2 {
+    font-size: 1.35rem;
+    margin: 1.2rem 0 .5rem 0;
+}
+
+.body h3 {
+    font-size: 1.1rem;
+    margin: 1rem 0 .4rem 0;
 }
 
 /* Абзаци */
@@ -67,41 +77,20 @@
 }
 
 /* Списки */
-.body ul {
+.body ul,
+.body ol {
     margin-left: 1.3rem;
-    list-style-type: disc;
-}
-@media (max-width: 600px) {
-    .body ul {
-        margin-left: 0;
-    }
+    padding-left: .2rem;
 }
 
 .body li {
     margin-bottom: 0.35rem;
 }
 
-/* Красива відстань і кольори для підзаголовків */
-.body h3 + ul,
-.body h3 + p {
-    margin-top: 0.4rem;
-}
-
-/* Порожній стан */
-.empty {
-    text-align: center;
-    color: #9ca3af;
-    font-size: 1rem;
-    font-weight: 500;
-}
-
-/* Анімація появи */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(6px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.content,
-.body {
-    animation: fadeIn 0.2s ease-in-out;
+/* Блок цитати */
+.body blockquote {
+    border-left: 3px solid #d1d5db;
+    padding-left: 14px;
+    color: #374151;
+    margin: 10px 0;
 }
