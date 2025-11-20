@@ -1,17 +1,11 @@
 import React, { useEffect, useState } from "react";
 import styles from "./KnowledgeContent.module.css";
-import { Calendar, User } from "lucide-react";
+import { Calendar } from "lucide-react";
 import { api } from "../../../../utils/api.ts";
 import LoaderDots from "../../../basic/LoaderDots/LoaderDots.tsx";
 import UserLabel from "../../../basic/User/UserLabel.tsx";
 import {safeDatetime} from "../../../../utils/safeDate.ts";
 import type {UserType} from "../../../../types/Users.ts";
-
-//interface DocumentAuthor {
-//    id: string;
-//    first_name: string;
-//    last_name: string;
-//}
 
 interface DocumentData {
     id: string;
