@@ -213,3 +213,19 @@
 .overdue .deadline span {
     color: #e11d48 !important; /* індикатор часу червоним */
 }
+
+/* 🟨 Задача зі строком сьогодні */
+.today {
+    outline-color: #facc15 !important; /* насичений жовтий */
+    background: #fffef4; /* легкий теплий фон */
+    animation: todayPulse 1.4s ease-in-out infinite;
+}
+
+.today .deadline svg,
+.today .deadline span {
+    color: #b45309 !important;
+}
+
+.today .title {
+    color: #b45309;
+}
