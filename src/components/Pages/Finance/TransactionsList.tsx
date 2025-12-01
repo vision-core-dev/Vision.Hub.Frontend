@@ -63,6 +63,7 @@ const TransactionsList: React.FC = () => {
             key: "transaction_at",
             label: "Дата і час",
             render: (v: string) => safeDatetime(v),
+            sortable: true,
         },
         {
             key: "user_id",
@@ -104,11 +105,13 @@ const TransactionsList: React.FC = () => {
                             : v}
                 </span>
             ),
+            sortable: true,
         },
         {
             key: "amount",
             label: "Сума",
             render: (v: number) => `${v.toFixed(2)} ₴`,
+            sortable: true,
         },
     ];
 

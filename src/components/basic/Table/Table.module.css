@@ -54,3 +54,24 @@
     color: #6b7280;
     font-size: 1rem;
 }
+
+
+.sortable {
+    cursor: pointer;
+    user-select: none;
+}
+
+.headerCell {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.sortIcon {
+    display: flex;
+    opacity: 0.5;
+}
+
+.sortable:hover .sortIcon {
+    opacity: 1;
+}
