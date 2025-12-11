@@ -28,7 +28,7 @@ const AssigneeSelector: React.FC<Props> = ({ taskId, assignees, onUpdate }) => {
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const res = await api.get("/v1/Hub/Users/List");
+                const res = await api.get("/v1/Hub/Users/List?only_active=true");
                 const data = await res.json();
                 setAvailableUsers(data.list || []);
                 setFilteredUsers(data.list || []);

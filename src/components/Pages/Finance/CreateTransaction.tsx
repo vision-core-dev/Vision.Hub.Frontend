@@ -16,7 +16,7 @@ const TransactionsList: React.FC = () => {
                     <ArrowLeft size={20} /> Назад до списку
                 </Button>
                 <SmartForm
-                    submitText="Створити подію"
+                    submitText="Створити транзакцію"
                     fields={[
                         { name: "transaction_at", label: "Дата транзакції", type: "datetime-local", required: true },
                         { name: "name", label: "Назва транзакції", type: "text", required: true },
@@ -30,7 +30,7 @@ const TransactionsList: React.FC = () => {
                             navigate("/finance/transactions/list");
                         } else {
                             const err = await res.json();
-                            throw new Error(err.detail || "Не вдалося створити подію");
+                            throw new Error(err.detail || "Не вдалося створити транзакцію");
                         }
                     }}
                 />

@@ -35,6 +35,8 @@ const TaskItem = ({ task, boardTags, users }: TaskProps) => {
             ${isToday ? styles.today : ""}
         `}>
 
+
+            {/* 🖼️ Банер */}
             {task.banner_url ? (
                 <div className={`${styles.banner} ${isDone ? styles.bannerDone : ""}`}>
                     <img src={task.banner_url} alt="Banner" />
@@ -58,6 +60,7 @@ const TaskItem = ({ task, boardTags, users }: TaskProps) => {
                 ) : null
             )}
 
+            {/* Якщо задача НЕ готова — показуємо інфо */}
             {!isDone && (
                 <div className={styles.content}>
                     {taskTags.length > 0 && (

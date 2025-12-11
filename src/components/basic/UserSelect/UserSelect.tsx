@@ -15,7 +15,7 @@ const UserSelect: React.FC<Props> = ({ onChange }) => {
 
     useEffect(() => {
         (async () => {
-            const res = await api.get("/v1/Hub/Users/List");
+            const res = await api.get("/v1/Hub/Users/List?only_active=true");
             const data = await res.json();
             setUsers(data.list || []);
         })();

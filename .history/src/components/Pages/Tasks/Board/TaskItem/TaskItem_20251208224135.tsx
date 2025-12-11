@@ -58,6 +58,7 @@ const TaskItem = ({ task, boardTags, users }: TaskProps) => {
                 ) : null
             )}
 
+            {/* Якщо задача НЕ готова — показуємо інфо */}
             {!isDone && (
                 <div className={styles.content}>
                     {taskTags.length > 0 && (
