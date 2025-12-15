@@ -35,7 +35,6 @@ const Sidebar: React.FC = () => {
     const location = useLocation();
     const [collapsed, setCollapsed] = useState(window.innerWidth < 900);
 
-    // ✅ авто-колапс при зміні ширини
     useEffect(() => {
         const handleResize = () => {
             setCollapsed(window.innerWidth < 900);

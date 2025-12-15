@@ -1,0 +1,47 @@
+.footer {
+    padding: 12px;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: #fff;
+}
+
+.row {
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+}
+
+.inputWrap {
+    flex: 1;              /* 🔥 головне */
+    display: flex;
+}
+
+.inputWrap textarea,
+.inputWrap input {
+    width: 100%;
+    resize: none;
+}
+
+/* прикріплені файли */
+.attachments {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.file {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #f3f4f6;
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 12px;
+}
+
+.file svg {
+    cursor: pointer;
+    color: #6b7280;
+}

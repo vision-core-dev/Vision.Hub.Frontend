@@ -34,6 +34,8 @@ import CreateTransaction from "./components/Pages/Finance/CreateTransaction.tsx"
 import ServersListPage from "./components/Pages/vision-bot/ServersList/ServersListPage.tsx";
 import ServerViewPage from "./components/Pages/vision-bot/ServerView/ServerViewPage.tsx";
 import ModuleEditorPage from "./components/Pages/vision-bot/ModuleEditor/ModuleEditorPage.tsx";
+import SupportLayout from "./components/Pages/vision-support/SupportLayout/SupportLayout.tsx";
+import ChatLayout from "./components/Pages/vision-support/SupportChat/ChatLayout/ChatLayout.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
@@ -93,6 +95,13 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                     <Route path="/vision-bot/servers" element={<ProtectedRoute><ServersListPage /></ProtectedRoute>} />
                     <Route path="/vision-bot/s/:guildId" element={<ProtectedRoute><ServerViewPage /></ProtectedRoute>} />
                     <Route path="/vision-bot/s/:guildId/m/:moduleId" element={<ProtectedRoute><ModuleEditorPage /></ProtectedRoute>} />
+
+                    {/* vision-support */}
+                    <Route path="vision-support" element={<ProtectedRoute><SupportLayout /></ProtectedRoute>}>
+                        {/* <Route index element={<EmptySupport />} /> */}
+                        <Route path=":telegramUserId" element={<ChatLayout />} />
+                    </Route>
+
 
                     <Route path="*" element={<NotFound />} />
                 </Routes>

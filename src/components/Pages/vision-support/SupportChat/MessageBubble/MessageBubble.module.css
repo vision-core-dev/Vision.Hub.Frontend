@@ -1,0 +1,78 @@
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 14px;
+}
+
+/* Вирівнювання */
+.user {
+    align-items: flex-start;
+}
+
+.operator {
+    align-items: flex-end;
+}
+
+/* Сам бабл */
+.bubble {
+    background: var(--bubble-bg);
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: 14px;
+    line-height: 1.45;
+    word-break: break-word;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Кольори */
+.user .bubble {
+    background: #e6f8ef;
+    border-top-left-radius: 6px;
+}
+
+.operator .bubble {
+    background: #e8f1ff;
+    border-top-right-radius: 6px;
+}
+
+/* Текст */
+.text {
+    white-space: pre-wrap;
+}
+
+/* Файли */
+.files {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* Картинки */
+.image {
+    max-width: 260px;
+    max-height: 260px;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+/* Посилання на файли */
+.file {
+    font-size: 13px;
+    color: #2563eb;
+    text-decoration: none;
+}
+
+.file:hover {
+    text-decoration: underline;
+}
+
+/* Час */
+.time {
+    margin-top: 4px;
+    font-size: 11px;
+    color: #6b7280;
+    user-select: none;
+}
