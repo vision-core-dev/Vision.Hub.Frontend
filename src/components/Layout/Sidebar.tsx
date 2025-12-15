@@ -8,7 +8,7 @@ import {
     Settings,
     SquareKanban,
     ChevronLeft,
-    ChevronRight, LayoutDashboard, CalendarDays, CalendarRange, BookMarked, Landmark, Bot,
+    ChevronRight, LayoutDashboard, CalendarDays, CalendarRange, BookMarked, Landmark, Bot, Headset
 } from "lucide-react";
 import styles from "./Layout.module.css";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -26,6 +26,7 @@ const icons: Record<string, React.ReactNode> = {
     settings: <Settings size={20} />,
     knowledge: <BookMarked size={20} />,
     "vision-bot": <Bot  size={20}/>,
+    "vision-support": <Headset size={20}/>,
 };
 
 const Sidebar: React.FC = () => {
