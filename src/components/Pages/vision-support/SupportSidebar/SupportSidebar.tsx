@@ -18,7 +18,7 @@ interface GetBotUsersResponse {
     users: VisionSupportUser[]
 }
 
-function SupportSidebar() {
+function SupportSidebar({ onSelectChat }: { onSelectChat?: () => void }) {
     const navigate = useNavigate();
     const { telegramUserId } = useParams();
 
@@ -69,7 +69,10 @@ function SupportSidebar() {
                             className={`${styles.item} ${
                                 String(u.telegram_id) === telegramUserId ? styles.active : ""
                             }`}
-                            onClick={() => navigate(`/vision-support/${u.telegram_id}`)}
+                            onClick={() => {
+                                navigate(`/vision-support/${u.telegram_id}`);
+                                if (onSelectChat) onSelectChat();
+                            }}
                         >
                             <div className={styles.text}>
                                 <span className={styles.title}>{u.username || `ID ${u.telegram_id}`}</span>

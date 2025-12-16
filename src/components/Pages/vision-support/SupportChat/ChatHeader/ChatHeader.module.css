@@ -6,3 +6,10 @@
     align-items: center;
     background-color: white;
 }
+
+.header > div {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+}
