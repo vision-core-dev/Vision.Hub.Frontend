@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import styles from "./AttachmentsSection.module.css";
-import { File, Link as LinkIcon, Link, SquarePen, Trash, X } from "lucide-react";
+import {File, FileText, Link as LinkIcon, Link, SquarePen, Trash, Video, X} from "lucide-react";
 import Button from "../../../../../basic/Button/Button.tsx";
 import { api } from "../../../../../../utils/api.ts";
 import { safeDatetime } from "../../../../../../utils/safeDate.ts";
@@ -89,6 +89,21 @@ const AttachmentsSection: React.FC<Props> = ({ attachments, taskId, onChange }) 
         }
     };
 
+    const imageExt = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
+    const videoExt = [".mp4", ".webm", ".mov", ".avi", ".mkv"];
+    const docExt = [".pdf", ".doc", ".docx"];
+
+    const getFileKind = (url: string) => {
+        const lower = url.toLowerCase();
+
+        if (imageExt.some(ext => lower.endsWith(ext))) return "image";
+        if (videoExt.some(ext => lower.endsWith(ext))) return "video";
+        if (docExt.some(ext => lower.endsWith(ext))) return "doc";
+
+        return "other";
+    };
+
+
     // ✏️ Перейменування
     const handleRename = async (att: Attachment) => {
         const newName = prompt("Нова назва:", att.name);
@@ -129,9 +144,7 @@ const AttachmentsSection: React.FC<Props> = ({ attachments, taskId, onChange }) 
 
     const files = list.filter((a) => a.type === "file");
     const links = list.filter((a) => a.type === "link");
-
-    const photoExtensions = [".jpg", ".jpeg", ".png", ".gif"];
-
+    
     return (
         <>
             <section className={styles.attachments}>
@@ -147,24 +160,62 @@ const AttachmentsSection: React.FC<Props> = ({ attachments, taskId, onChange }) 
                         {[...links, ...files].map((att) => (
                             <div key={att.id} className={styles.item}>
                                 {att.type === "file" ? (
-                                    <img
-                                        style={{ cursor: photoExtensions.some(ext => att.url.endsWith(ext)) ? "zoom-in" : "pointer" }}
-                                        src={att.url}
-                                        alt={att.name}
-                                        className={styles.thumb}
-                                        onClick={() => {
-                                            if (att.type === "file" && photoExtensions.some(ext => att.url.endsWith(ext))) {
-                                                setPreviewUrl(att.url);
-                                                return
-                                            }
-                                            window.open(att.url, "_blank");
-                                        }}
-                                    />
+                                    (() => {
+                                        const kind = getFileKind(att.url);
+
+                                        // 🖼 IMAGE
+                                        if (kind === "image") {
+                                            return (
+                                                <img
+                                                    src={att.url}
+                                                    alt={att.name}
+                                                    className={styles.thumb}
+                                                    style={{ cursor: "zoom-in" }}
+                                                    onClick={() => setPreviewUrl(att.url)}
+                                                />
+                                            );
+                                        }
+
+                                        // 🎥 VIDEO
+                                        if (kind === "video") {
+                                            return (
+                                                <div
+                                                    className={styles.icon}
+                                                    onClick={() => window.open(att.url, "_blank")}
+                                                >
+                                                    <Video size={20} />
+                                                </div>
+                                            );
+                                        }
+
+                                        // 📄 DOCUMENT
+                                        if (kind === "doc") {
+                                            return (
+                                                <div
+                                                    className={styles.icon}
+                                                    onClick={() => window.open(att.url, "_blank")}
+                                                >
+                                                    <FileText size={20} />
+                                                </div>
+                                            );
+                                        }
+
+                                        // 📦 OTHER
+                                        return (
+                                            <div
+                                                className={styles.icon}
+                                                onClick={() => window.open(att.url, "_blank")}
+                                            >
+                                                <File size={20} />
+                                            </div>
+                                        );
+                                    })()
                                 ) : (
                                     <div className={styles.icon}>
                                         <LinkIcon size={18} />
                                     </div>
                                 )}
+
 
                                 <div className={styles.details}>
                                     {att.type === "link" ? (
