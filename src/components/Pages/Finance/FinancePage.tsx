@@ -81,7 +81,7 @@ const FinancePage: React.FC = () => {
         {
             key: "last_withdraw_at",
             label: "Остання виплата",
-            render: (v: string) => new Date(v).toLocaleDateString("uk-UA"),
+            render: (v: string) => new Date(v).toLocaleDateString("uk-UA") ?? "—",
             sortable: true,
         }
     ]
