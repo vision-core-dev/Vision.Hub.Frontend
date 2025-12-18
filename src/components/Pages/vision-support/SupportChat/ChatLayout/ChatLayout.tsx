@@ -1,12 +1,18 @@
-import { useParams } from "react-router-dom";
+import { useParams, useOutletContext } from "react-router-dom";
 import styles from "./ChatLayout.module.css";
 import ChatHeader from "../ChatHeader/ChatHeader.tsx";
 import ChatMessages from "../ChatMessages/ChatMessages.tsx";
 import ChatFooter from "../ChatFooter/ChatFooter.tsx";
 import {api} from "../../../../../utils/api.ts";
 
+type LayoutCtx = {
+    isMobile: boolean;
+    openSidebar: () => void;
+};
+
 function SupportChat() {
     const { telegramUserId } = useParams();
+    const { isMobile, openSidebar } = useOutletContext<LayoutCtx>();
 
     const sendAnswer = async (text: string | null, files: File[]) => {
         const form = new FormData();
@@ -19,9 +25,14 @@ function SupportChat() {
         await api.post("/v1/VisionSupport/SendAnswer", form);
     };
 
+ 
     return (
         <div className={styles.chat}>
-            <ChatHeader userId={telegramUserId} blocked={false} onBlock={() => {}} />
+            <ChatHeader
+                userId={telegramUserId}
+                showMenu={isMobile}
+                onMenuClick={openSidebar}
+            />
             <ChatMessages userId={telegramUserId} />
             <ChatFooter onSend={sendAnswer} />
         </div>
