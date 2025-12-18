@@ -207,8 +207,16 @@ const AttachmentsSection: React.FC<Props> = ({ attachments, taskId, onChange }) 
                         ref={fileInputRef}
                         hidden
                         onChange={handleUpload}
-                        accept="image/*,.pdf,.doc,.docx,.zip"
+                        accept="
+                            image/*,
+                            video/*,
+                            .pdf,
+                            .doc,
+                            .docx,
+                            .zip
+                          "
                     />
+
                 </div>
             </section>
 
