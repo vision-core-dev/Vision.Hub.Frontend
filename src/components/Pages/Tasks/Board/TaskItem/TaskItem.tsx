@@ -6,12 +6,13 @@ import type { UserType } from "../../../../../types/Users.ts";
 import {safeDate} from "../../../../../utils/safeDate.ts";
 
 type TaskProps = {
+    isBoardPublic: boolean;
     task: Task;
     boardTags: TaskTag[];
     users: UserType[];
 };
 
-const TaskItem = ({ task, boardTags, users }: TaskProps) => {
+const TaskItem = ({ isBoardPublic=false, task, boardTags, users }: TaskProps) => {
     const taskTags =
         task.tags && task.tags.length > 0
             ? boardTags.filter((t) => task.tags.includes(t.id))
@@ -31,10 +32,10 @@ const TaskItem = ({ task, boardTags, users }: TaskProps) => {
     return (
         <div className={`${styles.task} 
             ${(isDone && task.banner_url) ? styles.doneTask : ""}
-            ${isOverdue ? styles.overdue : ""}
+            ${(isOverdue && !isBoardPublic) ? styles.overdue : ""}
             ${isToday ? styles.today : ""}
+            ${!isBoardPublic && styles.point}
         `}>
-
             {task.banner_url ? (
                 <div className={`${styles.banner} ${isDone ? styles.bannerDone : ""}`}>
                     <img src={task.banner_url} alt="Banner" />
@@ -60,7 +61,7 @@ const TaskItem = ({ task, boardTags, users }: TaskProps) => {
 
             {!isDone && (
                 <div className={styles.content}>
-                    {taskTags.length > 0 && (
+                    {(taskTags.length > 0 && !isBoardPublic) && (
                         <div className={styles.tags}>
                             {taskTags.map((tag) => (
                                 <span
@@ -81,7 +82,7 @@ const TaskItem = ({ task, boardTags, users }: TaskProps) => {
                         <h3 className={styles.title}>{task.name}</h3>
                     </div>
 
-                    {(task.deadline_at || task.started_at || (task.subtasks_total && task.subtasks_total > 0)) ? (
+                    {(task.deadline_at || task.started_at || (task.subtasks_total && task.subtasks_total > 0)) && !isBoardPublic  ? (
                         <div className={styles.miniDetails}>
                             {(task.deadline_at || task.started_at) && (
                                 <div className={styles.deadline}>
@@ -102,7 +103,7 @@ const TaskItem = ({ task, boardTags, users }: TaskProps) => {
                         </div>
                     ) : null}
 
-                    {taskAssignees.length > 0 && (
+                    {(taskAssignees.length > 0 && !isBoardPublic) && (
                         <div className={styles.assignees}>
                             {taskAssignees.map((a) => (
                                 <div key={a.id} className={styles.avatar}>

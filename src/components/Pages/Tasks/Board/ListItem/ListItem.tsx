@@ -10,6 +10,7 @@ import { getTextColor } from "../../../../../utils/colors.ts";
 import {useParams} from "react-router-dom";
 
 type ListProps = {
+    isBoardPublic: boolean;
     list: List;
     onSelectTask: (task: Task) => void;
     boardTags: TaskTag[];
@@ -19,6 +20,7 @@ type ListProps = {
 };
 
 const ListItem = ({
+                      isBoardPublic=false,
                       list,
                       onSelectTask,
                       boardTags,
@@ -54,6 +56,9 @@ const ListItem = ({
 
     // 🧠 Create
     const createTask = async () => {
+        if (isBoardPublic) {
+            return;
+        }
         if (!taskName.trim()) return;
         setLoading(true);
         await api
@@ -74,6 +79,9 @@ const ListItem = ({
 
     // 🎯 start
     const handleDragStart = (e: React.DragEvent<HTMLDivElement>, taskId: string) => {
+        if (isBoardPublic) {
+            return;
+        }
         e.dataTransfer.effectAllowed = "move";
         e.dataTransfer.setData("task_id", taskId);
         e.dataTransfer.setData("source_list_id", list.id);
@@ -83,6 +91,9 @@ const ListItem = ({
 
     // 🧲 over task
     const handleDragOverTask = (e: React.DragEvent<HTMLDivElement>, index: number) => {
+        if (isBoardPublic) {
+            return;
+        }
         e.preventDefault();
         e.stopPropagation();
         const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
@@ -92,6 +103,9 @@ const ListItem = ({
 
     // 🧲 over list
     const handleDragOverList = (e: React.DragEvent<HTMLDivElement>) => {
+        if (isBoardPublic) {
+            return;
+        }
         if (e.target !== e.currentTarget) return;
         e.preventDefault();
         setInsertIndex(localTasks.length);
@@ -99,6 +113,10 @@ const ListItem = ({
 
     // 💾 drop
     const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+        if (isBoardPublic) {
+            return;
+        }
+
         e.preventDefault();
         e.stopPropagation();
 
@@ -159,12 +177,18 @@ const ListItem = ({
 
 
     const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+        if (isBoardPublic) {
+            return;
+        }
         if (!e.currentTarget.contains(e.relatedTarget as Node)) {
             setInsertIndex(null);
         }
     };
 
     const handleDragEnd = () => {
+        if (isBoardPublic) {
+            return;
+        }
         setDraggingTaskId(null);
         setInsertIndex(null);
     };
@@ -173,10 +197,16 @@ const ListItem = ({
         <div
             className={styles.list}
             onDragOver={(e) => {
+                if (isBoardPublic) {
+                    return;
+                }
                 e.preventDefault(); // 🧠 must have
                 handleDragOverList(e);
             }}
             onDrop={(e) => {
+                if (isBoardPublic) {
+                    return;
+                }
                 e.preventDefault();
                 handleDrop(e);
             }}
@@ -197,17 +227,17 @@ const ListItem = ({
                     <React.Fragment key={task.id}>
                         {insertIndex === index && <div className={styles.insertLine} />}
                         <div
-                            draggable
+                            draggable={!isBoardPublic}
                             onDragStart={(e) => handleDragStart(e, task.id)}
                             onDragOver={(e) => handleDragOverTask(e, index)}
                             onDragEnd={handleDragEnd} // 👈 вот это
                             onDrop={(e) => handleDrop(e)} // 👈 чтоб точно сработал drop
                             className={`${styles.taskWrapper} ${
-                                draggingTaskId === task.id ? styles.dragging : ""
+                                (draggingTaskId === task.id && !isBoardPublic) ? styles.dragging : ""
                             }`}
-                            onClick={() => onSelectTask(task)}
+                            onClick={() => !isBoardPublic && onSelectTask(task)}
                         >
-                            <TaskItem boardTags={boardTags} users={users} task={task} />
+                            <TaskItem isBoardPublic={isBoardPublic} boardTags={boardTags} users={users} task={task} />
                         </div>
                     </React.Fragment>
                 ))}
@@ -215,30 +245,34 @@ const ListItem = ({
                 {insertIndex === localTasks.length && <div className={styles.insertLine} />}
             </div>
 
-            {!showCreateTask ? (
-                <button className={styles.addTask} onClick={() => setShowCreateTask(true)}>
-                    <Plus strokeWidth={2} size={16} /> Додати задачу
-                </button>
-            ) : (
-                <div className={styles.createTask}>
-            <textarea
-                autoFocus
-                placeholder="Введіть назву задачі..."
-                value={taskName}
-                onChange={(e) => setTaskName(e.target.value)}
-                onKeyDown={(e) =>
-                    e.key === "Enter" && (e.preventDefault(), createTask())
-                }
-            />
-                    <div className={styles.actions}>
-                        <Button variant="primary" onClick={createTask} disabled={loading}>
-                            {loading ? "Створюється..." : "Додати задачу"}
-                        </Button>
-                        <Button variant="secondary" onClick={() => setShowCreateTask(false)}>
-                            <X />
-                        </Button>
-                    </div>
-                </div>
+            {!isBoardPublic && (
+                <>
+                    {!showCreateTask ? (
+                        <button className={styles.addTask} onClick={() => setShowCreateTask(true)}>
+                            <Plus strokeWidth={2} size={16} /> Додати задачу
+                        </button>
+                    ) : (
+                        <div className={styles.createTask}>
+                            <textarea
+                                autoFocus
+                                placeholder="Введіть назву задачі..."
+                                value={taskName}
+                                onChange={(e) => setTaskName(e.target.value)}
+                                onKeyDown={(e) =>
+                                    e.key === "Enter" && (e.preventDefault(), createTask())
+                                }
+                            />
+                            <div className={styles.actions}>
+                                <Button variant="primary" onClick={createTask} disabled={loading}>
+                                    {loading ? "Створюється..." : "Додати задачу"}
+                                </Button>
+                                <Button variant="secondary" onClick={() => setShowCreateTask(false)}>
+                                    <X />
+                                </Button>
+                            </div>
+                        </div>
+                    )}
+                </>
             )}
         </div>
 

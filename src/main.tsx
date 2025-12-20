@@ -72,8 +72,10 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                     {/*boards*/}
                     <Route path="/boards" element={<ProtectedRoute><Navigate to="/boards/list" replace /></ProtectedRoute>} />
                     <Route path="/boards/list" element={<ProtectedRoute><BoardsListPage /></ProtectedRoute>} />
-                    <Route path="/boards/b/:id" element={<ProtectedRoute><BoardPage /></ProtectedRoute>} />
+                    <Route path="/boards/b/:id" element={<ProtectedRoute><BoardPage is_public={false} /></ProtectedRoute>} />
                     <Route path="/boards/create-board" element={<ProtectedRoute><CreateBoardPage /></ProtectedRoute>} />
+
+                    <Route path="/public/boards/b/:id" element={<BoardPage is_public={true} />} />
 
                     {/*knowledge*/}
                     <Route path="/knowledge" element={<ProtectedRoute><KnowledgeLayout /></ProtectedRoute>} />

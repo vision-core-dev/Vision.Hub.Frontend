@@ -54,7 +54,11 @@ type BoardDetails = {
     tags: TaskTag[];
 };
 
-const BoardPage = () => {
+interface Props {
+    is_public: boolean;
+}
+
+const BoardPage = ({ is_public=false }: Props) => {
     const { id } = useParams();
     const [boardDetails, setBoardDetails] = useState<BoardDetails | null>(null);
     const [boardLists, setBoardLists] = useState<List[]>([]);
@@ -70,15 +74,20 @@ const BoardPage = () => {
     const fetchBoard = async (silent = false) => {
         try {
             if (!silent) setLoading(true);
-            const res = await api.get(`/v1/Hub/Boards/${id}/GetDetails`);
+            const res = await api.get(`/v1/Hub/Boards/${id}/GetDetails`+(is_public ? "?only-public" : ""));
             const data: BoardDetails = await res.json();
 
             setBoardLists(data.lists)
 
-            const listsWithTasks: List[] = data.lists.map((list) => ({
-                ...list,
-                tasks: data.tasks.filter((task) => task.list_id === list.id),
-            }));
+            const listsWithTasks: List[] = data.lists
+                .map((list) => ({
+                    ...list,
+                    tasks: data.tasks.filter((task) => task.list_id === list.id),
+                }))
+                .filter((list) => {
+                    if (!is_public) return true;
+                    return list.tasks.length > 0;
+                });
 
             setBoardDetails({ ...data, lists: listsWithTasks });
         } catch (err) {
@@ -138,11 +147,13 @@ const BoardPage = () => {
     if (!boardDetails) return <div className={styles.error}>Дошку не знайдено 😔</div>;
 
     return (
-        <div className={styles.page} style={{backgroundImage: `url(${boardDetails.board.banner_url || ""})`}}>
+        <div className={`${is_public ? styles.publicPage : styles.page}`} style={{backgroundImage: `url(${boardDetails.board.banner_url || ""})`}}>
             <div className={styles.header}>
                 <h1 className={styles.title}>{boardDetails.board.name}</h1>
                 <div className={styles.extraActions}>
-                    <button onClick={() => setShowSettings(!showSettings)}><Ellipsis /></button>
+                    {is_public || (
+                        <button onClick={() => setShowSettings(!showSettings)}><Ellipsis /></button>
+                    )}
                 </div>
             </div>
 
@@ -150,6 +161,7 @@ const BoardPage = () => {
                 <div ref={scrollRef} className={styles.lists}>
                     {boardDetails.lists.map((list) => (
                         <ListItem
+                            isBoardPublic={is_public}
                             // refresh={() => fetchBoard(true)}
                             boardId={id}
                             boardTags={boardDetails.tags}
@@ -162,11 +174,13 @@ const BoardPage = () => {
                     ))}
                 </div>
 
-                <div className={styles.settingsWrapper}>
-                    <div className={`${styles.slideIn} ${showSettings ? styles.active : ""}`}>
-                        <BoardSettings boardId={boardDetails.board.id} />
+                {is_public || (
+                    <div className={styles.settingsWrapper}>
+                        <div className={`${styles.slideIn} ${showSettings ? styles.active : ""}`}>
+                            <BoardSettings boardId={boardDetails.board.id} />
+                        </div>
                     </div>
-                </div>
+                )}
 
             </div>
 
