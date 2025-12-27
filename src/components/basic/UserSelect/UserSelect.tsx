@@ -52,6 +52,7 @@ const UserSelect: React.FC<Props> = ({ onChange }) => {
                                 first_name: u.first_name,
                                 last_name: u.last_name || "",
                                 role_name: u.role?.name,
+                                avatar_url=u.avatar_url
                             }}
                             showAvatar={false}
                         />
