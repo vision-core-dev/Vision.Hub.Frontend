@@ -39,13 +39,15 @@ const UserSelect: React.FC<Props> = ({ onChange }) => {
         <div className={styles.wrapper}>
             <div className={styles.input}>
                 {users.map((u) => (
-                    <label key={u.id} style={{ display: "block", marginBottom: "0.25rem" }}>
+                    <label key={u.id} style={{ display: "block", marginBottom: "0.25rem", cursor: "pointer" }}>
                         <input
+                            style={{display: "none"}}
                             type="checkbox"
                             checked={selected.includes(u.id)}
                             onChange={() => toggleUser(u.id)}
                         />{" "}
                         <UserValue
+                            isActive={selected.includes(u.id)}
                             user={{
                                 id: u.id,
                                 email: u.email,

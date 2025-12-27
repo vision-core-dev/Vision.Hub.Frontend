@@ -13,14 +13,15 @@ interface UserValue {
 }
 
 interface Props {
+    isActive: boolean;
     user: UserValue;
     showAvatar?: boolean;
 }
 
-const UserValue: React.FC<Props> = ({ user, showAvatar = true }) => {
+const UserValue: React.FC<Props> = ({isActive = false, user, showAvatar = true }) => {
     const navigate = useNavigate()
     return (
-        <div className={styles.userValue}>
+        <div className={`${styles.userValue} ${isActive ? styles.isActive : ""}`}>
             {showAvatar && (
                 <div className={styles.avatar}>
                     {user.avatar_url ? (
