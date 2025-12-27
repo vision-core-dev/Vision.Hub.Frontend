@@ -62,7 +62,7 @@ const UsersListPage = () => {
     if (usersCount === 0) {
         return (
             <DefaultPage
-                title="Користувачі"
+                title={`Користувачі`}
                 action={
                     <Button adaptive={true} onClick={() => navigate("/users/add-user")}
                     >
@@ -78,7 +78,7 @@ const UsersListPage = () => {
     return (
         <>
             <DefaultPage
-                title="Користувачі"
+                title={`Користувачі ${activeUsers.length}`}
                 action={
                     <Button adaptive={true} onClick={() => navigate("/users/add-user")}
                     >
@@ -94,7 +94,7 @@ const UsersListPage = () => {
             </DefaultPage>
 
             <DefaultPage
-                title="Архівні користувачі"
+                title={`Архівні користувачі ${archivedUsers.length}`}
             >
                 <Table
                     columns={usersColumns}

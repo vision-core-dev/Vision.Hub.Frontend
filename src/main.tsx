@@ -21,7 +21,6 @@ import BoardPage from "./components/Pages/Tasks/Board/BoardPage/BoardPage.tsx";
 import CalendarTimeline from "./components/Pages/Events/CalendarTimeline/CalendarTimeline.tsx";
 import PublicEventDetails from "./components/Pages/Events/EventDetails/PublicEventDetails.tsx";
 import CreateBoardPage from "./components/Pages/Tasks/CreateBoardPage.tsx";
-import ProfilePage from "./components/Pages/My/Profile/Profile.tsx";
 import DashboardPage from "./components/Pages/Dashboard/Dashboard.tsx";
 import KnowledgeLayout from "./components/Pages/Knowledge/KnowledgeLayout/KnowledgeLayout.tsx";
 import ModerateEventDetails from "./components/Pages/Events/EventDetails/ModerateEventDetails.tsx";
@@ -51,7 +50,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                     <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>}/>
 
                     {/*profile*/}
-                    <Route path="/my/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+                    {/*<Route path="/my/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />*/}
 
                     {/*users*/}
                     <Route path="/users" element={<ProtectedRoute><Navigate to="/users/list" replace /></ProtectedRoute>} />
