@@ -51,28 +51,29 @@ const Sidebar: React.FC = () => {
         >
             <div className={styles.topSection}>
                 <nav className={styles.nav}>
-                    {role?.menu?.map((item: string) => {
-                        const path = `/${item}`;
-                        const isActive = location.pathname.startsWith(path);
-                        return (
-                            <button
-                                key={item}
-                                className={`${styles.navItem} ${
-                                    isActive ? styles.activeNavItem : ""
-                                }`}
-                                onClick={() => {
-                                    navigate(path)
-                                    const main = document.querySelector(".main");
-                                    if (main) main.scrollTo({ top: 0, behavior: "smooth" });
-                                }}
-                            >
-                                {icons[item] || <ClipboardList size={20} />}
-                                {!collapsed && (
-                                    <span>{getSidebarText(item)}</span>
-                                )}
-                            </button>
-                        );
-                    })}
+                    {role?.menu
+                        ?.filter((item: string) => !item.startsWith("_"))
+                        .map((item: string) => {
+                            const path = `/${item}`;
+                            const isActive = location.pathname.startsWith(path);
+
+                            return (
+                                <button
+                                    key={item}
+                                    className={`${styles.navItem} ${
+                                        isActive ? styles.activeNavItem : ""
+                                    }`}
+                                    onClick={() => {
+                                        navigate(path);
+                                        const main = document.querySelector(".main");
+                                        if (main) main.scrollTo({ top: 0, behavior: "smooth" });
+                                    }}
+                                >
+                                    {icons[item] || <ClipboardList size={20} />}
+                                    {!collapsed && <span>{getSidebarText(item)}</span>}
+                                </button>
+                            );
+                        })}
                 </nav>
             </div>
 

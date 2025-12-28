@@ -1,0 +1,74 @@
+.wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+}
+
+.block {
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+    margin-bottom: 1.5rem;
+}
+
+.question {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.ratingStat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.ratingBar {
+    height: 10px;
+    background: #e5e7eb;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.ratingFill {
+    height: 100%;
+    background: #00a86b;
+}
+
+.count {
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+.choicesStats {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.choiceRow {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.95rem;
+}
+
+.textAnswers {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.textAnswer {
+    background: #f9fafb;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    line-height: 1.45;
+}

@@ -36,6 +36,8 @@ import ModuleEditorPage from "./components/Pages/vision-bot/ModuleEditor/ModuleE
 import SupportLayout from "./components/Pages/vision-support/SupportLayout/SupportLayout.tsx";
 import ChatLayout from "./components/Pages/vision-support/SupportChat/ChatLayout/ChatLayout.tsx";
 import Snowfall from "./components/basic/Snowfall/Snowfall.tsx";
+import SubmitForm from "./components/Pages/forms/SubmitForm/SubmitForm.tsx";
+import FormResultsView from "./components/Pages/forms/FormResultsView/FormResultsView.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
@@ -103,6 +105,20 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                     <Route path="vision-support" element={<ProtectedRoute><SupportLayout /></ProtectedRoute>}>
                         {/* <Route index element={<EmptySupport />} /> */}
                         <Route path=":telegramUserId" element={<ChatLayout />} />
+                    </Route>
+
+                    {/* forms */}
+                    <Route path="/forms/f/:formId/results" element={<ProtectedRoute><FormResultsView /></ProtectedRoute>} />
+                    <Route path="/form/:formSlug">
+                        <Route index element={<Navigate to="submit" replace />} />
+                        <Route
+                            path="submit"
+                            element={
+                                <ProtectedRoute>
+                                    <SubmitForm />
+                                </ProtectedRoute>
+                            }
+                        />
                     </Route>
 
 
