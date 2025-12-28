@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import styles from "./SmartForm.module.css";
 import { getErrorText } from "../../../types/Messages";
 import UserSelect from "../UserSelect/UserSelect.tsx";
+import Select from "../Select/Select.tsx";
 
 type FieldType =
     | "text"
@@ -75,21 +76,20 @@ const SmartForm: React.FC<SmartFormProps> = ({
 
             {fields.map((field) => (
                 <div key={field.name} className={styles.field}>
-                    <label htmlFor={field.name}>{field.label} {field.required && (<span>*</span>)}</label>
+                    <label htmlFor={field.name}>{field.label} {field.type == "user-select" ? `(${values[field.name]?.length})` : ""} {field.required && (<span>*</span>)}</label>
 
                     {field.type === "select" ? (
-                        <select
-                            id={field.name}
-                            required={field.required}
-                            onChange={(e) => handleChange(field.name, e.target.value)}
-                        >
-                            <option value="">Оберіть...</option>
-                            {field.options?.map((opt) => (
-                                <option key={opt} value={opt}>
-                                    {opt}
-                                </option>
-                            ))}
-                        </select>
+                        <Select
+                            value={values[field.name]}
+                            placeholder={field.placeholder || "Оберіть..."}
+                            items={
+                                field.options?.map((opt) => ({
+                                    label: opt,
+                                    value: opt,
+                                })) ?? []
+                            }
+                            onChange={(value) => handleChange(field.name, value)}
+                        />
                     ) : field.type === "textarea" ? (
                         <textarea
                             id={field.name}

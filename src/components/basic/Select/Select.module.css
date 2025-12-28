@@ -1,0 +1,33 @@
+/* DropdownMenu.module.css */
+.menuWrapper {
+    position: relative;
+}
+
+.trigger {
+    padding: 10px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    cursor: pointer;
+    background: white;
+}
+
+.dropdownMenu {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    z-index: 20;
+}
+
+.dropdownItem {
+    padding: 10px 12px;
+    cursor: pointer;
+}
+
+.dropdownItem:hover {
+    background: #f3f4f6;
+}
