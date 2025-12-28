@@ -26,17 +26,13 @@ export default function Snowfall() {
             el.style.userSelect = "none";
             el.style.zIndex = "9999";
             el.style.willChange = "transform";
-            el.style.textShadow = `
-              0 0 4px rgba(0,0,0,0.35),
-              0 0 8px rgba(255,255,255,0.6)
-            `;
 
-            const colors = [
-                "rgba(230,238,255,0.9)",
-                "rgba(255,255,255,0.8)",
-                "rgba(220,230,255,0.85)",
-            ];
-            el.style.color = colors[Math.floor(Math.random() * colors.length)];
+            el.style.color = "rgba(235, 242, 255, 0.9)";
+            el.style.textShadow = "0 0 4px rgba(0,0,0,0.35)";
+            el.style.fontSize = `${14 + Math.random() * 18}px`;
+            el.style.filter = "blur(0.3px)";
+            el.style.opacity = "0.85";
+
 
 
             document.body.appendChild(el);
