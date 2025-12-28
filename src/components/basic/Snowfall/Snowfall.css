@@ -1,0 +1,17 @@
+.snowflake {
+    position: fixed;
+    top: -10px;
+    /*color: white;*/
+    pointer-events: none; /* 🔥 не влияет на клики */
+    user-select: none;
+    z-index: 9999;
+
+    animation-name: fall;
+    animation-timing-function: linear;
+}
+
+@keyframes fall {
+    to {
+        transform: translateY(110vh);
+    }
+}
