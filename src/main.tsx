@@ -35,14 +35,12 @@ import ServerViewPage from "./components/Pages/vision-bot/ServerView/ServerViewP
 import ModuleEditorPage from "./components/Pages/vision-bot/ModuleEditor/ModuleEditorPage.tsx";
 import SupportLayout from "./components/Pages/vision-support/SupportLayout/SupportLayout.tsx";
 import ChatLayout from "./components/Pages/vision-support/SupportChat/ChatLayout/ChatLayout.tsx";
-import Snowfall from "./components/basic/Snowfall/Snowfall.tsx";
 import SubmitForm from "./components/Pages/forms/SubmitForm/SubmitForm.tsx";
 import FormResultsView from "./components/Pages/forms/FormResultsView/FormResultsView.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
         <BrowserRouter>
-            <Snowfall />
             <AuthProvider>
                 <Routes>
                     <Route path="/" element={<Navigate to="/login" replace />} />
