@@ -325,7 +325,7 @@ const TaskDetailsModal: React.FC<Props> = ({ taskId, onClose, boardLists, boardT
                                 </div>
 
                                 <div className={styles.dateBlock}>
-                                    <label>Дедлайн</label>
+                                    <label>Крайдата</label>
                                     <input
                                         type="datetime-local"
                                         className={styles.dateInput}
