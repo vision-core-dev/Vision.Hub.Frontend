@@ -223,7 +223,7 @@ const ListItem = ({
                 <span className={styles.count}>{localTasks.length}</span>
             </div>
 
-            {localTasks.length === 0 && (
+            {localTasks.length > 0 && (
                 <div className={styles.tasks}>
                     {localTasks.map((task, index) => (
                         <React.Fragment key={task.id}>

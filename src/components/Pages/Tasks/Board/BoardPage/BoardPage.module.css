@@ -19,7 +19,6 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    backdrop-filter: blur(20px);
     background: rgba(163, 162, 162, 0.24);
 }
 
@@ -29,7 +28,6 @@
     justify-content: space-between;
     user-select: none;
     overflow: hidden;
-    backdrop-filter: blur(10px);
 }
 
 .lists {
