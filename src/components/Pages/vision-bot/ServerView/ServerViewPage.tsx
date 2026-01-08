@@ -8,13 +8,13 @@ import type {
     UniversalStoreItem,
     VisionBotModule,
     VisionBotServer
-} from "../../../../types/VisionBot.ts";
-import {visionBotApi} from "../../../../api/visionBot.ts";
+} from "@/types/VisionBot.ts";
+import {visionBotApi} from "@/api/visionBot.ts";
 import DefaultPage from "../../../basic/DefaultPage/DefaultPage.tsx";
-import Button from "../../../basic/Button/Button.tsx";
 import Table from "../../../basic/Table/Table.tsx";
 import SmartForm, {type Field} from "../../../basic/SmartForm/SmartForm.tsx";
 import {Undo2} from "lucide-react";
+import { Button } from "@/ui/base/buttons/button.tsx";
 
 type TabId = "overview" | "settings" | "modules" | "logs" | "store";
 
@@ -64,9 +64,13 @@ const ServerViewPage: React.FC = () => {
     };
 
     const returnElement = () => {
-        return (<Button variant="secondary" adaptive={true}
-                        onClick={() => navigate("/finance")}
-        ><Undo2 /> Повернутись</Button>);
+        return (
+            <Button color="secondary" iconLeading={Undo2}
+                onClick={() => navigate("/finance")}
+             >
+                Повернутись
+            </Button>)
+        ;
     }
 
     if (!guildId) {
@@ -84,31 +88,31 @@ const ServerViewPage: React.FC = () => {
             {/* Tabs */}
             <div className={styles.tabs}>
                 <Button
-                    variant={tab === "overview" ? "primary" : "secondary"}
+                    color={tab === "overview" ? "primary" : "secondary"}
                     onClick={() => setTab("overview")}
                 >
                     Огляд
                 </Button>
                 <Button
-                    variant={tab === "settings" ? "primary" : "secondary"}
+                    color={tab === "settings" ? "primary" : "secondary"}
                     onClick={() => setTab("settings")}
                 >
                     Налаштування
                 </Button>
                 <Button
-                    variant={tab === "modules" ? "primary" : "secondary"}
+                    color={tab === "modules" ? "primary" : "secondary"}
                     onClick={() => setTab("modules")}
                 >
                     Модулі
                 </Button>
                 <Button
-                    variant={tab === "logs" ? "primary" : "secondary"}
+                    color={tab === "logs" ? "primary" : "secondary"}
                     onClick={() => setTab("logs")}
                 >
                     Логи
                 </Button>
                 <Button
-                    variant={tab === "store" ? "primary" : "secondary"}
+                    color={tab === "store" ? "primary" : "secondary"}
                     onClick={() => setTab("store")}
                 >
                     Store

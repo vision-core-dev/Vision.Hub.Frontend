@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { api } from "../../../utils/api";
+import { api } from "@/utils/api.ts";
 import { useNavigate } from "react-router-dom";
 import Table from "../../basic/Table/Table.tsx";
-import type {EventType} from "../../../types/Events.ts";
-import {formatTime, safeDate} from "../../../utils/safeDate.ts";
+import type {EventType} from "@/types/Events.ts";
+import {formatTime, safeDate} from "@/utils/safeDate.ts";
 import DefaultPage from "../../basic/DefaultPage/DefaultPage.tsx";
-import Button from "../../basic/Button/Button.tsx";
 import {Plus} from "lucide-react";
+import {Button} from "@/ui/base/buttons/button.tsx";
 
 const UsersListPage = () => {
     const [events, setEvents] = useState<EventType[]>([]);
@@ -22,10 +22,9 @@ const UsersListPage = () => {
     }, []);
 
     const actionButton = (
-        <Button adaptive={true} onClick={() => navigate("/events/create-event")}
-        >
-            <Plus strokeWidth={2.25} />Додати
-        </Button>
+        <Button onClick={() => navigate("/events/create-event")}
+                iconLeading={Plus}
+        >Додати</Button>
     );
 
     if (loading) {

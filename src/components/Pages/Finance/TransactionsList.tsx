@@ -1,14 +1,14 @@
 import React, { useEffect } from "react";
 import styles from "./Finance.module.css";
 import {Plus, Undo2} from "lucide-react";
-import Button from "../../basic/Button/Button.tsx";
 import Table from "../../basic/Table/Table.tsx";
 import DefaultPage from "../../basic/DefaultPage/DefaultPage.tsx";
 import { useNavigate } from "react-router-dom";
-import { api } from "../../../utils/api.ts";
-import { safeDatetime } from "../../../utils/safeDate.ts";
+import { api } from "@/utils/api.ts";
+import { safeDatetime } from "@/utils/safeDate.ts";
 import UserLabel from "../../basic/User/UserLabel.tsx";
-import type { UserType } from "../../../types/Users.ts";
+import type { UserType } from "@/types/Users.ts";
+import {Button} from "@/ui/base/buttons/button.tsx";
 
 interface Transaction {
     id: string;
@@ -46,9 +46,13 @@ const TransactionsList: React.FC = () => {
     }, []);
 
     const returnElement = () => {
-        return (<Button variant="secondary" adaptive={true}
-            onClick={() => navigate("/finance")}
-        ><Undo2 /> Повернутись</Button>);
+        return (
+            <Button color="secondary"
+                onClick={() => navigate("/finance")}
+                iconLeading={Undo2}
+            >
+                Повернутись
+            </Button>);
     }
 
     if (!data)
@@ -122,11 +126,10 @@ const TransactionsList: React.FC = () => {
                 <>
                     {returnElement()}
                     <Button
-                        variant="primary"
-                        adaptive={true}
+                        color="primary" iconLeading={Plus}
                         onClick={() => navigate("/finance/transactions/create")}
                     >
-                        <Plus size={18} /> Додати транзакцію
+                        Додати транзакцію
                     </Button>
                 </>
             }

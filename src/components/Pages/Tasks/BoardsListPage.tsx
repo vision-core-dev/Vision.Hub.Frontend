@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {safeDate} from "../../../utils/safeDate.ts";
+import {safeDate} from "@/utils/safeDate.ts";
 import Table from "../../basic/Table/Table.tsx";
 import DefaultPage from "../../basic/DefaultPage/DefaultPage.tsx";
-import Button from "../../basic/Button/Button.tsx";
 import {Plus} from "lucide-react";
-import {api} from "../../../utils/api.ts";
+import {api} from "@/utils/api.ts";
+import {Button} from "@/ui/base/buttons/button.tsx";
 
 type BoardType = {
     id: string;
@@ -46,10 +46,8 @@ const BoardsListPage = () => {
         <DefaultPage
             title="Дошки"
             action={
-                <Button adaptive={true} onClick={() => navigate("/boards/create-board")}
-                >
-                    <Plus strokeWidth={2.25} />Додати
-                </Button>
+                <Button onClick={() => navigate("/boards/create-board")} iconLeading={Plus}
+                >Додати</Button>
             }
             isLoading={loading}
         >

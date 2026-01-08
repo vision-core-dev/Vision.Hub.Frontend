@@ -2,12 +2,12 @@ import React, { useState, useEffect } from "react";
 import styles from "./CalendarTimeline.module.css";
 import { addDays, format, isSameDay } from "date-fns";
 import { uk } from "date-fns/locale";
-import type { EventType } from "../../../../types/Events";
+import type { EventType } from "@/types/Events.ts";
 import DefaultPage from "../../../basic/DefaultPage/DefaultPage";
-import Button from "../../../basic/Button/Button";
 import { ChevronLeft, ChevronRight, Undo2 } from "lucide-react";
-import { api } from "../../../../utils/api";
+import { api } from "@/utils/api.ts";
 import {useNavigate} from "react-router-dom";
+import {Button} from "@/ui/base/buttons/button.tsx";
 
 const CalendarTimeline: React.FC = () => {
     const navigate = useNavigate();
@@ -85,18 +85,18 @@ const CalendarTimeline: React.FC = () => {
                     <div className={styles.actions}>
                         {!isToday && (
                             <div className={styles.returnWrap}>
-                                <Button variant="primary" adaptive onClick={goToday}>
-                                    <Undo2 /> Сьогодні
+                                <Button color="primary" onClick={goToday} iconTrailing={Undo2}>
+                                    Сьогодні
                                 </Button>
                             </div>
                         )}
 
-                        <Button variant="secondary" adaptive onClick={goPrev}>
-                            <ChevronLeft /> Назад
+                        <Button color="secondary" onClick={goPrev} iconLeading={ChevronLeft}>
+                            Назад
                         </Button>
 
-                        <Button variant="secondary" adaptive onClick={goNext}>
-                            Вперед <ChevronRight />
+                        <Button color="secondary" onClick={goNext} iconTrailing={ChevronRight}>
+                            Вперед
                         </Button>
                     </div>
                 </div>

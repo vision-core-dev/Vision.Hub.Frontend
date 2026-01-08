@@ -1,17 +1,17 @@
-import { api } from "../../../utils/api";
+import { api } from "@/utils/api.ts";
 import SmartForm from "../../basic/SmartForm/SmartForm";
 import { useNavigate } from "react-router-dom";
 import DefaultPage from "../../basic/DefaultPage/DefaultPage.tsx";
-import Button from "../../basic/Button/Button.tsx";
 import {ArrowLeft} from "lucide-react";
+import {Button} from "@/ui/base/buttons/button.tsx";
 
 const CreateUserPage = () => {
     const navigate = useNavigate();
 
     return (
         <DefaultPage>
-            <Button variant="link" onClick={() => navigate("/users/list")}>
-                <ArrowLeft size={20} /> Назад до списку
+            <Button color="link-color" onClick={() => navigate("/users/list")} iconLeading={ArrowLeft}>
+                Назад до списку
             </Button>
 
             <SmartForm

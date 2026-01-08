@@ -107,14 +107,6 @@ export default function BoardSettings({ boardId, isOpen, onOpenChange }: Props) 
                                 />
                             )}
 
-                            {selectedTab === "tags" && (
-                                <TagsTab
-                                    boardId={boardId}
-                                    tags={tags}
-                                    onUpdate={fetchSettings}
-                                />
-                            )}
-
                             {selectedTab === "lists" && (
                                 <ListsTab
                                     boardId={boardId}

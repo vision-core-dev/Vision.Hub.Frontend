@@ -1,17 +1,17 @@
 import { useNavigate } from "react-router-dom";
 import SmartForm from "../../basic/SmartForm/SmartForm.tsx";
-import {api} from "../../../utils/api.ts";
+import {api} from "@/utils/api.ts";
 import DefaultPage from "../../basic/DefaultPage/DefaultPage.tsx";
-import Button from "../../basic/Button/Button.tsx";
 import {ArrowLeft} from "lucide-react";
+import {Button} from "@/ui/base/buttons/button.tsx";
 
 const CreateEventPage = () => {
     const navigate = useNavigate();
 
     return (
         <DefaultPage title={"Створити подію"}>
-            <Button variant="link" onClick={() => navigate("/events/list")}>
-                <ArrowLeft size={20} /> Назад до списку
+            <Button color="link-color" onClick={() => navigate("/events/list")} iconLeading={ArrowLeft}>
+                Назад до списку
             </Button>
 
             <SmartForm

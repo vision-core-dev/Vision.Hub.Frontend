@@ -2,9 +2,9 @@ import React, { useEffect, useState, useRef } from "react";
 import styles from "./OfferAgreementPage.module.css";
 import { Handshake } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import Button from "../../../basic/Button/Button.tsx";
-import {api} from "../../../../utils/api.ts";
 import LoaderDots from "../../../basic/LoaderDots/LoaderDots.tsx";
+import {api} from "@/utils/api.ts";
+import {Button} from "@/ui/base/buttons/button.tsx";
 
 interface DocumentResponse {
     document: {
@@ -97,7 +97,7 @@ const OfferAgreementPage: React.FC = () => {
                     <Button
                         onClick={handleAccept}
                         disabled={!scrolledToBottom}
-                        variant={scrolledToBottom ? "primary" : "secondary"}
+                        color={scrolledToBottom ? "primary" : "secondary"}
                     >
                         {scrolledToBottom ? "✅ Підтвердити умови" : "📜 Пролистай до кінця"}
                     </Button>

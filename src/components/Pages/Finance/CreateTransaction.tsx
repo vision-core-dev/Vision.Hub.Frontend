@@ -1,10 +1,10 @@
 import React from "react";
 import {ArrowLeft} from "lucide-react";
-import Button from "../../basic/Button/Button.tsx";
 import DefaultPage from "../../basic/DefaultPage/DefaultPage.tsx";
 import {useNavigate} from "react-router-dom";
 import SmartForm from "../../basic/SmartForm/SmartForm.tsx";
-import {api} from "../../../utils/api.ts";
+import {api} from "@/utils/api.ts";
+import {Button} from "@/ui/base/buttons/button.tsx";
 
 const TransactionsList: React.FC = () => {
     const navigate = useNavigate();
@@ -12,7 +12,7 @@ const TransactionsList: React.FC = () => {
     return (
         <>
             <DefaultPage title="Створення транзакції">
-                <Button variant="link" onClick={() => navigate("/finance/transactions/list")}>
+                <Button color="link-color" onClick={() => navigate("/finance/transactions/list")}>
                     <ArrowLeft size={20} /> Назад до списку
                 </Button>
                 <SmartForm

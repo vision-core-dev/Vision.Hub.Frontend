@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { api } from "../../../../utils/api.ts";
+import { api } from "@/utils/api.ts";
 import styles from "./UserDetailsPage.module.css";
-import { safeDate, safeDatetime } from "../../../../utils/safeDate.ts";
-import type { SmallUser, UserType } from "../../../../types/Users.ts";
+import { safeDate, safeDatetime } from "@/utils/safeDate.ts";
+import type { SmallUser, UserType } from "@/types/Users.ts";
 import DefaultPage from "../../../basic/DefaultPage/DefaultPage.tsx";
-import Button from "../../../basic/Button/Button.tsx";
 import {ArrowLeft, X} from "lucide-react";
 import TransactionsListSection, {
     type TransactionItem
@@ -13,6 +12,7 @@ import TransactionsListSection, {
 import UserValue from "./UserValue/UserValue.tsx";
 import BadgesSection from "./BadgesSection/BadgesSection.tsx";
 import UserLabel from "../../../basic/User/UserLabel.tsx";
+import {Button} from "@/ui/base/buttons/button.tsx";
 
 export interface Badge {
     id: string;
@@ -156,7 +156,7 @@ const UserDetailsPage = () => {
 
 
     const backButton = (
-        <Button variant="link" onClick={() => navigate("/users/list")}>
+        <Button color="link-color" onClick={() => navigate("/users/list")}>
             <ArrowLeft size={20} /> Назад до списку
         </Button>
     );
@@ -230,7 +230,7 @@ const UserDetailsPage = () => {
                             </Button>
                         )}
                         {user.is_active ? (
-                            <Button variant="danger" onClick={handleDeactivate}>Деактивувати</Button>
+                            <Button color="primary-destructive" onClick={handleDeactivate}>Деактивувати</Button>
                         ) : (
                             <Button onClick={handleActivate}>Активувати</Button>
                         )}
@@ -280,7 +280,7 @@ const UserDetailsPage = () => {
 
                                                 {(actions.includes("change_org_structure") && editStructure) && (
                                                     <Button
-                                                        variant="danger"
+                                                        color="primary-destructive"
                                                         onClick={() => handleRemoveSupervisor(u.id)}
                                                     ><X /></Button>
                                                 )}
@@ -301,7 +301,7 @@ const UserDetailsPage = () => {
 
                                                 {(actions.includes("change_org_structure") && editStructure) && (
                                                     <Button
-                                                        variant="danger"
+                                                        color="primary-destructive"
                                                         onClick={() => handleRemoveSubordinate(u.id)}
                                                     ><X /></Button>
                                                 )}

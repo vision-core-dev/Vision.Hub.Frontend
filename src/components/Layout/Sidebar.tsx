@@ -1,95 +1,65 @@
-import React, { useState, useEffect } from "react";
+import type { FC } from "react";
+import React from "react";
 import { useAuth } from "../System/AuthContext";
+import { useLocation } from "react-router-dom";
+
 import {
-    ClipboardList,
+    LayoutDashboard,
+    CalendarDays,
+    SquareKanban,
+    CalendarRange,
     Users,
     Wallet,
+    Landmark,
     BarChart3,
     Settings,
-    SquareKanban,
-    ChevronLeft,
-    ChevronRight, LayoutDashboard, CalendarDays, CalendarRange, BookMarked, Landmark, Bot, Headset
+    BookMarked,
+    Bot,
+    Headset,
+    ClipboardList,
 } from "lucide-react";
-import styles from "./Layout.module.css";
-import { useNavigate, useLocation } from "react-router-dom";
-import {getSidebarText} from "../../types/Messages.ts";
 
-const icons: Record<string, React.ReactNode> = {
-    dashboard: <LayoutDashboard size={20} />,
-    calendar: <CalendarDays size={20} />,
-    boards: <SquareKanban size={20} />,
-    events: <CalendarRange size={20} />,
-    users: <Users size={20} />,
-    salary: <Wallet size={20} />,
-    finance: <Landmark size={20} />,
-    reports: <BarChart3 size={20} />,
-    settings: <Settings size={20} />,
-    knowledge: <BookMarked size={20} />,
-    "vision-bot": <Bot  size={20}/>,
-    "vision-support": <Headset size={20}/>,
+import type { NavItemType } from "@/ui/application/app-navigation/config";
+import { SidebarNavigationSimple } from "@/ui/application/app-navigation/sidebar-navigation/sidebar-simple";
+import { getSidebarText } from "@/types/Messages.ts";
+
+/* ================= ICON MAP ================= */
+
+const iconMap: Record<string, FC<{ className?: string }>> = {
+    dashboard: LayoutDashboard,
+    calendar: CalendarDays,
+    boards: SquareKanban,
+    events: CalendarRange,
+    users: Users,
+    salary: Wallet,
+    finance: Landmark,
+    reports: BarChart3,
+    settings: Settings,
+    knowledge: BookMarked,
+    "vision-bot": Bot,
+    "vision-support": Headset,
 };
+
+/* ================= SIDEBAR ================= */
 
 const Sidebar: React.FC = () => {
     const { role } = useAuth();
-    const navigate = useNavigate();
     const location = useLocation();
-    const [collapsed, setCollapsed] = useState(window.innerWidth < 900);
 
-    useEffect(() => {
-        const handleResize = () => {
-            setCollapsed(window.innerWidth < 900);
-        };
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
-    }, []);
+    const navItems: NavItemType[] =
+        role?.menu
+            ?.filter((key: string) => !key.startsWith("_"))
+            .map((key: string) => ({
+                label: getSidebarText(key),
+                href: `/${key}`,
+                icon: iconMap[key] ?? ClipboardList,
+                isActive: location.pathname.startsWith(`/${key}`),
+            })) ?? [];
 
     return (
-        <aside
-            className={`${styles.sidebar} ${
-                collapsed ? styles.collapsed : styles.expanded
-            }`}
-        >
-            <div className={styles.topSection}>
-                <nav className={styles.nav}>
-                    {role?.menu
-                        ?.filter((item: string) => !item.startsWith("_"))
-                        .map((item: string) => {
-                            const path = `/${item}`;
-                            const isActive = location.pathname.startsWith(path);
-
-                            return (
-                                <button
-                                    key={item}
-                                    className={`${styles.navItem} ${
-                                        isActive ? styles.activeNavItem : ""
-                                    }`}
-                                    onClick={() => {
-                                        navigate(path);
-                                        const main = document.querySelector(".main");
-                                        if (main) main.scrollTo({ top: 0, behavior: "smooth" });
-                                    }}
-                                >
-                                    {icons[item] || <ClipboardList size={20} />}
-                                    {!collapsed && <span>{getSidebarText(item)}</span>}
-                                </button>
-                            );
-                        })}
-                </nav>
-            </div>
-
-            <div className={styles.minimizeButton}>
-                <button
-                    className={styles.navItem}
-                    onClick={() => setCollapsed((prev) => !prev)}
-                >
-                    {collapsed ? (
-                        <ChevronRight size={20} strokeWidth={2.5} />
-                    ) : (
-                        <ChevronLeft size={20} strokeWidth={2.5} />
-                    )}
-                </button>
-            </div>
-        </aside>
+        <SidebarNavigationSimple
+            items={navItems}
+        />
     );
 };
 

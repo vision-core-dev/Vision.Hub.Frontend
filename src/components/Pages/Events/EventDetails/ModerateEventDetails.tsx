@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
-import type { EventInviteType, EventType } from "../../../../types/Events";
+import type { EventInviteType, EventType } from "@/types/Events.ts";
 import { format } from "date-fns";
 import { uk } from "date-fns/locale";
 import styles from "./EventDetails.module.css";
-import Button from "../../../basic/Button/Button";
-import { api } from "../../../../utils/api";
+import { api } from "@/utils/api.ts";
 import DefaultPage from "../../../basic/DefaultPage/DefaultPage";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -22,6 +21,7 @@ import Table from "../../../basic/Table/Table.tsx";
 import UserLabel from "../../../basic/User/UserLabel.tsx";
 import { safeDatetime } from "../../../../utils/safeDate.ts";
 import LoaderSpinner from "../../../basic/LoaderSpinner/LoaderSpinner.tsx";
+import {Button} from "@/ui/base/buttons/button.tsx";
 
 interface UserShort {
     id: string;
@@ -145,7 +145,7 @@ const ModerateEventDetails = () => {
                     {/* ✅ Відмітити присутність */}
                     {(actions.includes("mark_attended") && row.status !== "attended") && (
                         <Button
-                            variant="primary"
+                            color="primary"
                             onClick={() => handleMark(row.user.id, true)}
                             title="Відмітити як відвідав"
                             disabled={!!userLoading}
@@ -162,7 +162,7 @@ const ModerateEventDetails = () => {
                         row.status !== "declined" &&
                         row.status !== "attended") && (
                         <Button
-                            variant="danger"
+                            color="primary-destructive"
                             onClick={() => handleMark(row.user.id, false)}
                             title="Відмітити як відсутній"
                             disabled={!!userLoading}
@@ -234,7 +234,7 @@ const ModerateEventDetails = () => {
 
                 <Table columns={columns} data={invitees} />
 
-                <Button variant="link" onClick={() => navigate("/events/list")}>
+                <Button color="link-color" onClick={() => navigate("/events/list")}>
                     <ArrowLeft size={20} /> Назад до списку
                 </Button>
             </div>

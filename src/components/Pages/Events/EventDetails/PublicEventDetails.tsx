@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
-import type { EventInviteType, EventType } from "../../../../types/Events";
+import type { EventInviteType, EventType } from "@/types/Events.ts";
 import { format } from "date-fns";
 import { uk } from "date-fns/locale";
 
 import styles from "./EventDetails.module.css";
-import Button from "../../../basic/Button/Button";
-import { api } from "../../../../utils/api";
+import { api } from "@/utils/api.ts";
 import DefaultPage from "../../../basic/DefaultPage/DefaultPage";
 import {useNavigate, useParams} from "react-router-dom";
 import {MapPin, Clock, Check, X, Undo2, ExternalLink, Pin, TextAlignEnd, CalendarClock, ArrowLeft} from "lucide-react";
+import {Button} from "@/ui/base/buttons/button.tsx";
 
 interface PublicEventDetailsResponse {
     event: EventType;
@@ -132,9 +132,7 @@ const PublicEventDetails = () => {
                                 </span>
                             </div>
                             {(actions.includes("join") && event.location_url) && (
-                                <Button variant="primary"
-                                        onClick={() => window.open(event?.location_url)}
-                                ><ExternalLink color="#fff" strokeWidth={2.5} /></Button>
+                                <Button onClick={() => window.open(event?.location_url)} iconLeading={ExternalLink} />
                             )}
                         </div>
                     </div>
@@ -146,24 +144,24 @@ const PublicEventDetails = () => {
                 <div className={styles.actions}>
                     {invite.status === "pending" && (
                         <>
-                            <Button onClick={acceptInvite}><Check strokeWidth={2.5} /> Прийняти</Button>
-                            <Button onClick={declineInvite} variant="secondary">
-                                <X strokeWidth={2.5} /> Відхилити
+                            <Button onClick={acceptInvite} iconLeading={Check}>Прийняти</Button>
+                            <Button onClick={declineInvite} color="secondary" iconLeading={X}>
+                                Відхилити
                             </Button>
                         </>
                     )}
                     {invite.status === "accepted" && actions.includes("decline") && (
-                        <Button onClick={declineInvite} variant="secondary">
-                            <Undo2 strokeWidth={2.5} /> Відмовитись
+                        <Button onClick={declineInvite} color="secondary" iconLeading={Undo2}>
+                            Відмовитись
                         </Button>
                     )}
                     {invite.status === "declined" && actions.includes("accept") && (
-                        <Button onClick={acceptInvite}><Undo2 strokeWidth={2.5} /> Передумати</Button>
+                        <Button onClick={acceptInvite} iconLeading={Undo2}>Передумати</Button>
                     )}
                 </div>
 
-                <Button variant="link" onClick={() => navigate("/calendar")}>
-                    <ArrowLeft size={20} /> Назад до календаря
+                <Button color="link-color" onClick={() => navigate("/calendar")} iconLeading={ArrowLeft}>
+                    Назад до календаря
                 </Button>
             </div>
         </DefaultPage>

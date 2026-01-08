@@ -1,13 +1,13 @@
 import React, { useEffect } from "react";
 import styles from "./Finance.module.css";
 import {ArrowLeftRight, HandCoins, Plus} from "lucide-react";
-import Button from "../../basic/Button/Button.tsx";
 import Table from "../../basic/Table/Table.tsx";
 import DefaultPage from "../../basic/DefaultPage/DefaultPage.tsx";
 import {useNavigate} from "react-router-dom";
 import UserLabel from "../../basic/User/UserLabel.tsx";
-import type { UserType } from "../../../types/Users.ts";
-import { api } from "../../../utils/api.ts";
+import type { UserType } from "@/types/Users.ts";
+import { api } from "@/utils/api.ts";
+import {Button} from "@/ui/base/buttons/button.tsx";
 
 interface NoWithdrawnDataRes {
     items: Array<{
@@ -101,14 +101,14 @@ const FinancePage: React.FC = () => {
             <DefaultPage title={`0.00 ₴`}
                         action={(
                              <>
-                                <Button variant="primary" adaptive={true} onClick={() => navigate('/finance/withdraws/list')}>
-                                    <HandCoins size={18} /> Запити на вивід
+                                <Button color="primary" onClick={() => navigate('/finance/withdraws/list')} iconLeading={HandCoins}>
+                                    Запити на вивід
                                 </Button>
-                                <Button variant="primary" adaptive={true} onClick={() => navigate('/finance/transactions/list')}>
-                                    <ArrowLeftRight size={18} /> Транзакції
+                                <Button color="primary" onClick={() => navigate('/finance/transactions/list')} iconLeading={ArrowLeftRight}>
+                                    Транзакції
                                 </Button>
-                                <Button variant="primary" adaptive={true} onClick={() => navigate('/finance/spendings/add-spending')}>
-                                    <Plus size={18} /> Додати витрати
+                                <Button color="primary" onClick={() => navigate('/finance/spendings/add-spending')} iconLeading={Plus}>
+                                    Додати витрати
                                 </Button>
                             </>
                         )}>

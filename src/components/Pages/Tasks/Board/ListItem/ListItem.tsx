@@ -2,12 +2,12 @@ import styles from "./ListItem.module.css";
 import TaskItem from "../TaskItem/TaskItem";
 import { Plus, X } from "lucide-react";
 import type { List, Task, TaskTag } from "../BoardPage/BoardPage.tsx";
-import Button from "../../../../basic/Button/Button.tsx";
 import React, { useEffect, useState } from "react";
-import { api } from "../../../../../utils/api.ts";
-import type { UserType } from "../../../../../types/Users.ts";
-import { getTextColor } from "../../../../../utils/colors.ts";
+import { api } from "@/utils/api.ts";
+import type { UserType } from "@/types/Users.ts";
+import { getTextColor } from "@/utils/colors.ts";
 import {useParams} from "react-router-dom";
+import {Button} from "@/ui/base/buttons/button.tsx";
 
 type ListProps = {
     isBoardPublic: boolean;
@@ -267,12 +267,10 @@ const ListItem = ({
                                 }
                             />
                             <div className={styles.actions}>
-                                <Button variant="primary" onClick={createTask} disabled={loading}>
-                                    {loading ? "Створюється..." : "Додати задачу"}
+                                <Button color="primary" onClick={createTask} disabled={loading} isLoading={loading}>
+                                    Додати задачу
                                 </Button>
-                                <Button variant="secondary" onClick={() => setShowCreateTask(false)}>
-                                    <X />
-                                </Button>
+                                <Button color="secondary" onClick={() => setShowCreateTask(false)} iconLeading={X} />
                             </div>
                         </div>
                     )}

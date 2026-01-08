@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styles from "./ModuleEditorPage.module.css";
-import type { VisionBotModule } from "../../../../types/VisionBot.ts";
-import { visionBotApi } from "../../../../api/visionBot.ts";
+import type { VisionBotModule } from "@/types/VisionBot.ts";
+import { visionBotApi } from "@/api/visionBot.ts";
 import DefaultPage from "../../../basic/DefaultPage/DefaultPage.tsx";
 import CodeEditor from "../CodeEditor/CodeEditor.tsx";
-import Button from "../../../basic/Button/Button.tsx";
 import { Undo2 } from "lucide-react";
+import {Button} from "@/ui/base/buttons/button.tsx";
 
 const ModuleEditorPage: React.FC = () => {
     const { guildId, moduleId } = useParams<{ guildId: string,  moduleId: string }>();
@@ -62,11 +62,11 @@ const ModuleEditorPage: React.FC = () => {
 
     const returnElement = () => (
         <Button
-            variant="secondary"
-            adaptive={true}
+            color="secondary"
+            iconLeading={Undo2}
             onClick={() => navigate(`/vision-bot/s/${guildId}`)}
         >
-            <Undo2 /> Повернутись
+            Повернутись
         </Button>
     );
 

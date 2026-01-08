@@ -1,22 +1,14 @@
-import React, {type ReactNode } from "react";
+import type { FC } from "react";
+import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
-import Header from "./Header/Header.tsx";
-import Footer from "./Footer";
-import styles from "./Layout.module.css";
 
-interface LayoutProps {
-    children?: ReactNode;
-}
-
-const Layout: React.FC<LayoutProps> = ({ children }) => {
+const Layout: FC = () => {
     return (
-        <div className={styles.app}>
-            <Header />
-            <div className={styles.wrapper}>
-                <Sidebar />
-                <main className={styles.main}>{children}</main>
-            </div>
-            <Footer />
+        <div className="flex h-screen dark:bg-gray-900">
+            <Sidebar />
+            <main className="flex-1 overflow-auto">
+                <Outlet />
+            </main>
         </div>
     );
 };

@@ -5,7 +5,7 @@ import KnowledgeSidebar from "../KnowledgeSidebar/KnowledgeSidebar";
 import KnowledgeContent from "../KnowledgeContent/KnowledgeContent";
 import KnowledgeContentEdit from "../KnowledgeContent/KnowledgeContentEdit.tsx"; // 👈 новий компонент
 import { Menu } from "lucide-react";
-import Button from "../../../basic/Button/Button.tsx";
+import {Button} from "@/ui/base/buttons/button.tsx";
 
 const KnowledgeLayout: React.FC = () => {
     const navigate = useNavigate();
@@ -56,9 +56,7 @@ const KnowledgeLayout: React.FC = () => {
                     documentId={selectedDoc}
                     sidebarButton={
                         windowWidth < 900 && !sidebarOpened && (
-                            <Button variant="secondary" onClick={() => setSidebarOpened(true)}>
-                                <Menu size={22} />
-                            </Button>
+                            <Button color="secondary" onClick={() => setSidebarOpened(true)} iconLeading={Menu} />
                         )
                     }
                     sidebarClose={() => sidebarOpened && setSidebarOpened(false)}
@@ -68,9 +66,7 @@ const KnowledgeLayout: React.FC = () => {
                     documentId={selectedDoc}
                     sidebarButton={
                         windowWidth < 900 && !sidebarOpened && (
-                            <Button variant="secondary" onClick={() => setSidebarOpened(true)}>
-                                <Menu size={22} />
-                            </Button>
+                            <Button color="secondary" onClick={() => setSidebarOpened(true)} iconLeading={Menu} />
                         )
                     }
                     sidebarClose={() => sidebarOpened && setSidebarOpened(false)}

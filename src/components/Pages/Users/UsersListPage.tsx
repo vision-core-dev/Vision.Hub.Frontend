@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { api } from "../../../utils/api";
+import { api } from "@/utils/api.ts";
 import { useNavigate } from "react-router-dom";
 import Table from "../../basic/Table/Table.tsx";
 import UserLabel from "../../basic/User/UserLabel.tsx";
 import DefaultPage from "../../basic/DefaultPage/DefaultPage.tsx";
-import Button from "../../basic/Button/Button.tsx";
 import {Plus} from "lucide-react";
-import type {UserRoleType} from "../../../types/Users.ts";
+import type {UserRoleType} from "@/types/Users.ts";
+import {Button} from "@/ui/base/buttons/button.tsx";
 
 interface User {
     id: string;
@@ -64,9 +64,9 @@ const UsersListPage = () => {
             <DefaultPage
                 title={`Користувачі`}
                 action={
-                    <Button adaptive={true} onClick={() => navigate("/users/add-user")}
+                    <Button onClick={() => navigate("/users/add-user")} iconLeading={Plus}
                     >
-                        <Plus strokeWidth={2.25} />Додати
+                        Додати
                     </Button>
                 }
             >
@@ -80,9 +80,9 @@ const UsersListPage = () => {
             <DefaultPage
                 title={`Користувачі ${activeUsers.length}`}
                 action={
-                    <Button adaptive={true} onClick={() => navigate("/users/add-user")}
+                    <Button onClick={() => navigate("/users/add-user")} iconLeading={Plus}
                     >
-                        <Plus strokeWidth={2.25} />Додати
+                        Додати
                     </Button>
                 }
             >

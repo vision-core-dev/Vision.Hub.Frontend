@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { api } from "../../../../utils/api.ts";
+import { api } from "@/utils/api.ts";
 
 import styles from "./SubmitForm.module.css";
 import LoaderDots from "../../../basic/LoaderDots/LoaderDots.tsx";
-import Button from "../../../basic/Button/Button.tsx";
 import FieldRenderer from "./FieldRenderer.tsx";
+import {Button} from "@/ui/base/buttons/button.tsx";
 
 /* ================= TYPES ================= */
 
@@ -186,7 +186,7 @@ export default function SubmitForm() {
 
                         <div className={styles.actions}>
                             {step > 0 && (
-                                <Button variant="link" onClick={goBack}>
+                                <Button color="link-color" onClick={goBack}>
                                     Назад
                                 </Button>
                             )}
