@@ -54,7 +54,7 @@ const NotificationsMenu: React.FC<Props> = ({ isOpen, setIsOpen, onReadAll }: Pr
 
     return (
         <SlideoutMenu.Trigger isOpen={isOpen} onOpenChange={setIsOpen}>
-            <SlideoutMenu isDismissable>
+            <SlideoutMenu className="z-100" isDismissable>
 
                 <SlideoutMenu.Header onClose={() => setIsOpen(false)} className="relative flex w-full gap-0.5 px-4 pt-6 md:px-6">
                     <h1 className="text-md font-semibold text-primary md:text-lg">Сповіщення</h1>

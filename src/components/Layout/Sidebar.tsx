@@ -58,6 +58,7 @@ const Sidebar: React.FC = () => {
 
     return (
         <SidebarNavigationSimple
+            className="z-50"
             items={navItems}
         />
     );
