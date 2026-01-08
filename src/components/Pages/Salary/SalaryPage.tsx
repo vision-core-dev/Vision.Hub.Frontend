@@ -1,13 +1,19 @@
-import React, {useEffect, useState} from "react";
-import styles from "./SalaryPage.module.css";
-import {HandCoins} from "lucide-react";
-import SalaryWithdrawModal from "./SalaryWithdrawModal.tsx";
-import Button from "../../basic/Button/Button.tsx";
-import Table from "../../basic/Table/Table.tsx";
-import DefaultPage from "../../basic/DefaultPage/DefaultPage.tsx";
-import {api} from "../../../utils/api.ts";
-import {safeDatetime} from "../../../utils/safeDate.ts";
-import TransactionsListSection from "../Finance/TransactionsListSection/TransactionsListSection.tsx";
+import React, { useEffect, useState } from "react";
+import { HandCoins } from "lucide-react";
+
+import DefaultPage from "../../basic/DefaultPage/DefaultPage";
+import Table from "../../basic/Table/Table";
+
+import SalaryWithdrawModal from "./SalaryWithdrawModal";
+import TransactionsListSection from "../Finance/TransactionsListSection/TransactionsListSection";
+
+import { MetricsSimple, MetricsChart04 } from "@/ui/application/metrics/metrics";
+import { api } from "@/utils/api";
+import { safeDatetime } from "@/utils/safeDate";
+import {Button} from "@/ui/base/buttons/button.tsx";
+import * as Alerts from "@/ui/application/alerts/alerts.tsx";
+
+/* ===================== TYPES ===================== */
 
 export interface Transaction {
     id: string;
@@ -35,37 +41,84 @@ interface BalanceData {
     withdraw_requests: WithdrawRequest[];
 }
 
+/* ===================== HELPERS ===================== */
+
+const isSameMonth = (date: Date, ref: Date) =>
+    date.getMonth() === ref.getMonth() &&
+    date.getFullYear() === ref.getFullYear();
+
+const percentChange = (current: number, prev: number) => {
+    if (prev === 0) return 100;
+    return Math.round(((current - prev) / prev) * 100);
+};
+
+/* ===================== PAGE ===================== */
+
 const SalaryPage: React.FC = () => {
     const [data, setData] = useState<BalanceData | null>(null);
     const [showModal, setShowModal] = useState(false);
 
     const fetchBalanceData = async () => {
         try {
-            setData(null);
-
-            const response = await api.get("/v1/Hub/Finance/GetSalaryInfo");
-            const result = await response.json();
-            if (response.ok) {
-                setData(result);
-            } else {
-                console.error("Failed to fetch balance data:", result.message);
-            }
-        } catch (error) {
-            console.error("Error fetching balance data:", error);
+            const res = await api.get("/v1/Hub/Finance/GetSalaryInfo");
+            const json = await res.json();
+            if (res.ok) setData(json);
+        } catch (e) {
+            console.error("Salary fetch error", e);
         }
-    }
+    };
 
     useEffect(() => {
         fetchBalanceData();
     }, []);
 
-    if (!data)
-        return <DefaultPage title="Моя зарплата" isLoading={true} />;
+    if (!data) {
+        return <DefaultPage title="Моя зарплата" isLoading />;
+    }
+
+    /* ===================== METRICS LOGIC ===================== */
+
+    const now = new Date();
+    const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+
+    const incomeThisMonth = data.transactions.filter(
+        t =>
+            t.type === "income" &&
+            isSameMonth(new Date(t.transaction_at), now)
+    );
+
+    const incomePrevMonth = data.transactions.filter(
+        t =>
+            t.type === "income" &&
+            isSameMonth(new Date(t.transaction_at), prevMonth)
+    );
+
+    const currentMonthTotal = incomeThisMonth.reduce((s, t) => s + t.amount, 0);
+    const prevMonthTotal = incomePrevMonth.reduce((s, t) => s + t.amount, 0);
+
+    const change = percentChange(currentMonthTotal, prevMonthTotal);
+
+    const daysInMonth = new Date(
+        now.getFullYear(),
+        now.getMonth() + 1,
+        0
+    ).getDate();
+
+    const chartData = Array.from({ length: daysInMonth }, (_, i) => {
+        const day = i + 1;
+        const sum = incomeThisMonth
+            .filter(t => new Date(t.transaction_at).getDate() === day)
+            .reduce((s, t) => s + t.amount, 0);
+
+        return { value: sum };
+    });
+
+    /* ===================== TABLE ===================== */
 
     const withdrawColumns = [
         {
             key: "created_at",
-            label: "Дата і час",
+            label: "Дата",
             render: (v: string) => safeDatetime(v),
         },
         {
@@ -76,76 +129,114 @@ const SalaryPage: React.FC = () => {
         {
             key: "status",
             label: "Статус",
-            render: (v: string) => (
-                <span className={`${styles.status} ${styles[v]}`}>
-                    {v === "pending"
-                        ? "Очікує"
-                        : v === "approved"
-                            ? "Прийнято"
-                            : v === "paid"
-                                ? "Перераховано"
-                                : "Відхилено"}
-                </span>
-            ),
+            render: (v: string) =>
+                ({
+                    pending: "Очікує",
+                    approved: "Прийнято",
+                    paid: "Виплачено",
+                    rejected: "Відхилено",
+                }[v]),
         },
         {
             key: "comment",
             label: "Коментар",
-            render: (v: string) => <span className={styles.requestDescription}>{v || "—"}</span>,
-        },
-        {
-            key: "reason",
-            label: "Причина відхилення",
-            render: (v: string, row: WithdrawRequest) => <span className={styles.requestDescription}>{row.status == "pending" ? "—" : (row.status == "rejected" ? (v || "Не вказано") : "—")}</span>,
+            render: (v: string) => v || "—",
         },
     ];
 
+    /* ===================== RENDER ===================== */
+
     return (
-        <DefaultPage title="Моя зарплата"
-            action={data.balance > 0 && (
-                <Button variant="primary" adaptive={true} onClick={() => setShowModal(true)}>
-                    <HandCoins size={18} /> Вивести гроші
-                </Button>
-            )}
+        <DefaultPage
+            title="Моя зарплата"
+            action={
+                data.balance > 0 && (
+                    <Button
+                        color="primary"
+                        onClick={() => setShowModal(true)}
+                        iconLeading={HandCoins}
+                    >
+                        Вивести гроші
+                    </Button>
+                )
+            }
         >
-            <div className={styles.container}>
+            <div className="flex flex-col gap-6 w-full">
 
-                {/* Баланс */}
-                <section className={styles.cards}>
-                    <div className={styles.card}>
-                        <p className={styles.label}>Поточний баланс</p>
-                        <h2 className={styles.green}>{data.balance.toFixed(2)} ₴</h2>
-                    </div>
+                {/* === MAIN METRICS === */}
+                <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                    <MetricsSimple
+                        title={`${data.balance.toFixed(2)} ₴`}
+                        subtitle="Поточний баланс"
+                        type="modern"
+                        trend={data.balance > 0 ? "positive" : "negative"}
+                        footer={null}
+                    />
 
-                    <div className={styles.card}>
-                        <p className={styles.label}>Всього заробив</p>
-                        <h2 className={styles.green}>{(data.balance + data.withdrawn_total).toFixed(2)} ₴</h2>
-                    </div>
+                    <MetricsSimple
+                        title={`${(data.balance + data.withdrawn_total)} ₴`}
+                        subtitle="Всього заробив"
+                        type="modern"
+                        trend="positive"
+                        footer={null}
+                    />
 
-                    <div className={styles.card}>
-                        <p className={styles.label}>Вже вивів</p>
-                        <h2 className={styles.blue}>{data.withdrawn_total.toFixed(2)} ₴</h2>
-                    </div>
+                    <MetricsSimple
+                        title={`${data.withdrawn_total} ₴`}
+                        subtitle="Вже вивів"
+                        type="modern"
+                        trend="positive"
+                        footer={null}
+                    />
                 </section>
 
-                {/* Трансакції */}
+                {/* === MONTH ACTIVITY === */}
+                <section className="w-full">
+                    <MetricsChart04
+                        title={`${currentMonthTotal} ₴`}
+                        subtitle="Заробіток за місяць"
+                        change={`${Math.abs(change)} ₴`}
+                        changeTrend={change >= 0 ? "positive" : "negative"}
+                        changeDescription="порівняно з минулим місяцем"
+                        chartData={chartData}
+                    />
+                </section>
+
+                <Alerts.AlertFloating
+                    color="error"
+                    title="Як вивести кошти?"
+                    description="На даний момент виплати зарплати здіснюються в ручному форматі. Ми самі зв'яжемось під час виплати ЗП."
+                />
+
+                {/* === TRANSACTIONS === */}
                 <TransactionsListSection transactions={data.transactions} />
 
-                {/* Запити на вивід */}
+                {/* === WITHDRAW REQUESTS === */}
                 {data.withdraw_requests.length > 0 && (
-                    <section className={styles.withdraws}>
-                        <h3>Запити на вивід</h3>
-                        <Table columns={withdrawColumns} data={data.withdraw_requests} />
+                    <section className="flex flex-col gap-3">
+                        <h3 className="text-lg font-semibold">
+                            Запити на вивід
+                        </h3>
+                        <Table
+                            columns={withdrawColumns}
+                            data={data.withdraw_requests}
+                        />
                     </section>
                 )}
 
-                {showModal && (
-                    <SalaryWithdrawModal
-                        onClose={() => setShowModal(false)}
-                        withdrawLimit={Math.min(data.balance, data.withdrawable)}
-                        onSuccess={() => fetchBalanceData()}
-                    />
-                )}
+                <SalaryWithdrawModal
+                    isOpen={showModal}
+                    onOpenChange={(open) => {
+                        if (!open) {
+                            setShowModal(false);
+                        }
+                    }}
+                    withdrawLimit={Math.min(
+                        data.balance,
+                        data.withdrawable
+                    )}
+                    onSuccess={fetchBalanceData}
+                />
             </div>
         </DefaultPage>
     );
