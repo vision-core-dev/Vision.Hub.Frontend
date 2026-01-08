@@ -1,9 +1,8 @@
 import { useNavigate, useParams } from "react-router-dom";
 import styles from "./SupportSidebar.module.css";
-import Input from "../../../basic/Input/Input.tsx";
 import {useEffect, useState} from "react";
 import LoaderDots from "../../../basic/LoaderDots/LoaderDots.tsx";
-import {api} from "../../../../utils/api.ts";
+import {api} from "@/utils/api.ts";
 
 interface VisionSupportUser {
     telegram_id: number
@@ -48,6 +47,7 @@ function SupportSidebar({ onSelectChat }: { onSelectChat?: () => void }) {
 
         load();
 
+        // eslint-disable-next-line prefer-const
         timer = setInterval(() => {
             fetchBotUsers();
         }, 5000); // ⏱ кожні 5 секунд
@@ -57,8 +57,6 @@ function SupportSidebar({ onSelectChat }: { onSelectChat?: () => void }) {
 
     return (
         <div className={styles.sidebar}>
-            <Input type="text" placeholder="Пошук..." />
-
             {isLoading ? (
                 <LoaderDots />
             ) : (

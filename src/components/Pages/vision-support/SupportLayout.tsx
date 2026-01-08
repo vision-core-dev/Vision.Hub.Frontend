@@ -1,7 +1,6 @@
 import { Outlet, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
-import SupportSidebar from "../SupportSidebar/SupportSidebar";
-import styles from "./SupportLayout.module.css";
+import SupportSidebar from "./SupportSidebar/SupportSidebar.tsx";
 
 export default function SupportLayout() {
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -30,7 +29,7 @@ export default function SupportLayout() {
     }, [isChatOpen, isMobile]);
 
     return (
-        <div className={styles.wrapper}>
+        <div className="flex h-full w-full">
             {(!isMobile || sidebarOpened) && (
                 <SupportSidebar
                     onSelectChat={() => {
@@ -40,12 +39,10 @@ export default function SupportLayout() {
             )}
 
             {(!isMobile || !sidebarOpened) && (
-                <div className={styles.content}>
-                    <Outlet context={{
-                        isMobile,
-                        openSidebar: () => setSidebarOpened(true),
-                    }} />
-                </div>
+                <Outlet context={{
+                    isMobile,
+                    openSidebar: () => setSidebarOpened(true),
+                }} />
             )}
         </div>
     );

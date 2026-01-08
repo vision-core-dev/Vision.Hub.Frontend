@@ -32,8 +32,8 @@ import CreateTransaction from "./components/Pages/Finance/CreateTransaction.tsx"
 import ServersListPage from "./components/Pages/vision-bot/ServersList/ServersListPage.tsx";
 import ServerViewPage from "./components/Pages/vision-bot/ServerView/ServerViewPage.tsx";
 import ModuleEditorPage from "./components/Pages/vision-bot/ModuleEditor/ModuleEditorPage.tsx";
-import SupportLayout from "./components/Pages/vision-support/SupportLayout/SupportLayout.tsx";
-import ChatLayout from "./components/Pages/vision-support/SupportChat/ChatLayout/ChatLayout.tsx";
+import SupportLayout from "./components/Pages/vision-support/SupportLayout.tsx";
+import ChatLayout from "./components/Pages/vision-support/SupportChat/ChatLayout.tsx";
 import SubmitForm from "./components/Pages/forms/SubmitForm/SubmitForm.tsx";
 import FormResultsView from "./components/Pages/forms/FormResultsView/FormResultsView.tsx";
 

@@ -1,9 +1,8 @@
 import { useParams, useOutletContext } from "react-router-dom";
-import styles from "./ChatLayout.module.css";
-import ChatHeader from "../ChatHeader/ChatHeader.tsx";
-import ChatMessages from "../ChatMessages/ChatMessages.tsx";
-import ChatFooter from "../ChatFooter/ChatFooter.tsx";
-import {api} from "../../../../../utils/api.ts";
+import ChatHeader from "./ChatHeader.tsx";
+import {api} from "@/utils/api.ts";
+import {ChatMessagesProvider} from "@/components/Pages/vision-support/SupportChat/ChatMessagesProvider.tsx";
+import {ChatComposer} from "@/components/Pages/vision-support/SupportChat/ChatComposer.tsx";
 
 type LayoutCtx = {
     isMobile: boolean;
@@ -19,24 +18,25 @@ function SupportChat() {
 
         form.append("telegram_user_id", String(telegramUserId));
         if (text) form.append("text", text);
-
         files.forEach(f => form.append("files", f));
 
         await api.post("/v1/VisionSupport/SendAnswer", form);
     };
 
- 
     return (
-        <div className={styles.chat}>
+        <div className="flex h-full w-full flex-col">
             <ChatHeader
                 userId={telegramUserId}
                 showMenu={isMobile}
                 onMenuClick={openSidebar}
             />
-            <ChatMessages userId={telegramUserId} />
-            <ChatFooter onSend={sendAnswer} />
+
+            <ChatMessagesProvider telegramUserId={telegramUserId} />
+
+            <ChatComposer onSend={sendAnswer} />
         </div>
     );
 }
+
 
 export default SupportChat;
