@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import { useMemo, useState } from "react";
+import { Plus, Search } from "lucide-react";
+import { Dropdown } from "@/ui/base/dropdown/dropdown";
+import { ButtonUtility } from "@/ui/base/buttons/button-utility";
+import { Input } from "@/ui/base/input/input";
+import {BadgeWithButton} from "@/ui/base/badges/badges";
+import { api } from "@/utils/api";
 import styles from "./TagSelector.module.css";
-import { Plus, X, Search } from "lucide-react";
-import { api } from "@/utils/api.ts";
-import { getTextColor } from "@/utils/colors.ts";
-import {ButtonUtility} from "@/ui/base/buttons/button-utility.tsx";
 
 interface Tag {
     id: string;
@@ -15,95 +17,89 @@ interface Props {
     taskId: string;
     boardTags: Tag[];
     selectedTags: Tag[];
-    onUpdate: (newTags: Tag[]) => void;
+    onUpdate: (tags: Tag[]) => void;
 }
 
-const TagSelector: React.FC<Props> = ({ taskId, boardTags, selectedTags, onUpdate }) => {
-    const [showSelect, setShowSelect] = useState(false);
+export const TagSelector = ({
+                                taskId,
+                                boardTags,
+                                selectedTags,
+                                onUpdate,
+                            }: Props) => {
     const [search, setSearch] = useState("");
 
-    // 🔎 Фільтрація тегів
-    const filteredTags = boardTags.filter(
-        (tag) =>
-            tag.name.toLowerCase().includes(search.toLowerCase()) &&
-            !selectedTags.some((t) => t.id === tag.id)
-    );
+    /* available tags */
+    const availableTags = useMemo(() => {
+        const lower = search.toLowerCase();
+        return boardTags.filter(
+            (t) =>
+                !selectedTags.some((s) => s.id === t.id) &&
+                t.name.toLowerCase().includes(lower)
+        );
+    }, [boardTags, selectedTags, search]);
 
-    const handleAddTag = async (tag: Tag) => {
-        try {
-            await api.post(`/v1/Hub/Tasks/${taskId}/AssignTag`, { tag_id: tag.id });
-            onUpdate([...selectedTags, tag]);
-            setShowSelect(false);
-            setSearch("");
-        } catch (e) {
-            console.error("Failed to assign tag", e);
-        }
+    /* actions */
+    const assign = async (tag: Tag) => {
+        await api.post(`/v1/Hub/Tasks/${taskId}/AssignTag`, {
+            tag_id: tag.id,
+        });
+        onUpdate([...selectedTags, tag]);
+        setSearch("");
     };
 
-    const handleRemoveTag = async (tagId: string) => {
-        try {
-            await api.post(`/v1/Hub/Tasks/${taskId}/UnassignTag`, { tag_id: tagId });
-            onUpdate(selectedTags.filter((t) => t.id !== tagId));
-        } catch (e) {
-            console.error("Failed to unassign tag", e);
-        }
+    const unassign = async (id: string) => {
+        await api.post(`/v1/Hub/Tasks/${taskId}/UnassignTag`, {
+            tag_id: id,
+        });
+        onUpdate(selectedTags.filter((t) => t.id !== id));
     };
 
     return (
-        <div className={styles.tagsWrapper}>
-            <div className={styles.tagsList}>
+        <div className={styles.wrapper}>
+            <div className={styles.chips}>
+                {/* selected tags */}
                 {selectedTags.map((tag) => (
-                    <div
-                        key={tag.id}
-                        className={styles.tag}
-                        style={{ backgroundColor: tag.color, color: getTextColor(tag.color) }}
-                    >
-                        <span>{tag.name}</span>
-                        <X
-                            color={getTextColor(tag.color)}
-                            onClick={() => handleRemoveTag(tag.id)}
-                            className={styles.removeBtn}
-                            size={14}
-                        />
-                    </div>
+                    <BadgeWithButton type="color" color="gray" size="lg" buttonLabel="Clear" onButtonClick={() => unassign(tag.id)}>
+                        {tag.name}
+                    </BadgeWithButton >
                 ))}
-                <ButtonUtility onClick={() => setShowSelect((prev) => !prev)} icon={Plus} />
-            </div>
 
-            {showSelect && (
-                <div className={styles.dropdown}>
-                    <div className={styles.searchBox}>
-                        <Search size={14} className={styles.searchIcon} />
-                        <input
-                            type="text"
-                            placeholder="Пошук мітки..."
+                {/* add */}
+                <Dropdown.Root>
+                    <ButtonUtility icon={Plus} />
+
+                    <Dropdown.Popover className={styles.dropdown}>
+                        <Input
+                            placeholder="Пошук мітки…"
                             value={search}
-                            onChange={(e) => setSearch(e.target.value)}
+                            onChange={(v) => setSearch(v as string)}
+                            icon={Search}
                         />
-                    </div>
 
-                    <div className={styles.tagsListDropdown}>
-                        {filteredTags.map((tag) => (
-                            <div
-                                key={tag.id}
-                                className={styles.tagOption}
-                                onClick={() => handleAddTag(tag)}
-                            >
-                                <span
-                                    className={styles.tagColor}
-                                    style={{ backgroundColor: tag.color }}
-                                />
-                                {tag.name}
-                            </div>
-                        ))}
-                        {filteredTags.length === 0 && (
-                            <div className={styles.empty}>Нічого не знайдено</div>
-                        )}
-                    </div>
-                </div>
-            )}
+                        <div className={styles.list}>
+                            {availableTags.map((tag) => (
+                                <div
+                                    key={tag.id}
+                                    className={styles.option}
+                                    onClick={() => assign(tag)}
+                                >
+                                    <span
+                                        className={styles.color}
+                                        style={{ backgroundColor: tag.color }}
+                                    />
+                                    {tag.name}
+                                </div>
+                            ))}
+
+                            {availableTags.length === 0 && (
+                                <div className={styles.empty}>
+                                    Нічого не знайдено
+                                </div>
+                            )}
+                        </div>
+                    </Dropdown.Popover>
+                </Dropdown.Root>
+            </div>
         </div>
     );
 };
-
-export default TagSelector;

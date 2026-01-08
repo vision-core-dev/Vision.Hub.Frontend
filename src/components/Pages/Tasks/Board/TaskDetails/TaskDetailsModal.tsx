@@ -17,6 +17,7 @@ import type { DateValue } from "react-aria-components";
 
 import { Dialog, DialogTrigger, Modal, ModalOverlay } from "@/ui/application/modals/modal";
 import { TaskDetailsHeader } from "./TaskDetailsHeader";
+import {Label} from "@/ui/base/input/label.tsx";
 
 /* ===================== TYPES ===================== */
 
@@ -257,7 +258,7 @@ const TaskDetailsModal: React.FC<Props> = ({
                                         <TaskNameInput value={task.name} onChange={handleNameChange} />
 
                                         <section>
-                                            <h3 className="mb-2 font-medium">Учасники</h3>
+                                            <Label>Учасники</Label>
                                             <AssigneeSelector
                                                 taskId={task.id}
                                                 assignees={task.assignees}
@@ -268,7 +269,7 @@ const TaskDetailsModal: React.FC<Props> = ({
                                         </section>
 
                                         <section>
-                                            <h3 className="mb-2 font-medium">Мітки</h3>
+                                            <Label>Мітки</Label>
                                             <TagSelector
                                                 taskId={task.id}
                                                 boardTags={boardTags}
@@ -280,39 +281,31 @@ const TaskDetailsModal: React.FC<Props> = ({
 
 
                                         <section className="flex flex-row gap-6">
-                                            <div>
-                                                <h3 className="mb-2 font-medium">Початок</h3>
-                                                <div className="flex gap-4">
-                                                    <DatePicker
-                                                        value={startedAt}
-                                                        onChange={(v) => setStartedAt(v)}
-                                                        onApply={(v) => {
-                                                            setStartedAt(v);
-                                                            saveDates(v, deadlineAt);
-                                                        }}
-                                                    />
-                                                </div>
-                                            </div>
+                                            <DatePicker
+                                                label="Початок"
+                                                value={startedAt}
+                                                onChange={(v) => setStartedAt(v)}
+                                                onApply={(v) => {
+                                                    setStartedAt(v);
+                                                    saveDates(v, deadlineAt);
+                                                }}
+                                            />
 
-                                            <div>
-                                                <h3 className="mb-2 font-medium">Крайдата</h3>
-                                                <div className="flex gap-4">
-                                                    <DatePicker
-                                                        value={deadlineAt}
-                                                        onChange={(v) => setDeadlineAt(v)}
-                                                        onApply={(v) => {
-                                                            setDeadlineAt(v);
-                                                            saveDates(startedAt, v);
-                                                        }}
-                                                    />
-                                                </div>
-                                            </div>
-
+                                            <DatePicker
+                                                label="Крайдата"
+                                                value={deadlineAt}
+                                                onChange={(v) => setDeadlineAt(v)}
+                                                onApply={(v) => {
+                                                    setDeadlineAt(v);
+                                                    saveDates(startedAt, v);
+                                                }}
+                                            />
                                         </section>
 
                                         <section>
-                                            <h3 className="mb-2 font-medium">Опис</h3>
+                                            <Label>Опис</Label>
                                             <TextEditor.Root
+                                                placeholder="Додайте опис задачі..."
                                                 inputClassName="w-full"
                                                 content={description}
                                                 onUpdate={({ editor }) => {
@@ -321,8 +314,11 @@ const TaskDetailsModal: React.FC<Props> = ({
                                                     saveDescription(html);
                                                 }}
                                             >
-                                                <TextEditor.Toolbar type="advanced" />
-                                                <TextEditor.Content />
+                                                <TextEditor.Tooltip />
+                                                <div className="flex flex-col gap-2">
+                                                    <TextEditor.Toolbar type="advanced" />
+                                                    <TextEditor.Content />
+                                                </div>
                                             </TextEditor.Root>
                                         </section>
 
