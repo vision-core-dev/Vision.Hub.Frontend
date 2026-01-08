@@ -11,8 +11,10 @@ import BannerTab from "./tabs/BannerTab";
 import MembersTab from "./tabs/MembersTab";
 import LoaderDots from "@/components/basic/LoaderDots/LoaderDots.tsx";
 import type {BoardDetails} from "@/components/Pages/Tasks/Board/BoardPage/BoardPage.tsx";
+import GeneralTab from "@/components/Pages/Tasks/Board/BoardPage/BoardSettings/tabs/GeneralTab.tsx";
 
 const BOARD_TABS = [
+    { id: "general", label: "Загальне" },
     { id: "tags", label: "Теги" },
     { id: "lists", label: "Списки" },
     { id: "banner", label: "Банер" },
@@ -26,7 +28,7 @@ interface Props {
 }
 
 export default function BoardSettings({ boardId, isOpen, onOpenChange }: Props) {
-    const [selectedTab, setSelectedTab] = useState<Key>("tags");
+    const [selectedTab, setSelectedTab] = useState<Key>("general");
     const [data, setData] = useState<BoardDetails | null>(null);
     const [loading, setLoading] = useState(true);
 
@@ -77,7 +79,6 @@ export default function BoardSettings({ boardId, isOpen, onOpenChange }: Props) 
                                 <LoaderDots />
                             )}
 
-                            {/* Tabs */}
                             <NativeSelect
                                 value={selectedTab as string}
                                 onChange={(e) => setSelectedTab(e.target.value)}
@@ -93,6 +94,18 @@ export default function BoardSettings({ boardId, isOpen, onOpenChange }: Props) 
                                     {(tab) => <Tabs.Item {...tab} />}
                                 </Tabs.List>
                             </Tabs>
+
+                            {selectedTab === "general" && (
+                                <GeneralTab boardId={boardId} boardName={board.name} onUpdate={fetchSettings} />
+                            )}
+
+                            {selectedTab === "tags" && (
+                                <TagsTab
+                                    boardId={boardId}
+                                    tags={tags}
+                                    onUpdate={fetchSettings}
+                                />
+                            )}
 
                             {selectedTab === "tags" && (
                                 <TagsTab
