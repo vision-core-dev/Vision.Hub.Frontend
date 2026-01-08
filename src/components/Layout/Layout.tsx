@@ -4,7 +4,7 @@ import Sidebar from "./Sidebar";
 
 const Layout: FC = () => {
     return (
-        <div className="flex h-screen dark:bg-gray-900">
+        <div className="flex flex-col lg:flex-row h-screen dark:bg-gray-900">
             <Sidebar />
             <main className="flex-1 overflow-auto">
                 <Outlet />

@@ -151,17 +151,12 @@ const UsersListPage = () => {
                     users={activeUsers}
                     onRowClick={(u) => navigate(`/users/u/${u.id}`)}
                 />
+                <UsersTable
+                    title="Архів"
+                    users={archivedUsers}
+                    onRowClick={(u) => navigate(`/users/u/${u.id}`)}
+                />
             </DefaultPage>
-
-            {archivedUsers.length > 0 && (
-                <DefaultPage title="Архівні користувачі">
-                    <UsersTable
-                        title="Архів"
-                        users={archivedUsers}
-                        onRowClick={(u) => navigate(`/users/u/${u.id}`)}
-                    />
-                </DefaultPage>
-            )}
         </>
     );
 };
