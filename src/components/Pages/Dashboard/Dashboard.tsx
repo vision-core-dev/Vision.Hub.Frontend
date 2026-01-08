@@ -1,11 +1,28 @@
 import React from "react";
-import styles from "./Dashboard.module.css";
-// import { Award, FileWarning, Wallet, Calendar, CheckCircle2 } from "lucide-react";
+import {useAuth} from "@/components/System/AuthContext.tsx";
+import LoaderDots from "@/components/basic/LoaderDots/LoaderDots.tsx";
 
 const DashboardPage: React.FC = () => {
+    const { user } = useAuth()
+
+    if (!user) {
+        return <LoaderDots />;
+    }
+
     return (
-        <div className={styles.dashboard}>
-            {/*/!* 🏅 Нагороди *!/*/}
+        <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <h2 className="text-xl font-semibold mb-4">Привіт, <span className="text-[#0a9a59] font-extrabold">{user?.first_name} {user?.last_name || ""}</span></h2>
+
+            <div>
+
+            </div>
+        </div>
+    );
+};
+
+export default DashboardPage;
+
+{/*/!* 🏅 Нагороди *!/*/}
             {/*<div className={`${styles.card} ${styles.awards}`}>*/}
             {/*    <div className={styles.cardHeader}>*/}
             {/*        <Award size={28} />*/}
@@ -82,8 +99,3 @@ const DashboardPage: React.FC = () => {
             {/*    </ul>*/}
             {/*    <button className={styles.actionSecondary}>Переглянути календар</button>*/}
             {/*</div>*/}
-        </div>
-    );
-};
-
-export default DashboardPage;

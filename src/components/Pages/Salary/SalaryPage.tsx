@@ -169,7 +169,6 @@ const SalaryPage: React.FC = () => {
                         title={`${data.balance.toFixed(2)} ₴`}
                         subtitle="Поточний баланс"
                         type="modern"
-                        trend={data.balance > 0 ? "positive" : "negative"}
                         footer={null}
                     />
 
@@ -177,7 +176,6 @@ const SalaryPage: React.FC = () => {
                         title={`${(data.balance + data.withdrawn_total)} ₴`}
                         subtitle="Всього заробив"
                         type="modern"
-                        trend="positive"
                         footer={null}
                     />
 
@@ -185,7 +183,6 @@ const SalaryPage: React.FC = () => {
                         title={`${data.withdrawn_total} ₴`}
                         subtitle="Вже вивів"
                         type="modern"
-                        trend="positive"
                         footer={null}
                     />
                 </section>
@@ -195,7 +192,7 @@ const SalaryPage: React.FC = () => {
                     <MetricsChart04
                         title={`${currentMonthTotal} ₴`}
                         subtitle="Заробіток за місяць"
-                        change={`${Math.abs(change)} ₴`}
+                        change={`на ${Math.abs(change)}%`}
                         changeTrend={change >= 0 ? "positive" : "negative"}
                         changeDescription="порівняно з минулим місяцем"
                         chartData={chartData}

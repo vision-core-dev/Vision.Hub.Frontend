@@ -91,7 +91,7 @@ export const MetricsSimple = ({
     title?: string;
     subtitle?: string;
     type: "simple" | "trend" | "modern";
-    trend: "positive" | "negative";
+    trend?: "positive" | "negative";
     change?: string;
     footer?: ReactNode;
     className?: string;
@@ -103,7 +103,9 @@ export const MetricsSimple = ({
 
                 <div className="flex items-end gap-4">
                     <p className="flex-1 text-display-sm font-semibold text-primary">{title}</p>
-                    <MetricChangeIndicator type={type} trend={trend} value={change} />
+                    { (type && change && trend) &&
+                        <MetricChangeIndicator type={type} trend={trend} value={change} />
+                    }
                 </div>
 
                 <div className="absolute top-4 right-4 md:top-5 md:right-5">

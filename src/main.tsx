@@ -40,6 +40,7 @@ import SubmitForm from "./components/Pages/forms/SubmitForm/SubmitForm.tsx";
 import FormResultsView from "./components/Pages/forms/FormResultsView/FormResultsView.tsx";
 
 import "./styles/globals.css";
+import UserSettingsPage from "@/components/Pages/UserSettings/UserSettingsPage.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
@@ -59,6 +60,11 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
 
                             <Route index element={<Navigate to="/dashboard" replace />} />
                             <Route path="dashboard" element={<DashboardPage />} />
+
+                            {/* me */}
+                            <Route path="me">
+                                <Route path="settings" element={<UserSettingsPage />} />
+                            </Route>
 
                             {/* users */}
                             <Route path="users">
