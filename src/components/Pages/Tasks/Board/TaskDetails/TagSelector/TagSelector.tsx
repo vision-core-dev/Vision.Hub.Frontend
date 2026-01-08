@@ -21,11 +21,11 @@ interface Props {
 }
 
 export const TagSelector = ({
-                                taskId,
-                                boardTags,
-                                selectedTags,
-                                onUpdate,
-                            }: Props) => {
+    taskId,
+    boardTags,
+    selectedTags,
+    onUpdate,
+}: Props) => {
     const [search, setSearch] = useState("");
 
     /* available tags */
