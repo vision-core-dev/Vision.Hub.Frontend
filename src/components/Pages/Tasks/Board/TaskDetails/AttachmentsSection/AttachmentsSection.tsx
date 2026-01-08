@@ -1,10 +1,10 @@
-import React, { useRef, useState } from "react";
-import styles from "./AttachmentsSection.module.css";
-import {File, FileText, Link as LinkIcon, Link, SquarePen, Trash, Video, X} from "lucide-react";
-import Button from "../../../../../basic/Button/Button.tsx";
-import { api } from "../../../../../../utils/api.ts";
-import { safeDatetime } from "../../../../../../utils/safeDate.ts";
-import LoaderDots from "../../../../../basic/LoaderDots/LoaderDots.tsx";
+import { useEffect, useState } from "react";
+import { Link as LinkIcon, Trash, File } from "lucide-react";
+import { api } from "@/utils/api";
+import { safeDatetime } from "@/utils/safeDate";
+import {ButtonUtility} from "@/ui/base/buttons/button-utility.tsx";
+
+/* ===================== TYPES ===================== */
 
 export interface Attachment {
     id: string;
@@ -15,278 +15,236 @@ export interface Attachment {
 }
 
 interface Props {
-    attachments: Attachment[];
     taskId: string;
-    onChange?: (newList: Attachment[]) => void;
+    attachments: Attachment[];
+    onChange?: (list: Attachment[]) => void;
 }
 
-const AttachmentsSection: React.FC<Props> = ({ attachments, taskId, onChange }) => {
-    const [list, setList] = useState<Attachment[]>(attachments || []);
-    const fileInputRef = useRef<HTMLInputElement>(null);
-    const [loading, setLoading] = useState(false);
-    const [previewUrl, setPreviewUrl] = useState<string | null>(null); // 🖼️ full-screen preview
+/* ===================== COMPONENT ===================== */
 
-    // 🔄 Оновлення локального і глобального стану
-    const updateList = (updated: Attachment[]) => {
-        setList(updated);
-        onChange?.(updated);
+const AttachmentsSection: React.FC<Props> = ({
+                                                 taskId,
+                                                 attachments,
+                                                 onChange,
+                                             }) => {
+    const [files, setFiles] = useState<Attachment[]>([]);
+    const [links, setLinks] = useState<Attachment[]>([]);
+    // const [uploading, setUploading] = useState<UploadedFile[]>([]);
+
+    /* ===================== INIT ===================== */
+
+    useEffect(() => {
+        setFiles(attachments.filter((a) => a.type === "file"));
+        setLinks(attachments.filter((a) => a.type === "link"));
+    }, [attachments]);
+
+    const sync = (nextFiles: Attachment[], nextLinks = links) => {
+        onChange?.([...nextLinks, ...nextFiles]);
     };
 
-    // 🖼️ Завантаження файлу
-    const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
+    /* ===================== FILE UPLOAD ===================== */
 
-        setLoading(true);
-        try {
-            const formData = new FormData();
-            formData.append("file", file);
+    // const uploadFile = async (
+    //     file: File,
+    //     onProgress: (p: number) => void
+    // ) => {
+    //     const formData = new FormData();
+    //     formData.append("file", file);
+    //
+    //     const xhr = new XMLHttpRequest();
+    //     xhr.open(
+    //         "POST",
+    //         `/v1/Hub/Tasks/${taskId}/Attachments/UploadFile`
+    //     );
+    //
+    //     xhr.upload.onprogress = (e) => {
+    //         if (e.lengthComputable) {
+    //             onProgress(Math.round((e.loaded / e.total) * 100));
+    //         }
+    //     };
+    //
+    //     xhr.onload = () => {
+    //         const data = JSON.parse(xhr.responseText);
+    //
+    //         const newFile: Attachment = {
+    //             id: data.id,
+    //             name: data.name,
+    //             url: data.url,
+    //             type: "file",
+    //             created_at: new Date().toISOString(),
+    //         };
+    //
+    //         const updated = [...files, newFile];
+    //         setFiles(updated);
+    //         sync(updated);
+    //     };
+    //
+    //     xhr.onerror = () => {
+    //         throw new Error("Upload failed");
+    //     };
+    //
+    //     xhr.send(formData);
+    // };
 
-            const res = await api.post(`/v1/Hub/Tasks/${taskId}/Attachments/UploadFile`, formData);
-            const data = await res.json();
+    // const handleDropFiles = (fileList: FileList) => {
+    //     const newFiles = Array.from(fileList);
+    //
+    //     const uploadItems: UploadedFile[] = newFiles.map((file) => ({
+    //         id: crypto.randomUUID(),
+    //         name: file.name,
+    //         size: file.size,
+    //         type: file.type,
+    //         progress: 0,
+    //         fileObject: file,
+    //     }));
+    //
+    //     setUploading((prev) => [...uploadItems, ...prev]);
+    //
+    //     uploadItems.forEach(({ id, fileObject }) => {
+    //         uploadFile(fileObject, (progress) => {
+    //             setUploading((prev) =>
+    //                 prev.map((f) =>
+    //                     f.id === id ? { ...f, progress } : f
+    //                 )
+    //             );
+    //         });
+    //     });
+    // };
+    //
+    // const handleDeleteUploaded = (id: string) => {
+    //     setUploading((prev) => prev.filter((f) => f.id !== id));
+    // };
 
-            if (!res.ok) throw new Error(data.detail || "Помилка завантаження файлу");
+    /* ===================== LINKS ===================== */
 
-            const newItem: Attachment = {
-                id: data.id || crypto.randomUUID(),
-                name: data.name || file.name,
-                url: data.url || data.file_url,
-                type: "file",
-                created_at: new Date().toISOString(),
-            };
-
-            updateList([...list, newItem]);
-        } catch (err) {
-            console.error("Помилка при завантаженні файлу:", err);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // 🔗 Додавання лінку
     const handleAddLink = async () => {
-        const url = prompt("Введіть посилання:");
+        const url = prompt("Введіть посилання");
         if (!url) return;
 
-        try {
-            const res = await api.post(`/v1/Hub/Tasks/${taskId}/Attachments/AddLink`, { url: url });
-            if (!res.ok) throw new Error("Не вдалося додати лінк");
+        const res = await api.post(
+            `/v1/Hub/Tasks/${taskId}/Attachments/AddLink`,
+            { url }
+        );
 
-            const data = await res.json();
+        const data = await res.json();
 
-            const newItem: Attachment = {
-                id: data.id,
-                name: data.name,
-                url: data.url,
-                type: "link",
-                created_at: new Date().toISOString(),
-            };
+        const newLink: Attachment = {
+            id: data.id,
+            name: data.name,
+            url: data.url,
+            type: "link",
+            created_at: new Date().toISOString(),
+        };
 
-            updateList([...list, newItem]);
-        } catch (err) {
-            console.error("Помилка при додаванні лінку:", err);
-            return;
+        const updated = [...links, newLink];
+        setLinks(updated);
+        sync(files, updated);
+    };
+
+    const handleRemoveAttachment = async (att: Attachment) => {
+        await api.post(
+            `/v1/Hub/Tasks/${taskId}/Attachments/${att.id}/Remove`
+        );
+
+        if (att.type === "file") {
+            const updated = files.filter((f) => f.id !== att.id);
+            setFiles(updated);
+            sync(updated);
+        } else {
+            const updated = links.filter((l) => l.id !== att.id);
+            setLinks(updated);
+            sync(files, updated);
         }
     };
 
-    const imageExt = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
-    const videoExt = [".mp4", ".webm", ".mov", ".avi", ".mkv"];
-    const docExt = [".pdf", ".doc", ".docx"];
+    /* ===================== RENDER ===================== */
 
-    const getFileKind = (url: string) => {
-        const lower = url.toLowerCase();
-
-        if (imageExt.some(ext => lower.endsWith(ext))) return "image";
-        if (videoExt.some(ext => lower.endsWith(ext))) return "video";
-        if (docExt.some(ext => lower.endsWith(ext))) return "doc";
-
-        return "other";
-    };
-
-
-    // ✏️ Перейменування
-    const handleRename = async (att: Attachment) => {
-        const newName = prompt("Нова назва:", att.name);
-        if (!newName || newName.trim() === att.name) return;
-
-        try {
-            const res = await api.post(
-                `/v1/Hub/Tasks/${taskId}/Attachments/${att.id}/Rename`,
-                { new_name: newName }
-            );
-            if (!res.ok) throw new Error("Не вдалося перейменувати");
-
-            const updated = list.map((a) =>
-                a.id === att.id ? { ...a, name: newName } : a
-            );
-            updateList(updated);
-        } catch (err) {
-            console.error("Помилка при перейменуванні:", err);
-        }
-    };
-
-    // 🗑️ Видалення
-    const handleRemove = async (att: Attachment) => {
-        if (!confirm(`Видалити "${att.name}"?`)) return;
-
-        try {
-            const res = await api.post(
-                `/v1/Hub/Tasks/${taskId}/Attachments/${att.id}/Remove`
-            );
-            if (!res.ok) throw new Error("Не вдалося видалити");
-
-            const updated = list.filter((a) => a.id !== att.id);
-            updateList(updated);
-        } catch (err) {
-            console.error("Помилка при видаленні:", err);
-        }
-    };
-
-    const files = list.filter((a) => a.type === "file");
-    const links = list.filter((a) => a.type === "link");
-    
     return (
-        <>
-            <section className={styles.attachments}>
-                <header>
-                    <div className={styles.titleWrap}>
-                        <h3>Вкладення</h3>
-                        {loading && <span className={styles.loading}><LoaderDots /></span>}
-                    </div>
-                </header>
+        <section className="flex flex-col gap-4">
+            <header className={"flex flex-row gap-4 items-center justify-between"}>
+                <h3 className="text-sm font-medium">Вкладення</h3>
+                <ButtonUtility size="sm" className="mt-2" onClick={handleAddLink} icon={<File size={16} />} />
+                <ButtonUtility size="sm" className="mt-2" onClick={handleAddLink} icon={<LinkIcon size={16} />} />
+            </header>
 
-                {[...links, ...files].length > 0 && (
-                    <div className={styles.items}>
-                        {[...links, ...files].map((att) => (
-                            <div key={att.id} className={styles.item}>
-                                {att.type === "file" ? (
-                                    (() => {
-                                        const kind = getFileKind(att.url);
+            {/* FILE UPLOAD */}
+            {/*<FileUpload.Root>*/}
+            {/*    <FileUpload.DropZone*/}
+            {/*        onDropFiles={handleDropFiles}*/}
+            {/*        hint="Перетягніть файли або натисніть для вибору"*/}
+            {/*    />*/}
 
-                                        // 🖼 IMAGE
-                                        if (kind === "image") {
-                                            return (
-                                                <img
-                                                    src={att.url}
-                                                    alt={att.name}
-                                                    className={styles.thumb}
-                                                    style={{ cursor: "zoom-in" }}
-                                                    onClick={() => setPreviewUrl(att.url)}
-                                                />
-                                            );
-                                        }
+            {/*    <FileUpload.List>*/}
+            {/*        {uploading.map((file) => (*/}
+            {/*            <FileUpload.ListItemProgressBar*/}
+            {/*                key={file.id}*/}
+            {/*                {...file}*/}
+            {/*                onDelete={() =>*/}
+            {/*                    handleDeleteUploaded(file.id)*/}
+            {/*                }*/}
+            {/*            />*/}
+            {/*        ))}*/}
+            {/*    </FileUpload.List>*/}
+            {/*</FileUpload.Root>*/}
 
-                                        // 🎥 VIDEO
-                                        if (kind === "video") {
-                                            return (
-                                                <div
-                                                    className={styles.icon}
-                                                    onClick={() => window.open(att.url, "_blank")}
-                                                >
-                                                    <Video size={20} />
-                                                </div>
-                                            );
-                                        }
-
-                                        // 📄 DOCUMENT
-                                        if (kind === "doc") {
-                                            return (
-                                                <div
-                                                    className={styles.icon}
-                                                    onClick={() => window.open(att.url, "_blank")}
-                                                >
-                                                    <FileText size={20} />
-                                                </div>
-                                            );
-                                        }
-
-                                        // 📦 OTHER
-                                        return (
-                                            <div
-                                                className={styles.icon}
-                                                onClick={() => window.open(att.url, "_blank")}
-                                            >
-                                                <File size={20} />
-                                            </div>
-                                        );
-                                    })()
-                                ) : (
-                                    <div className={styles.icon}>
-                                        <LinkIcon size={18} />
-                                    </div>
-                                )}
-
-
-                                <div className={styles.details}>
-                                    {att.type === "link" ? (
-                                        <a href={att.url} target="_blank" rel="noopener noreferrer"
-                                           className={styles.itemName}
-                                        >
-                                            {att.name || att.url}
-                                        </a>
-                                    ) : (
-                                        <span className={styles.itemName}>{att.name}</span>
-                                    )}
-                                    <span>{safeDatetime(att.created_at)}</span>
-                                </div>
-
-                                <div className={styles.actionsRight}>
-                                    <button onClick={() => handleRename(att)}>
-                                        <SquarePen size={18} />
-                                    </button>
-                                    <button
-                                        onClick={() => handleRemove(att)}
-                                        className={styles.destructive}
-                                    >
-                                        <Trash size={18} />
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
-
-                <div className={styles.actions}>
-                    <Button variant="secondary" onClick={handleAddLink}>
-                        <Link /> Додати посилання
-                    </Button>
-                    <Button variant="secondary" onClick={() => fileInputRef.current?.click()}>
-                        <File /> Додати файл
-                    </Button>
-                    <input
-                        type="file"
-                        ref={fileInputRef}
-                        hidden
-                        onChange={handleUpload}
-                        accept="
-                            image/*,
-                            video/*,
-                            .pdf,
-                            .doc,
-                            .docx,
-                            .zip
-                          "
-                    />
-
-                </div>
-            </section>
-
-            {/* 🖼️ Повноекранний перегляд */}
-            {previewUrl && (
-                <div className={styles.previewOverlay} onClick={() => setPreviewUrl(null)}>
-                    <button
-                        className={styles.closeBtn}
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            setPreviewUrl(null);
-                        }}
+            {/* FILES */}
+            {files.map((file) => (
+                <div
+                    key={file.id}
+                    className="flex items-center justify-between rounded-lg border px-3 py-2"
+                >
+                    <a
+                        href={file.url}
+                        target="_blank"
+                        className="truncate text-sm text-primary hover:underline"
                     >
-                        <X size={24} />
-                    </button>
-                    <img src={previewUrl} alt="Preview" className={styles.previewImage} />
+                        {file.name}
+                    </a>
+                    <div className="flex items-center gap-3 text-xs text-tertiary">
+                        {safeDatetime(file.created_at)}
+                        <button
+                            onClick={() =>
+                                handleRemoveAttachment(file)
+                            }
+                        >
+                            <Trash size={14} />
+                        </button>
+                    </div>
                 </div>
-            )}
-        </>
+            ))}
+
+            {/* LINKS */}
+            {links.map((link) => (
+                <div
+                    key={link.id}
+                    className="flex items-center justify-between rounded-lg border px-3 py-2"
+                >
+                    <a
+                        href={link.url}
+                        target="_blank"
+                        className="flex items-center gap-2 truncate text-sm text-primary"
+                    >
+                        <LinkIcon size={14} />
+                        {link.name || link.url}
+                    </a>
+                    <button
+                        onClick={() =>
+                            handleRemoveAttachment(link)
+                        }
+                    >
+                        <Trash size={14} />
+                    </button>
+                </div>
+            ))}
+
+            {/*<Button*/}
+            {/*    size="sm"*/}
+            {/*    onClick={handleAddLink}*/}
+            {/*>*/}
+            {/*    <LinkIcon size={14} />*/}
+            {/*    Додати посилання*/}
+            {/*</Button>*/}
+        </section>
     );
 };
 

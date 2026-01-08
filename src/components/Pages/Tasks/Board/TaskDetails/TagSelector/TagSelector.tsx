@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import styles from "./TagSelector.module.css";
 import { Plus, X, Search } from "lucide-react";
-import Button from "../../../../../basic/Button/Button.tsx";
-import { api } from "../../../../../../utils/api.ts";
-import { getTextColor } from "../../../../../../utils/colors.ts";
+import { api } from "@/utils/api.ts";
+import { getTextColor } from "@/utils/colors.ts";
+import {ButtonUtility} from "@/ui/base/buttons/button-utility.tsx";
 
 interface Tag {
     id: string;
@@ -67,9 +67,7 @@ const TagSelector: React.FC<Props> = ({ taskId, boardTags, selectedTags, onUpdat
                         />
                     </div>
                 ))}
-                <Button variant="secondary" onClick={() => setShowSelect((p) => !p)}>
-                    <Plus />
-                </Button>
+                <ButtonUtility onClick={() => setShowSelect((prev) => !prev)} icon={Plus} />
             </div>
 
             {showSelect && (

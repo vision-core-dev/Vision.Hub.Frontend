@@ -2,13 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import styles from "./BoardPage.module.css";
 import ListItem from "../ListItem/ListItem";
 import { useParams } from "react-router-dom";
-import type {UserType} from "../../../../../types/Users.ts";
-import {api} from "../../../../../utils/api.ts";
+import type {UserType} from "@/types/Users.ts";
+import {api} from "@/utils/api.ts";
 import LoaderDots from "../../../../basic/LoaderDots/LoaderDots.tsx";
-import {useDragScroll} from "../../../../../utils/useDragScroll.ts";
-import {Ellipsis} from "lucide-react";
+import {useDragScroll} from "@/utils/useDragScroll.ts";
+import {SlidersVertical} from "lucide-react";
 import BoardSettings from "./BoardSettings/BoardSettings.tsx";
 import TaskDetailsModal from "../TaskDetails/TaskDetailsModal.tsx";
+import {ButtonUtility} from "@/ui/base/buttons/button-utility.tsx";
 
 
 export type Task = {
@@ -40,12 +41,13 @@ export type TaskTag = {
     color: string;
 }
 
-type BoardDetails = {
+export type BoardDetails = {
     board: {
         id: string;
         name: string;
         description?: string;
         banner_url?: string;
+        members: { [userId: string]: string};
     };
     lists: List[];
     tasks: Task[];
@@ -66,7 +68,9 @@ const BoardPage = ({ is_public=false }: Props) => {
     const [loading, setLoading] = useState(true);
 
     const [showSettings, setShowSettings] = useState(false);
+
     const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+    const isTaskModalOpen = Boolean(selectedTaskId);
 
     const scrollRef = useRef<HTMLDivElement | null>(null);
     useDragScroll(scrollRef, { axis: "x", speed: 1.2 });
@@ -152,7 +156,7 @@ const BoardPage = ({ is_public=false }: Props) => {
                 <h1 className={styles.title}>{boardDetails.board.name}</h1>
                 <div className={styles.extraActions}>
                     {is_public || (
-                        <button onClick={() => setShowSettings(!showSettings)}><Ellipsis /></button>
+                        <ButtonUtility onClick={() => setShowSettings(!showSettings)} icon={SlidersVertical} />
                     )}
                 </div>
             </div>
@@ -175,21 +179,29 @@ const BoardPage = ({ is_public=false }: Props) => {
                 </div>
 
                 {is_public || (
-                    <div className={styles.settingsWrapper}>
-                        <div className={`${styles.slideIn} ${showSettings ? styles.active : ""}`}>
-                            <BoardSettings boardId={boardDetails.board.id} />
-                        </div>
-                    </div>
+                    <BoardSettings
+                        isOpen={showSettings}
+                        onOpenChange={(open) => {
+                            if (!open) {
+                                setShowSettings(false);
+                            }
+                        }}
+                        boardId={boardDetails.board.id} />
                 )}
 
             </div>
 
             {selectedTaskId && (
                 <TaskDetailsModal
-                    taskId={selectedTaskId}
+                    isOpen={isTaskModalOpen}
+                    onOpenChange={(open) => {
+                        if (!open) {
+                            setSelectedTaskId(null);
+                        }
+                    }}
+                    taskId={selectedTaskId ?? ""}
                     boardTags={boardDetails.tags}
                     boardLists={boardLists}
-                    onClose={() => setSelectedTaskId(null)}
                 />
             )}
 

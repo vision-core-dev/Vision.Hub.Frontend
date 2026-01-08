@@ -1,20 +1,26 @@
-import React, {useEffect, useRef, useState} from "react";
-import styles from "./TaskDetailsModal.module.css";
-import {X, Image, Ellipsis, Archive, Link} from "lucide-react";
-import Button from "../../../../basic/Button/Button.tsx";
-import {api} from "../../../../../utils/api.ts";
-import type {List} from "../BoardPage/BoardPage.tsx";
-import LoaderDots from "../../../../basic/LoaderDots/LoaderDots.tsx";
-import AssigneeSelector from "./AssigneeSelector/AssigneeSelector.tsx";
-import TaskNameInput from "./TaskNameInput/TaskNameInput.tsx";
-import TagSelector from "./TagSelector/TagSelector.tsx";
-import TextEditor from "../../../../basic/TextEditor/TextEditor.tsx";
-import AttachmentsSection, {type Attachment} from "./AttachmentsSection/AttachmentsSection.tsx";
-import SubtasksSection, {type Subtask} from "./SubtaskSection/SubtasksSection.tsx";
-import DropdownMenu from "../../../../basic/DropdownMenu/DropdownMenu.tsx";
+import React, { type Key, useEffect, useState } from "react";
+import { api } from "@/utils/api";
+import type { List } from "../BoardPage/BoardPage";
+import LoaderDots from "../../../../basic/LoaderDots/LoaderDots";
 
+import {AssigneeSelector} from "./AssigneeSelector/AssigneeSelector";
+import TaskNameInput from "./TaskNameInput/TaskNameInput";
+import TagSelector from "./TagSelector/TagSelector";
+import AttachmentsSection, { type Attachment } from "./AttachmentsSection/AttachmentsSection";
+import SubtasksSection, { type Subtask } from "./SubtaskSection/SubtasksSection";
 
-interface User {
+import { useDebouncedCallback } from "use-debounce";
+import { TextEditor } from "@/ui/base/text-editor/text-editor";
+import { dateValueToLocalString, isoToDateValue } from "@/utils/date";
+import { DatePicker } from "@/ui/application/date-picker/date-picker";
+import type { DateValue } from "react-aria-components";
+
+import { Dialog, DialogTrigger, Modal, ModalOverlay } from "@/ui/application/modals/modal";
+import { TaskDetailsHeader } from "./TaskDetailsHeader";
+
+/* ===================== TYPES ===================== */
+
+export interface TaskUser {
     id: string;
     first_name: string;
     last_name?: string;
@@ -29,7 +35,7 @@ interface Tag {
 
 interface Comment {
     id: string;
-    user: User;
+    user: TaskUser;
     content: string;
     created_at: string;
 }
@@ -41,384 +47,306 @@ export interface TaskDetails {
     banner_url?: string;
     list_id: string;
     tags: Tag[];
-    assignees: User[];
+    assignees: TaskUser[];
     attachments: Attachment[];
     subtasks: Subtask[];
     comments: Comment[];
     started_at?: string | null;
     deadline_at?: string | null;
-    created_by: User;
+    created_by: TaskUser;
     created_at: string;
 }
 
 interface Props {
-    taskId: string,
-    boardTags: Tag[],
-    boardLists: List[],
-    onClose: () => void,
+    taskId: string;
+    boardTags: Tag[];
+    boardLists: List[];
+    isOpen: boolean;
+    onOpenChange: (open: boolean) => void;
 }
 
+/* ===================== COMPONENT ===================== */
 
-const TaskDetailsModal: React.FC<Props> = ({ taskId, onClose, boardLists, boardTags }) => {
+const TaskDetailsModal: React.FC<Props> = ({
+                                               taskId,
+                                               boardLists,
+                                               boardTags,
+                                               isOpen,
+                                               onOpenChange,
+                                           }) => {
+    const [loading, setLoading] = useState(false);
     const [task, setTask] = useState<TaskDetails | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error] = useState<string | null>(null);
-    const [, setShowMenu] = useState(false);
-    const menuRef = useRef<HTMLDivElement | null>(null);
 
-    // 🧠 Фетч деталей задачі
+    const [startedAt, setStartedAt] = useState<DateValue | null>(null);
+    const [deadlineAt, setDeadlineAt] = useState<DateValue | null>(null);
+    const [description, setDescription] = useState("");
+
+    /* ===================== DERIVED ===================== */
+
+    const listItems = boardLists.map((list) => ({
+        id: list.id,
+        label: list.name,
+    }));
+
+    const currentListId = task?.list_id ?? null;
+
+    /* ===================== FETCH ===================== */
+
     const fetchTaskDetails = async () => {
         try {
             setLoading(true);
             const res = await api.get(`/v1/Hub/Tasks/${taskId}/GetDetails`);
             const data = await res.json();
-            if (!res.ok) throw new Error(data.detail || "Failed to fetch task details");
-            setTask(data.task || data);
+
+            const taskData = data.task ?? data;
+
+            setTask(taskData);
+            setDescription(taskData.description || "");
+            setStartedAt(isoToDateValue(taskData.started_at));
+            setDeadlineAt(isoToDateValue(taskData.deadline_at));
+        } catch (e) {
+            console.error("❌ Failed to load task", e);
         } finally {
             setLoading(false);
         }
     };
 
-    // 🧹 Клік поза меню закриває його
     useEffect(() => {
-        const handleClickOutside = (e: MouseEvent) => {
-            if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-                setShowMenu(false);
+        if (isOpen && taskId) {
+            fetchTaskDetails();
+        }
+    }, [isOpen, taskId]);
+
+    /* ===================== SAVE ===================== */
+
+    const saveDescription = useDebouncedCallback(async (html: string) => {
+        if (!task) return;
+        try {
+            await api.post(`/v1/Hub/Tasks/${task.id}/UpdateDescription`, {
+                description: html,
+            });
+        } catch (e) {
+            console.error("❌ Failed to save description", e);
+        }
+    }, 800);
+
+    const saveDates = useDebouncedCallback(
+        async (start: DateValue | null, end: DateValue | null) => {
+            if (!task) return;
+            try {
+                await api.post(`/v1/Hub/Tasks/${task.id}/UpdateDates`, {
+                    started_at: dateValueToLocalString(start),
+                    deadline_at: dateValueToLocalString(end),
+                });
+            } catch (e) {
+                console.error("❌ Failed to save dates", e);
             }
+        },
+        600
+    );
+
+    useEffect(() => {
+        return () => {
+            saveDescription.flush();
+            saveDates.flush();
         };
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    // 📦 Архівування задачі
+    /* ===================== ACTIONS ===================== */
+
+    const handleMoveToList = async (key: Key | null) => {
+        if (!task || key == null || key === task.list_id) return;
+
+        const newListId = String(key);
+        const prevListId = task.list_id;
+
+        // optimistic
+        setTask({ ...task, list_id: newListId });
+
+        try {
+            const res = await api.post(
+                `/v1/Hub/Tasks/${task.id}/MoveToList`,
+                { list_id: newListId }
+            );
+            if (!res.ok) throw new Error();
+        } catch {
+            // rollback
+            setTask({ ...task, list_id: prevListId });
+        }
+    };
+
     const handleArchive = async () => {
+        if (!task) return;
         try {
-            const res = await api.post(`/v1/Hub/Tasks/${taskId}/Archive`);
-            if (res.ok) {
-                onClose();
-            } else {
-                console.error("Не вдалося архівувати задачу");
-            }
-        } catch (err) {
-            console.error("Помилка при архівуванні:", err);
+            await api.post(`/v1/Hub/Tasks/${task.id}/Archive`);
+            onOpenChange(false);
+        } catch (e) {
+            console.error("❌ Archive failed", e);
         }
     };
 
-    const handleNameChange = async (newName: string) => {
-        setTask((prev) => (prev ? { ...prev, name: newName } : prev));
-        try {
-            await api.post(`/v1/Hub/Tasks/${taskId}/UpdateName`, {
-                name: newName
-            });
-        } catch (err) {
-            console.error("Не вдалося оновити назву:", err);
-        }
-    }
-
-    // 🖼️ Завантаження або зміна банеру
-    const handleBannerChange = async () => {
-        try {
-            const input = document.createElement("input");
-            input.type = "file";
-            input.accept = "image/*";
-
-            input.onchange = async () => {
-                const file = input.files?.[0];
-                if (!file) return;
-
-                const formData = new FormData();
-                formData.append("file", file);
-
-                const res = await api.post(`/v1/Hub/Tasks/${taskId}/UploadBanner`, formData);
-                const data = await res.json();
-
-                if (res.ok && data.banner_url) {
-                    // 🔄 оновлюємо локальний стан
-                    setTask((prev) => prev ? { ...prev, banner_url: data.banner_url } : prev);
-                } else {
-                    console.error("Не вдалося завантажити банер:", data.detail || data);
-                }
-            };
-
-            input.click();
-        } catch (err) {
-            console.error("Помилка при зміні банеру:", err);
-        } finally {
-            setShowMenu(false);
-        }
+    const handleNameChange = async (name: string) => {
+        if (!task) return;
+        setTask({ ...task, name });
+        await api.post(`/v1/Hub/Tasks/${task.id}/UpdateName`, { name });
     };
 
-    // 🔗 Встановлення банеру за URL
-    const handleBannerByUrl = async () => {
-        try {
-            const url = prompt("Введіть URL зображення банеру:");
-            if (!url) return;
+    const handleUploadBanner = async () => {
+        if (!task) return;
 
-            const res = await api.post(`/v1/Hub/Tasks/${taskId}/SetBanner`, { banner_url: url });
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = "image/*";
+
+        input.onchange = async () => {
+            const file = input.files?.[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append("file", file);
+
+            const res = await api.post(
+                `/v1/Hub/Tasks/${task.id}/UploadBanner`,
+                formData
+            );
             const data = await res.json();
 
-            if (res.ok) {
-                setTask((prev) => (prev ? { ...prev, banner_url: url } : prev));
-            } else {
-                console.error("Не вдалося встановити банер за URL:", data.detail || data);
+            if (data.banner_url) {
+                setTask({ ...task, banner_url: data.banner_url });
             }
-        } catch (err) {
-            console.error("Помилка при встановленні банеру за URL:", err);
-        } finally {
-            setShowMenu(false);
-        }
+        };
+
+        input.click();
     };
 
+    const handleBannerByUrl = async () => {
+        if (!task) return;
+        const url = prompt("Введіть URL зображення");
+        if (!url) return;
 
+        await api.post(`/v1/Hub/Tasks/${task.id}/SetBanner`, { banner_url: url });
+        setTask({ ...task, banner_url: url });
+    };
 
-
-    useEffect(() => {
-        if (taskId) fetchTaskDetails();
-    }, [taskId]);
-
-    if (loading) {
-        return (
-            <div className={styles.overlay}>
-                <div className={styles.modal}>
-                    <LoaderDots />
-                </div>
-                <div className={styles.backdrop} onClick={onClose}></div>
-            </div>
-        );
-    }
-
-    if (error || !task) {
-        return (
-            <div className={styles.overlay}>
-                <div className={styles.modal}>
-                    <div className={styles.error}>{error || "Помилка завантаження"}</div>
-                </div>
-                <div className={styles.backdrop} onClick={onClose}></div>
-            </div>
-        );
-    }
+    /* ===================== RENDER ===================== */
 
     return (
-        <div className={styles.overlay}>
-            <div className={styles.modal}>
-                <div
-                    className={`${styles.header} ${task.banner_url ? styles.banner : ""}`}
-                    style={{backgroundImage: task.banner_url ? `url(${task.banner_url})` : "none"}}
-                >
-                    <select
-                        className={styles.taskListSelect}
-                        value={task.list_id || boardLists.find(l => l.tasks?.some(t => t.id === task.id))?.id || ""}
-                        onChange={async (e) => {
-                            const newListId = e.target.value;
-                            if (!newListId || newListId === task.list_id) return;
-
-                            try {
-                                const res = await api.post(`/v1/Hub/Tasks/${task.id}/MoveToList`, {
-                                    list_id: newListId,
-                                });
-                                if (!res.ok) throw new Error("Не вдалося перемістити задачу");
-
-                                // 🔄 Оновлення локального стану
-                                setTask((prev) => (prev ? { ...prev, list_id: newListId } : prev));
-                            } catch (err) {
-                                console.error("Помилка при зміні списку:", err);
-                            }
-                        }}
-                    >
-                        <option value="" disabled>— Обери список —</option>
-                        {boardLists.map((list) => (
-                            <option key={list.id} value={list.id}>
-                                {list.name}
-                            </option>
-                        ))}
-                    </select>
-
-
-
-
-                    <div className={styles.actions}>
-                        <DropdownMenu
-                            trigger={<Button variant="secondary"><Ellipsis size={18} /></Button>}
-                            items={[
-                                {
-                                    label: "Завантажити банер",
-                                    icon: <Image size={16} />,
-                                    onClick: handleBannerChange
-                                },
-                                {
-                                    label: "Встановити банер по URL",
-                                    icon: <Link size={16} />,
-                                    onClick: handleBannerByUrl
-                                },
-                                {
-                                    label: "Архівувати задачу",
-                                    icon: <Archive size={16} />,
-                                    danger: true,
-                                    onClick: handleArchive
-                                }
-                            ]}
-                        />
-
-                        <Button variant="secondary" onClick={onClose}>
-                            <X size={18} />
-                        </Button>
-                    </div>
-                </div>
-
-                <div className={styles.content}>
-                    <main>
-                        <TaskNameInput value={task.name} onChange={handleNameChange} />
-
-                        {/* 👥 Учасники */}
-                        <section className={styles.infoItem}>
-                            <h3>Учасники</h3>
-                            <AssigneeSelector
-                                taskId={task.id}
-                                assignees={task.assignees}
-                                onUpdate={(newAssignees) => setTask((prev) => prev ? { ...prev, assignees: newAssignees } : prev)}
-                            />
-                        </section>
-
-                        {/* 🏷️ Мітки */}
-                        <section className={styles.infoItem}>
-                            <h3>Мітки</h3>
-                            <TagSelector
-                                taskId={task.id}
-                                boardTags={boardTags}
-                                selectedTags={task.tags}
-                                onUpdate={(newTags) =>
-                                    setTask((prev) => (prev ? { ...prev, tags: newTags } : prev))
-                                }
-                            />
-                        </section>
-
-                        <section className={styles.datesSection}>
-                            <h3>Терміни виконання</h3>
-
-                            <div className={styles.datesRow}>
-                                <div className={styles.dateBlock}>
-                                    <label>Дата початку</label>
-                                    <input
-                                        type="datetime-local"
-                                        className={styles.dateInput}
-                                        value={
-                                            task.started_at
-                                                ? task.started_at.slice(0, 16) // формат YYYY-MM-DDTHH:mm
-                                                : ""
-                                        }
-                                        onChange={(e) =>
-                                            setTask((prev) =>
-                                                prev ? { ...prev, started_at: e.target.value } : prev
-                                            )
-                                        }
-                                        onBlur={async (e) => {
-                                            try {
-                                                await api.post(`/v1/Hub/Tasks/${task.id}/UpdateDates`, {
-                                                    started_at: e.target.value || null,
-                                                    deadline_at: task.deadline_at || null,
-                                                });
-                                            } catch (err) {
-                                                console.error("❌ Помилка оновлення дати початку:", err);
-                                            }
-                                        }}
-                                    />
+        <DialogTrigger isOpen={isOpen} onOpenChange={onOpenChange}>
+            <ModalOverlay isDismissable>
+                <Modal>
+                    <Dialog>
+                        <div className="relative w-full max-w-[900px] overflow-hidden rounded-2xl bg-primary shadow-xl">
+                            {loading || !task ? (
+                                <div className="flex h-[200px] items-center justify-center">
+                                    <LoaderDots />
                                 </div>
-
-                                <div className={styles.dateBlock}>
-                                    <label>Крайдата</label>
-                                    <input
-                                        type="datetime-local"
-                                        className={styles.dateInput}
-                                        value={
-                                            task.deadline_at
-                                                ? task.deadline_at.slice(0, 16)
-                                                : ""
-                                        }
-                                        onChange={(e) =>
-                                            setTask((prev) =>
-                                                prev ? { ...prev, deadline_at: e.target.value } : prev
-                                            )
-                                        }
-                                        onBlur={async (e) => {
-                                            try {
-                                                await api.post(`/v1/Hub/Tasks/${task.id}/UpdateDates`, {
-                                                    started_at: task.started_at || null,
-                                                    deadline_at: e.target.value || null,
-                                                });
-                                            } catch (err) {
-                                                console.error("❌ Помилка оновлення дедлайну:", err);
-                                            }
-                                        }}
+                            ) : (
+                                <>
+                                    <TaskDetailsHeader
+                                        task={task}
+                                        listItems={listItems}
+                                        currentListId={currentListId}
+                                        onMoveToList={handleMoveToList}
+                                        onUploadBanner={handleUploadBanner}
+                                        onSetBannerByUrl={handleBannerByUrl}
+                                        onArchive={handleArchive}
+                                        onClose={() => onOpenChange(false)}
                                     />
-                                </div>
-                            </div>
-                        </section>
 
-                        <section className={styles.descriptionSection}>
-                            <h3>Опис</h3>
-                            <TextEditor
-                                mode="edit"
-                                value={task.description || ""}
-                                onChange={async (newHtml) => {
-                                    setTask((prev) => prev ? { ...prev, description: newHtml } : prev);
-                                    // 💾 одразу відправляємо оновлення на бекенд
-                                    try {
-                                        await api.post(`/v1/Hub/Tasks/${task.id}/UpdateDescription`, {
-                                            description: newHtml
-                                        });
-                                    } catch (err) {
-                                        console.error("Не вдалося оновити опис:", err);
-                                    }
-                                }}
-                                onUploadImage={async (file) => {
-                                    // 🔄 логіка кастомного аплоаду (можеш винести в util)
-                                    const formData = new FormData();
-                                    formData.append("file", file);
-                                    const res = await api.post(`/v1/Hub/Tasks/${task.id}/Attachments/UploadFile`, formData);
-                                    const { url } = await res.json();
-                                    // якщо потрібно вставити у текст:
-                                    document.execCommand("insertHTML", false, `<img src="${url}" alt=""/>`);
-                                }}
-                            />
-                        </section>
+                                    <div className="flex flex-col gap-6 px-6 py-5">
+                                        <TaskNameInput value={task.name} onChange={handleNameChange} />
 
-                        <AttachmentsSection
-                            taskId={task.id}
-                            attachments={task.attachments || []}
-                            onChange={(newList) => {
-                                setTask((prev) => (prev ? { ...prev, attachments: newList } : prev));
-                            }}
-                        />
+                                        <section>
+                                            <h3 className="mb-2 font-medium">Учасники</h3>
+                                            <AssigneeSelector
+                                                taskId={task.id}
+                                                assignees={task.assignees}
+                                                onUpdate={(assignees) =>
+                                                    setTask({ ...task, assignees })
+                                                }
+                                            />
+                                        </section>
 
-                        <SubtasksSection taskId={task.id} initialSubtasks={task.subtasks} users={[]} />
-
-                        {/*<section className={styles.descriptionSection}>*/}
-                        {/*    <h3>Нарахування</h3>*/}
-
-                        {/*    {task.assignees.length === 0 && (*/}
-                        {/*        <p style={{opacity: 0.6}}>Немає учасників — нема кому нараховувати 🫠</p>*/}
-                        {/*    )}*/}
-
-                        {/*    <div className={styles.accrualList}>*/}
-                        {/*        <AccrualItem user={{*/}
-                        {/*            id: "1",*/}
-                        {/*            first_name: "Test",*/}
-                        {/*            last_name: undefined,*/}
-                        {/*            avatar_url: undefined*/}
-                        {/*        }} amount={100} />*/}
-                        {/*    </div>*/}
-                        {/*</section>*/}
+                                        <section>
+                                            <h3 className="mb-2 font-medium">Мітки</h3>
+                                            <TagSelector
+                                                taskId={task.id}
+                                                boardTags={boardTags}
+                                                selectedTags={task.tags}
+                                                onUpdate={(tags) => setTask({ ...task, tags })}
+                                            />
+                                        </section>
 
 
-                    </main>
 
-                    <aside>
+                                        <section className="flex flex-row gap-6">
+                                            <div>
+                                                <h3 className="mb-2 font-medium">Початок</h3>
+                                                <div className="flex gap-4">
+                                                    <DatePicker
+                                                        value={startedAt}
+                                                        onChange={(v) => setStartedAt(v)}
+                                                        onApply={(v) => {
+                                                            setStartedAt(v);
+                                                            saveDates(v, deadlineAt);
+                                                        }}
+                                                    />
+                                                </div>
+                                            </div>
 
-                    </aside>
-                </div>
-            </div>
-            <div className={styles.backdrop} onClick={onClose}></div>
-        </div>
+                                            <div>
+                                                <h3 className="mb-2 font-medium">Крайдата</h3>
+                                                <div className="flex gap-4">
+                                                    <DatePicker
+                                                        value={deadlineAt}
+                                                        onChange={(v) => setDeadlineAt(v)}
+                                                        onApply={(v) => {
+                                                            setDeadlineAt(v);
+                                                            saveDates(startedAt, v);
+                                                        }}
+                                                    />
+                                                </div>
+                                            </div>
+
+                                        </section>
+
+                                        <section>
+                                            <h3 className="mb-2 font-medium">Опис</h3>
+                                            <TextEditor.Root
+                                                inputClassName="w-full"
+                                                content={description}
+                                                onUpdate={({ editor }) => {
+                                                    const html = editor.getHTML();
+                                                    setDescription(html);
+                                                    saveDescription(html);
+                                                }}
+                                            >
+                                                <TextEditor.Toolbar type="advanced" />
+                                                <TextEditor.Content />
+                                            </TextEditor.Root>
+                                        </section>
+
+                                        <AttachmentsSection
+                                            taskId={task.id}
+                                            attachments={task.attachments}
+                                            onChange={(attachments) =>
+                                                setTask({ ...task, attachments })
+                                            }
+                                        />
+
+                                        <SubtasksSection
+                                            taskId={task.id}
+                                            initialSubtasks={task.subtasks}
+                                            users={[]}
+                                        />
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    </Dialog>
+                </Modal>
+            </ModalOverlay>
+        </DialogTrigger>
     );
 };
 

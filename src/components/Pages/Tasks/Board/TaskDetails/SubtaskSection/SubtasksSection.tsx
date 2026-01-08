@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import styles from "./SubtasksSection.module.css";
 import {Check, Circle, Ellipsis, Plus, Trash2} from "lucide-react";
-import { api } from "../../../../../../utils/api.ts";
-import Button from "../../../../../basic/Button/Button.tsx";
-import type { UserType } from "../../../../../../types/Users.ts";
-import Input from "../../../../../basic/Input/Input.tsx";
+import { api } from "@/utils/api.ts";
+import type { UserType } from "@/types/Users.ts";
 import DropdownMenu from "../../../../../basic/DropdownMenu/DropdownMenu.tsx";
+import {Input} from "@/ui/base/input/input.tsx";
+import {Button} from "@/ui/base/buttons/button.tsx";
+import {ProgressBar} from "@/ui/base/progress-indicators/progress-indicators.tsx";
 
 export interface Subtask {
     id: string;
@@ -99,12 +100,13 @@ const SubtasksSection: React.FC<Props> = ({ taskId, initialSubtasks }) => {
             <h3>Підзадачі</h3>
 
             {subtasks.length > 0 && (
-                <div className={styles.progressContainer}>
-                    <div className={styles.progressText}>{progress}%</div>
-                    <div className={styles.progressBar}>
-                        <div className={styles.progressFill} style={{ width: `${progress}%` }} />
-                    </div>
-                </div>
+                <ProgressBar labelPosition="right" min={0} max={100} value={progress} />
+                // <div className={styles.progressContainer}>
+                //     <div className={styles.progressText}>{progress}%</div>
+                //     <div className={styles.progressBar}>
+                //         <div className={styles.progressFill} style={{ width: `${progress}%` }} />
+                //     </div>
+                // </div>
             )}
 
             <div className={styles.list}>
@@ -184,13 +186,11 @@ const SubtasksSection: React.FC<Props> = ({ taskId, initialSubtasks }) => {
                         type="text"
                         value={newName}
                         placeholder="Нова підзадача..."
-                        onChange={(e) => setNewName(e.target.value)}
+                        onChange={(value) => setNewName(value)}
                         onKeyDown={(e) => e.key === "Enter" && handleAdd()}
-                        disabled={isAdding}
+                        isDisabled={isAdding}
                     />
-                    <Button variant="secondary" onClick={handleAdd} disabled={isAdding}>
-                        <Plus strokeWidth={2.25} />
-                    </Button>
+                    <Button onClick={handleAdd} disabled={isAdding} iconLeading={Plus} />
                 </div>
             </div>
         </section>

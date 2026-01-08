@@ -211,6 +211,7 @@ const ListItem = ({
                 handleDrop(e);
             }}
             onDragLeave={handleDragLeave}
+            style={{ backgroundColor: list.color || "#f1f2f4" }}
         >
             <div className={styles.header}>
                 <h2
@@ -222,28 +223,31 @@ const ListItem = ({
                 <span className={styles.count}>{localTasks.length}</span>
             </div>
 
-            <div className={styles.tasks}>
-                {localTasks.map((task, index) => (
-                    <React.Fragment key={task.id}>
-                        {insertIndex === index && <div className={styles.insertLine} />}
-                        <div
-                            draggable={!isBoardPublic}
-                            onDragStart={(e) => handleDragStart(e, task.id)}
-                            onDragOver={(e) => handleDragOverTask(e, index)}
-                            onDragEnd={handleDragEnd} // 👈 вот это
-                            onDrop={(e) => handleDrop(e)} // 👈 чтоб точно сработал drop
-                            className={`${styles.taskWrapper} ${
-                                (draggingTaskId === task.id && !isBoardPublic) ? styles.dragging : ""
-                            }`}
-                            onClick={() => !isBoardPublic && onSelectTask(task)}
-                        >
-                            <TaskItem isBoardPublic={isBoardPublic} boardTags={boardTags} users={users} task={task} />
-                        </div>
-                    </React.Fragment>
-                ))}
+            {localTasks.length === 0 && (
+                <div className={styles.tasks}>
+                    {localTasks.map((task, index) => (
+                        <React.Fragment key={task.id}>
+                            {insertIndex === index && <div className={styles.insertLine} />}
+                            <div
+                                draggable={!isBoardPublic}
+                                onDragStart={(e) => handleDragStart(e, task.id)}
+                                onDragOver={(e) => handleDragOverTask(e, index)}
+                                onDragEnd={handleDragEnd} // 👈 вот это
+                                onDrop={(e) => handleDrop(e)} // 👈 чтоб точно сработал drop
+                                className={`${styles.taskWrapper} ${
+                                    (draggingTaskId === task.id && !isBoardPublic) ? styles.dragging : ""
+                                }`}
+                                onClick={() => !isBoardPublic && onSelectTask(task)}
+                            >
+                                <TaskItem isBoardPublic={isBoardPublic} boardTags={boardTags} users={users} task={task} />
+                            </div>
+                        </React.Fragment>
+                    ))}
 
-                {insertIndex === localTasks.length && <div className={styles.insertLine} />}
-            </div>
+                    {insertIndex === localTasks.length && <div className={styles.insertLine} />}
+                </div>
+            )}
+
 
             {!isBoardPublic && (
                 <>
