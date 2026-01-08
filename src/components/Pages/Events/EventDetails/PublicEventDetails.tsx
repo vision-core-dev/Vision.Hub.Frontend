@@ -138,9 +138,6 @@ const PublicEventDetails = () => {
                     </div>
                 </div>
 
-
-
-                {/* ⚙️ Дії */}
                 <div className={styles.actions}>
                     {invite.status === "pending" && (
                         <>

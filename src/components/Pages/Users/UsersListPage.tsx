@@ -1,71 +1,125 @@
-import { useEffect, useState } from "react";
-import { api } from "@/utils/api.ts";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Table from "../../basic/Table/Table.tsx";
-import UserLabel from "../../basic/User/UserLabel.tsx";
-import DefaultPage from "../../basic/DefaultPage/DefaultPage.tsx";
-import {Plus} from "lucide-react";
-import type {UserRoleType} from "@/types/Users.ts";
-import {Button} from "@/ui/base/buttons/button.tsx";
+import type { SortDescriptor } from "react-aria-components";
+import { Plus } from "@untitledui/icons";
 
-interface User {
-    id: string;
-    email: string;
-    avatar_url?: string;
-    first_name?: string;
-    last_name?: string;
-    role: { name: string };
-    is_active: boolean;
-    created_at: string;
-}
+import { api } from "@/utils/api";
+import DefaultPage from "@/components/basic/DefaultPage/DefaultPage";
+
+import {
+    Table,
+    TableCard,
+} from "@/ui/application/table/table";
+
+import { Button } from "@/ui/base/buttons/button";
+import type {UserType} from "@/types/Users.ts";
+import {safeDate} from "@/utils/safeDate.ts";
+import {getAge} from "@/utils/date.ts";
+import {AvatarLabelGroup} from "@/ui/base/avatar/avatar-label-group.tsx";
+
+
+const UsersTable = ({
+                        title,
+                        users,
+                        onRowClick,
+                    }: {
+    title: string;
+    users: UserType[];
+    onRowClick: (u: UserType) => void;
+}) => {
+    const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
+        column: "first_name",
+        direction: "ascending",
+    });
+
+    const sortedUsers = useMemo(() => {
+        return [...users].sort((a, b) => {
+            const first = a[sortDescriptor.column as keyof UserType];
+            const second = b[sortDescriptor.column as keyof UserType];
+
+            if (typeof first === "string" && typeof second === "string") {
+                const cmp = first.localeCompare(second);
+                return sortDescriptor.direction === "descending" ? -cmp : cmp;
+            }
+
+            return 0;
+        });
+    }, [users, sortDescriptor]);
+
+    return (
+        <TableCard.Root>
+            <TableCard.Header
+                title={title}
+                badge={`${users.length}`}
+            />
+
+            <Table
+                aria-label={title}
+                sortDescriptor={sortDescriptor}
+                onSortChange={setSortDescriptor}
+            >
+                <Table.Header>
+                    <Table.Head id="first_name" label="Користувач" isRowHeader allowsSorting />
+                    <Table.Head id="birthday" label="День народження" allowsSorting />
+                    <Table.Head id="email" label="Email" />
+                </Table.Header>
+
+                <Table.Body items={sortedUsers}>
+                    {(user) => (
+                        <Table.Row id={user.id} onAction={() => onRowClick(user)}>
+                            <Table.Cell>
+                                <AvatarLabelGroup
+                                    src={user.avatar_url}
+                                    alt={user.first_name}
+                                    size="md"
+                                    title={`${user.first_name} ${user.last_name || ""}`}
+                                    subtitle={user.role.name}
+                                />
+                            </Table.Cell>
+
+                            <Table.Cell>
+                                {user.birthday}
+                                {/*{safeDate(user.birthday)} {getAge(user.birthday)}*/}
+                            </Table.Cell>
+
+                            <Table.Cell>
+                                {user.email}
+                            </Table.Cell>
+
+                        </Table.Row>
+                    )}
+                </Table.Body>
+            </Table>
+        </TableCard.Root>
+    );
+};
 
 const UsersListPage = () => {
-    const [usersCount, setUsersCount] = useState<number>(0);
-
-    const [activeUsers, setActiveUsers] = useState<User[]>([]);
-    const [archivedUsers, setArchivedUsers] = useState<User[]>([]);
-
     const [loading, setLoading] = useState(true);
+    const [activeUsers, setActiveUsers] = useState<UserType[]>([]);
+    const [archivedUsers, setArchivedUsers] = useState<UserType[]>([]);
+
     const navigate = useNavigate();
 
     useEffect(() => {
         api.get("/v1/Hub/Users/List").then(async (res) => {
             const data = await res.json();
-
-            setUsersCount(data.list.length);
-            setActiveUsers(data.list.filter((u: User) => u.is_active));
-            setArchivedUsers(data.list.filter((u: User) => !u.is_active));
-
+            setActiveUsers(data.list.filter((u: UserType) => u.is_active));
+            setArchivedUsers(data.list.filter((u: UserType) => !u.is_active));
             setLoading(false);
         });
     }, []);
 
-    const usersColumns = [
-        {
-            key: "first_name",
-            label: "Користувач",
-            render: (v: string, row: User) => v && (
-                <UserLabel
-                    name={`${row.first_name} ${row.last_name || ""}`.trim()}
-                    avatar_url={row.avatar_url}
-                />
-            ),
-        },
-        { key: "role", label: "Роль", render: (v: UserRoleType) => v?.name || "—" },
-        { key: "email", label: "Email" },
-    ]
-
     if (loading) {
-        return <DefaultPage title="Користувачі" isLoading={true} />;
+        return <DefaultPage title="Користувачі" isLoading />;
     }
 
-    if (usersCount === 0) {
+    if (!activeUsers.length && !archivedUsers.length) {
         return (
             <DefaultPage
-                title={`Користувачі`}
+                title="Користувачі"
                 action={
-                    <Button onClick={() => navigate("/users/add-user")} iconLeading={Plus}
-                    >
+                    <Button onClick={() => navigate("/users/add-user")} iconLeading={Plus}>
                         Додати
                     </Button>
                 }
@@ -78,30 +132,29 @@ const UsersListPage = () => {
     return (
         <>
             <DefaultPage
-                title={`Користувачі ${activeUsers.length}`}
+                title="Користувачі"
                 action={
-                    <Button onClick={() => navigate("/users/add-user")} iconLeading={Plus}
-                    >
+                    <Button onClick={() => navigate("/users/add-user")} iconLeading={Plus}>
                         Додати
                     </Button>
                 }
             >
-                <Table
-                    columns={usersColumns}
-                    data={activeUsers}
-                    onRowClick={(row) => navigate(`/users/u/${row.id}`)}
+                <UsersTable
+                    title="Активні користувачі"
+                    users={activeUsers}
+                    onRowClick={(u) => navigate(`/users/u/${u.id}`)}
                 />
             </DefaultPage>
 
-            <DefaultPage
-                title={`Архівні користувачі ${archivedUsers.length}`}
-            >
-                <Table
-                    columns={usersColumns}
-                    data={archivedUsers}
-                    onRowClick={(row) => navigate(`/users/u/${row.id}`)}
-                />
-            </DefaultPage>
+            {archivedUsers.length > 0 && (
+                <DefaultPage title="Архівні користувачі">
+                    <UsersTable
+                        title="Архів"
+                        users={archivedUsers}
+                        onRowClick={(u) => navigate(`/users/u/${u.id}`)}
+                    />
+                </DefaultPage>
+            )}
         </>
     );
 };

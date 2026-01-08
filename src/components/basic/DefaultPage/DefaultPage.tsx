@@ -20,7 +20,7 @@ const DefaultPage: React.FC<DefaultPageProps> = ({
     isLoading = false,
 }) => {
     return (
-        <div className={styles.pageWrapper}>
+        <div className="flex flex-col p-[28px]">
             { (title || description || action) && (
                     <div className={styles.pageHeader}>
                         <div className={styles.pageTitleBlock}>

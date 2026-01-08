@@ -142,6 +142,7 @@ const UserDetailsPage = () => {
         refreshUserData()
     };
 
+
     const getAge = (birthday: string | number | Date | undefined) => {
         if (!birthday) return null;
         const birthDate = new Date(birthday);
