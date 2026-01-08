@@ -5,7 +5,7 @@ import LoaderDots from "../../../../basic/LoaderDots/LoaderDots";
 
 import {AssigneeSelector} from "./AssigneeSelector/AssigneeSelector";
 import TaskNameInput from "./TaskNameInput/TaskNameInput";
-import TagSelector from "./TagSelector/TagSelector";
+import {TagSelector} from "./TagSelector/TagSelector";
 import AttachmentsSection, { type Attachment } from "./AttachmentsSection/AttachmentsSection";
 import SubtasksSection, { type Subtask } from "./SubtaskSection/SubtasksSection";
 
