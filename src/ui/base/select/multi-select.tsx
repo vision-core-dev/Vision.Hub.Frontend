@@ -13,7 +13,7 @@ import { Label } from "@/ui/base/input/label";
 import { Popover } from "@/ui/base/select/popover";
 import { type SelectItemType, sizes } from "@/ui/base/select/select";
 import { TagCloseX } from "@/ui/base/tags/base-components/tag-close-x";
-import { useResizeObserver } from "@/hooks/use-resize-observer";
+import { useResizeObserver } from "@/utils/use-resize-observer";
 import { cx } from "@/utils/cx";
 import { SelectItem } from "./select-item";
 
