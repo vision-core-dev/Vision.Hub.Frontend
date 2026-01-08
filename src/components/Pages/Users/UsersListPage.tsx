@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { SortDescriptor } from "react-aria-components";
-import { Plus } from "@untitledui/icons";
+import {Eye, Plus} from "@untitledui/icons";
 
 import { api } from "@/utils/api";
 import DefaultPage from "@/components/basic/DefaultPage/DefaultPage";
@@ -62,11 +62,12 @@ const UsersTable = ({
                     <Table.Head id="first_name" label="Користувач" isRowHeader allowsSorting />
                     <Table.Head id="birthday" label="День народження" allowsSorting />
                     <Table.Head id="email" label="Email" />
+                    <Table.Head id="actions" />
                 </Table.Header>
 
                 <Table.Body items={sortedUsers}>
                     {(user) => (
-                        <Table.Row id={user.id} onAction={() => onRowClick(user)}>
+                        <Table.Row id={user.id}>
                             <Table.Cell>
                                 <AvatarLabelGroup
                                     src={user.avatar_url}
@@ -78,12 +79,18 @@ const UsersTable = ({
                             </Table.Cell>
 
                             <Table.Cell>
-                                {user.birthday}
-                                {/*{safeDate(user.birthday)} {getAge(user.birthday)}*/}
+                                {user.birthday && `${safeDate(user.birthday)} (${getAge(user.birthday)} років)`}
                             </Table.Cell>
 
                             <Table.Cell>
                                 {user.email}
+                            </Table.Cell>
+
+                            <Table.Cell>
+                                <Button size="sm" color="secondary"
+                                    onClick={() => onRowClick(user)}
+                                    iconLeading={Eye}
+                                >Переглянути</Button>
                             </Table.Cell>
 
                         </Table.Row>

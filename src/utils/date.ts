@@ -3,8 +3,6 @@ import {
     getLocalTimeZone
 } from "@internationalized/date";
 import type { DateValue } from "react-aria-components";
-import styles from "@/components/Pages/Users/UserDetails/UserDetailsPage.module.css";
-
 
 export function dateValueToIso(value: DateValue | null): string | null {
     if (!value) return null;

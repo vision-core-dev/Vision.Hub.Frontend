@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import {safeDatetime} from "@/utils/safeDate.ts";
 import {api} from "@/utils/api.ts";
 import {SlideoutMenu} from "@/ui/application/slideout-menus/slideout-menu.tsx";
+import {Button} from "@/ui/base/buttons/button.tsx";
 
 interface Notification {
     id: string;
@@ -66,7 +67,25 @@ const NotificationsMenu: React.FC<Props> = ({ isOpen, setIsOpen, onReadAll }: Pr
                             className={`${styles.notification} ${notif.is_read ? styles.read : ""}`}
                         >
                             <div className={styles.notifContent}>
-                                <h3>{notif.title}</h3>
+                                <div className="flex items-center justify-between">
+                                    <h3>{notif.title}</h3>
+                                    {(!notif.is_read || notif.link) && (
+                                        <Button
+                                            color={notif.is_read ? "link-gray" : "link-color"}
+                                            size="md"
+                                            onClick={() => {
+                                                if (!notif.is_read) markAsRead(notif.id);
+                                                if (notif.link) {
+                                                    navigate(notif.link)
+                                                    setIsOpen(false);
+                                                };
+                                            }}
+                                            iconLeading={notif.link ? "Перейти" : "Добре"}
+                                        >
+                                            {notif.link ? "Перейти" : "Добре"}
+                                        </Button>
+                                    )}
+                                </div>
                                 <p
                                     dangerouslySetInnerHTML={{ __html: notif.message }}
                                 />
@@ -74,23 +93,6 @@ const NotificationsMenu: React.FC<Props> = ({ isOpen, setIsOpen, onReadAll }: Pr
                                     <Clock strokeWidth={2.5} /> {safeDatetime(notif.created_at)}{" "}
                                     {notif.is_read && <CheckCheck strokeWidth={2.5} />}
                                 </span>
-                            </div>
-
-                            <div className={styles.actions}>
-                                {(!notif.is_read || notif.link) && (
-                                    <button
-                                        className={styles.linkButton}
-                                        onClick={() => {
-                                            if (!notif.is_read) markAsRead(notif.id);
-                                            if (notif.link) {
-                                                navigate(notif.link)
-                                                setIsOpen(false);
-                                            };
-                                        }}
-                                    >
-                                        {notif.link ? "Перейти" : "Добре"}
-                                    </button>
-                                )}
                             </div>
                         </div>
                     ))}
