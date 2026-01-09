@@ -10,6 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@capacitor/android": "^8.0.0",
+    "@capacitor/cli": "^8.0.0",
+    "@capacitor/core": "^8.0.0",
     "@codemirror/autocomplete": "^6.19.1",
     "@codemirror/legacy-modes": "^6.5.2",
     "@floating-ui/dom": "^1.7.4",
