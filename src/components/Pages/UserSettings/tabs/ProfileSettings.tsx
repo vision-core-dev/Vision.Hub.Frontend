@@ -84,7 +84,7 @@ function ChangeAvatarModal({ isOpen, setIsOpen, handleAvatarUpload }: ChangeAvat
                     <Dialog>
                         <div className="relative w-full overflow-hidden p-4 rounded-2xl bg-primary shadow-xl sm:max-w-120">
 
-                            <FileUploadDropZone className="w-full max-md:hidden" onDropFiles={(files) => handleAvatarUpload(files[0])} />
+                            <FileUploadDropZone className="w-full" onDropFiles={(files) => handleAvatarUpload(files[0])} />
 
                         </div>
                     </Dialog>
