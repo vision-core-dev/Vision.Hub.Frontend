@@ -39,6 +39,7 @@ const tickSizeMap = {
 
 interface AvatarProfilePhotoProps extends AvatarProps {
     size: "sm" | "md" | "lg";
+    onClick?: () => void;
 }
 
 export const AvatarProfilePhoto = ({
@@ -53,6 +54,7 @@ export const AvatarProfilePhoto = ({
     badge,
     status,
     className,
+    onClick,
 }: AvatarProfilePhotoProps) => {
     const [isFailed, setIsFailed] = useState(false);
 
@@ -60,6 +62,7 @@ export const AvatarProfilePhoto = ({
         if (src && !isFailed) {
             return (
                 <img
+                    onClick={onClick ? onClick : undefined}
                     src={src}
                     alt={alt}
                     onError={() => setIsFailed(true)}

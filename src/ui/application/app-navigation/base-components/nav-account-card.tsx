@@ -9,6 +9,7 @@ import { AvatarLabelGroup } from "@/ui/base/avatar/avatar-label-group";
 import { useBreakpoint } from "@/hooks/use-breakpoint";
 import { cx } from "@/utils/cx";
 import {useAuth} from "@/components/System/AuthContext.tsx";
+import {useNavigate} from "react-router-dom";
 
 type NavAccountType = {
     /** Unique identifier for the nav item. */
@@ -31,6 +32,7 @@ export const NavAccountMenu = ({
     const dialogRef = useRef<HTMLDivElement>(null);
 
     const {logout} = useAuth();
+    const navigate = useNavigate();
 
     const onKeyDown = useCallback(
         (e: KeyboardEvent) => {
@@ -68,7 +70,7 @@ export const NavAccountMenu = ({
             <div className="rounded-xl bg-primary ring-1 ring-secondary">
                 <div className="flex flex-col gap-0.5 py-1.5">
                     {/*<NavAccountCardMenuItem label="View profile" icon={User01} shortcut="⌘K->P" />*/}
-                    <NavAccountCardMenuItem label="Налаштування" icon={Settings01} />
+                    <NavAccountCardMenuItem label="Налаштування" icon={Settings01} onClick={() => navigate("/me/settings")} />
                     {/*<NavAccountCardMenuItem label="Documentation" icon={BookOpen01} />*/}
                 </div>
             </div>

@@ -9,6 +9,7 @@ import {useNavigate} from "react-router-dom";
 import {api} from "@/utils/api.ts";
 import {Bell} from "lucide-react";
 import NotificationsMenu from "@/components/Layout/Notifications/NotificationsMenu.tsx";
+import {Badge} from "@/ui/base/badges/badges.tsx";
 
 interface SidebarNavigationProps {
     /** URL of the currently active item. */
@@ -101,7 +102,7 @@ export const SidebarNavigationSimple = ({
                 <ul className="flex flex-col">
 
                     <li key="notifs" className="py-0.5">
-                        <NavItemBase badge={unreadCount} icon={Bell} type="link" current={showNotifs} onClick={() => setShowNotifs(true)}>
+                        <NavItemBase badge={unreadCount > 0 && <Badge color="error">{unreadCount}</Badge>} icon={Bell} type="link" current={showNotifs} onClick={() => setShowNotifs(true)}>
                             Сповіщення
                         </NavItemBase>
                     </li>
