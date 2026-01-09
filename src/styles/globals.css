@@ -30,6 +30,9 @@
 
 html,
 body {
+    --safe-bottom: env(safe-area-inset-bottom);
+    padding-bottom: var(--safe-bottom);
+
     font-family: var(--font-body), serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
