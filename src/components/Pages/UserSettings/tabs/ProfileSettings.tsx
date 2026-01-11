@@ -17,7 +17,6 @@ export default function ProfileSettings({ user }: Props) {
 
     const handleAvatarUpload = async (file: File) => {
         try {
-            // optimistic UI (можеш прибрати, якщо не хочеш)
             setUploadedAvatar(URL.createObjectURL(file));
 
             const formData = new FormData();
@@ -26,13 +25,10 @@ export default function ProfileSettings({ user }: Props) {
             const res = await api.post("/v1/Hub/UserMe/UploadAvatar", formData);
             const data: {file_url: string} = await res.json();
 
-            // фінально оновлюємо аватар
             setUploadedAvatar(data.file_url);
             setAvatarModal(false);
         } catch (error) {
             console.error("Avatar upload failed", error);
-
-            // rollback, якщо треба
             setUploadedAvatar(user.avatar_url ?? null);
         }
     };
@@ -56,14 +52,6 @@ export default function ProfileSettings({ user }: Props) {
                     icon={User}
                 />
             )}
-
-            {/*<InputGroup label="День народження" className="w-full" size="sm">*/}
-            {/*    <DatePicker*/}
-            {/*        size="sm"*/}
-            {/*        className="w-full"*/}
-            {/*        value={user.birthday ? new Date(user.birthday) : null}*/}
-            {/*    />*/}
-            {/*</InputGroup>*/}
 
             <ChangeAvatarModal isOpen={avatarModal} setIsOpen={(v) => setAvatarModal(v)} handleAvatarUpload={handleAvatarUpload} />
         </>
