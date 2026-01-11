@@ -96,7 +96,7 @@ const MessageActionTextarea = ({
                 {/*    />*/}
                 {/*</div>*/}
 
-                <Button size="sm" type="submit" color="link-color" isLoading={isLoading} isDisabled={isLoading}>
+                <Button size="sm" type="submit" color="link-color" isLoading={isLoading} showTextWhileLoading>
                     Відправити
                 </Button>
             </div>

@@ -267,7 +267,7 @@ const ListItem = ({
                                 }
                             />
                             <div className={styles.actions}>
-                                <Button color="primary" onClick={createTask} disabled={loading} isLoading={loading}>
+                                <Button color="primary" onClick={createTask} disabled={loading} isLoading={loading} showTextWhileLoading>
                                     Додати задачу
                                 </Button>
                                 <Button color="secondary" onClick={() => setShowCreateTask(false)} iconLeading={X} />

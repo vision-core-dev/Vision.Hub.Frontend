@@ -67,7 +67,7 @@ const LoginPage = () => {
 
                     {error && <p className={styles.error}>{error}</p>}
 
-                    <Button type="submit" size="md" isLoading={isLoading}>
+                    <Button type="submit" size="md" isLoading={isLoading} showTextWhileLoading>
                         Увійти
                     </Button>
                 </form>

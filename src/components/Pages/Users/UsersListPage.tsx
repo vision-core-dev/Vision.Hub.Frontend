@@ -197,8 +197,8 @@ const CreateUserModal = ({ isOpen, setIsOpen }: CreateUserModalProps) => {
 
             setIsOpen(false);
             window.location.reload(); // або callback для оновлення списку
-        } catch (e: any) {
-            setError(e.message);
+        } catch {
+            setError("Не вдалося створити користувача.");
         } finally {
             setLoading(false);
         }
@@ -270,7 +270,6 @@ const CreateUserModal = ({ isOpen, setIsOpen }: CreateUserModalProps) => {
 
                                 <Select
                                     label="Роль"
-                                    isRequired
                                     selectedKey={form.role_id}
                                     onSelectionChange={(key) =>
                                         setForm({ ...form, role_id: key as string })
@@ -287,10 +286,11 @@ const CreateUserModal = ({ isOpen, setIsOpen }: CreateUserModalProps) => {
                                     ))}
                                 </Select>
 
-
-                                {/*    select of role */}
-
-
+                                {error && (
+                                    <p className="text-sm text-error">
+                                        {error}
+                                    </p>
+                                )}
                             </div>
 
 
@@ -302,7 +302,7 @@ const CreateUserModal = ({ isOpen, setIsOpen }: CreateUserModalProps) => {
                                     <Button color="secondary" onClick={() => setIsOpen(false)}>
                                         Скасувати
                                     </Button>
-                                    <Button color="primary" onClick={handleSubmit} isLoading={loading}>
+                                    <Button color="primary" onClick={handleSubmit} isLoading={loading} showTextWhileLoading>
                                         Додати
                                     </Button>
                                 </div>
