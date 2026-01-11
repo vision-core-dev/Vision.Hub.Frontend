@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import type { SortDescriptor } from "react-aria-components";
-import {Eye, Plus} from "@untitledui/icons";
+import {Heading, type SortDescriptor} from "react-aria-components";
+import {Eye, Plus, User01} from "@untitledui/icons";
 
 import { api } from "@/utils/api";
 import DefaultPage from "@/components/basic/DefaultPage/DefaultPage";
@@ -16,6 +16,15 @@ import type {UserType} from "@/types/Users.ts";
 import {safeDate} from "@/utils/safeDate.ts";
 import {getAge} from "@/utils/date.ts";
 import {AvatarLabelGroup} from "@/ui/base/avatar/avatar-label-group.tsx";
+import {Dialog, DialogTrigger, Modal, ModalOverlay} from "@/ui/application/modals/modal.tsx";
+import {BackgroundPattern} from "@/ui/shared-assets/background-patterns";
+import {FeaturedIcon} from "@/ui/foundations/featured-icon/featured-icon.tsx";
+import {CloseButton} from "@/ui/base/buttons/close-button.tsx";
+import {Input, InputBase} from "@/ui/base/input/input.tsx";
+import {InputGroup} from "@/ui/base/input/input-group.tsx";
+import {Shuffle} from "lucide-react";
+import type {Role} from "@/components/Pages/Users/UserDetails/UserDetailsPage.tsx";
+import {Select} from "@/ui/base/select/select.tsx";
 
 
 const UsersTable = ({
@@ -106,6 +115,8 @@ const UsersListPage = () => {
     const [activeUsers, setActiveUsers] = useState<UserType[]>([]);
     const [archivedUsers, setArchivedUsers] = useState<UserType[]>([]);
 
+    const [createModalOpen, setCreateModalOpen] = useState(false);
+
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -117,31 +128,13 @@ const UsersListPage = () => {
         });
     }, []);
 
-    if (loading) {
-        return <DefaultPage title="Користувачі" isLoading />;
-    }
-
-    if (!activeUsers.length && !archivedUsers.length) {
-        return (
-            <DefaultPage
-                title="Користувачі"
-                action={
-                    <Button onClick={() => navigate("/users/add-user")} iconLeading={Plus}>
-                        Додати
-                    </Button>
-                }
-            >
-                <p>Поки немає жодного користувача.</p>
-            </DefaultPage>
-        );
-    }
-
     return (
         <>
             <DefaultPage
+                isLoading={loading}
                 title="Користувачі"
                 action={
-                    <Button onClick={() => navigate("/users/add-user")} iconLeading={Plus}>
+                    <Button onClick={() => setCreateModalOpen(true)} iconLeading={Plus}>
                         Додати
                     </Button>
                 }
@@ -157,7 +150,169 @@ const UsersListPage = () => {
                     onRowClick={(u) => navigate(`/users/u/${u.id}`)}
                 />
             </DefaultPage>
+            <CreateUserModal isOpen={createModalOpen} setIsOpen={setCreateModalOpen} />
         </>
+    );
+};
+
+interface CreateUserModalProps {
+    isOpen: boolean;
+    setIsOpen: (open: boolean) => void;
+}
+
+const CreateUserModal = ({ isOpen, setIsOpen }: CreateUserModalProps) => {
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    const [form, setForm] = useState({
+        first_name: "",
+        email: "",
+        password: "",
+        role_id: null as string | null,
+    });
+
+    const [roles, setRoles] = useState<Role[]>([]);
+
+    useEffect(() => {
+        if (!isOpen) return;
+
+        api.get("/v1/Hub/UserRoles/MyLowerRoles").then(async (res) => {
+            if (res.ok) {
+                setRoles(await res.json());
+            }
+        });
+    }, [isOpen]);
+
+    const handleSubmit = async () => {
+        setLoading(true);
+        setError(null);
+
+        try {
+            const res = await api.post("/v1/Hub/Users/Create", form);
+
+            if (!res.ok) {
+                const data = await res.json();
+                throw new Error(data.detail || "Помилка");
+            }
+
+            setIsOpen(false);
+            window.location.reload(); // або callback для оновлення списку
+        } catch (e: any) {
+            setError(e.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <DialogTrigger isOpen={isOpen} onOpenChange={setIsOpen}>
+            <ModalOverlay isDismissable>
+                <Modal>
+                    <Dialog className="overflow-hidden">
+                        <div className="relative w-full overflow-hidden rounded-2xl bg-primary shadow-xl sm:max-w-172 lg:max-w-[400px]">
+                            <CloseButton onClick={() => setIsOpen(false)} theme="light" size="lg" className="absolute top-3 right-3" />
+                            <div className="flex flex-col gap-4 px-4 pt-5 sm:px-6 sm:pt-6">
+                                <div className="relative w-max max-sm:hidden">
+                                    <FeaturedIcon color="gray" size="lg" theme="modern" icon={User01} />
+
+                                    <BackgroundPattern pattern="circle" size="sm" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+                                </div>
+                                <div className="z-10 flex flex-col gap-0.5">
+                                    <Heading slot="title" className="text-md font-semibold text-primary">
+                                        Додати користувача
+                                    </Heading>
+                                    <p className="text-sm text-tertiary">Додати користувача до команди Vision Core Dev.</p>
+                                </div>
+                            </div>
+
+                            <div className="h-5 w-full" />
+                            <div className="w-full border-t border-secondary" />
+                            <div className="flex flex-col justify-start gap-4 px-4 pt-5 sm:px-6">
+
+                                <Input isRequired label="Ім'я користувача" placeholder="Тестовий"
+                                       value={form.first_name}
+                                       onChange={(value) =>
+                                           setForm({ ...form, first_name: value })
+                                       }
+                                />
+
+                                <Input isRequired label="Email" type="email" placeholder="test@mail.com"
+                                       value={form.email}
+                                       onChange={(value) =>
+                                           setForm({ ...form, email: value })
+                                       }
+                                />
+
+                                <InputGroup
+                                    label="Пароль"
+                                    isRequired
+                                    trailingAddon={
+                                        <Button
+                                            color="secondary"
+                                            iconLeading={Shuffle}
+                                            onClick={() =>
+                                                setForm({
+                                                    ...form,
+                                                    password: Math.random().toString(36).slice(-10),
+                                                })
+                                            }
+                                        />
+                                    }
+                                >
+                                    <InputBase
+                                        value={form.password}
+                                        onChange={(value) =>
+                                            setForm({ ...form, password: value })
+                                        }
+                                        placeholder="••••••••"
+                                    />
+                                </InputGroup>
+
+                                <Select
+                                    label="Роль"
+                                    isRequired
+                                    selectedKey={form.role_id}
+                                    onSelectionChange={(key) =>
+                                        setForm({ ...form, role_id: key as string })
+                                    }
+                                    className="w-full"
+                                    placeholder="Виберіть роль"
+                                >
+                                    {roles.map((role) => (
+                                        <Select.Item
+                                            key={role.id}
+                                            id={role.id}
+                                            label={role.name}
+                                        />
+                                    ))}
+                                </Select>
+
+
+                                {/*    select of role */}
+
+
+                            </div>
+
+
+                            <div className="z-10 flex flex-col pt-6 pb-4 sm:pt-8 sm:pb-6">
+                                <div className="w-full border-t border-secondary" />
+
+                                <div className="h-4 w-full sm:h-6" />
+                                <div className="flex flex-1 flex-col-reverse gap-3 px-4 sm:grid sm:grid-cols-2 sm:px-6">
+                                    <Button color="secondary" onClick={() => setIsOpen(false)}>
+                                        Скасувати
+                                    </Button>
+                                    <Button color="primary" onClick={handleSubmit} isLoading={loading}>
+                                        Додати
+                                    </Button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </Dialog>
+                </Modal>
+            </ModalOverlay>
+        </DialogTrigger>
     );
 };
 

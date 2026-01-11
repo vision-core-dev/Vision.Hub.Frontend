@@ -1,9 +1,18 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "./AuthContext";
+import LoaderDots from "@/components/basic/LoaderDots/LoaderDots.tsx";
 
 const ProtectedRoute = () => {
-    const { isAuthenticated, role } = useAuth();
+    const { isAuthenticated, role, loading } = useAuth();
     const location = useLocation();
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center h-screen">
+                <LoaderDots size="lg" />
+            </div>
+        );
+    }
 
     if (!isAuthenticated) {
         return <Navigate to="/login" replace />;

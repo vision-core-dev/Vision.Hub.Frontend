@@ -1,7 +1,7 @@
 import {createContext, useContext, useState, useEffect} from "react";
 import type { ReactNode } from "react";
-import { api } from "../../utils/api";
-import type {AuthContextType, CheckMeResponse, MeUser, MyRole} from "../../types/AuthUser.ts";
+import { api } from "@/utils/api.ts";
+import type {AuthContextType, CheckMeResponse, MeUser, MyRole} from "@/types/AuthUser.ts";
 import {useNavigate} from "react-router-dom";
 
 const greetings: string[] = [
@@ -26,7 +26,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<MeUser | null>(null);
     const [role, setRole] = useState<MyRole | null>(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
+    const [loading, setLoading] = useState(true);
 
     const path = window.location.pathname;
 
@@ -73,7 +73,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
                     }
                 }
             } finally {
-                setIsLoading(false);
+                setLoading(false);
             }
         };
 
@@ -89,9 +89,10 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
                 setRole,
                 login,
                 logout,
+                loading,
             }}
         >
-            {isLoading ? <div></div> : children}
+            {children}
         </AuthContext.Provider>
     );
 };

@@ -17,6 +17,21 @@
     animation: pulse 1.4s infinite;
 }
 
+.sm span {
+    width: 6px;
+    height: 6px;
+}
+
+.md span {
+    width: 10px;
+    height: 10px;
+}
+
+.lg span {
+    width: 14px;
+    height: 14px;
+}
+
 .loader span:nth-child(1) {
     animation-delay: 0s;
 }

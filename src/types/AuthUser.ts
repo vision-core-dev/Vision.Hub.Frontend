@@ -35,4 +35,5 @@ export interface AuthContextType {
     setRole: (role: MyRole) => void;
     login: (token: string) => void;
     logout: () => void;
+    loading: boolean;
 }

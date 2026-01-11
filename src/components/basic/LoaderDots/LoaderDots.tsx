@@ -1,11 +1,16 @@
 import styles from "./LoaderDots.module.css";
+import clsx from "clsx";
 
-const LoaderDots = () => {
+interface LoaderDotsProps {
+    size?: "sm" | "md" | "lg";
+}
+
+const LoaderDots = ({ size = "md" }: LoaderDotsProps) => {
     return (
-        <div className={styles.loader}>
-            <span></span>
-            <span></span>
-            <span></span>
+        <div className={clsx(styles.loader, styles[size])}>
+            <span />
+            <span />
+            <span />
         </div>
     );
 };

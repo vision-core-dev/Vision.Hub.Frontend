@@ -23,7 +23,7 @@ export interface Badge {
     awarded_at: string;
 }
 
-interface Role {
+export interface Role {
     id: string;
     name: string;
     order: number;
