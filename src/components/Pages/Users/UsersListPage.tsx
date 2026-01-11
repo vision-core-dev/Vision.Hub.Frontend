@@ -261,9 +261,8 @@ const CreateUserModal = ({ isOpen, setIsOpen }: CreateUserModalProps) => {
                                 >
                                     <InputBase
                                         value={form.password}
-                                        onChange={(e) => {
-                                            setForm({...form, password: e.value})
-                                        }
+                                        onChange={(value: string) =>
+                                            setForm({...form, password: value})
                                         }
                                         placeholder="••••••••"
                                     />

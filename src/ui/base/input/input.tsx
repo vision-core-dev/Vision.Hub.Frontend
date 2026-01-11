@@ -31,6 +31,8 @@ export interface InputBaseProps extends TextFieldProps {
     groupRef?: Ref<HTMLDivElement>;
     /** Icon component to display on the left side of the input. */
     icon?: ComponentType<HTMLAttributes<HTMLOrSVGElement>>;
+    value?: string;
+    onChange?: (value: string) => void;
 }
 
 export const InputBase = ({
@@ -47,6 +49,8 @@ export const InputBase = ({
     tooltipClassName,
     inputClassName,
     iconClassName,
+    value,
+    onChange,
     // Omit this prop to avoid invalid HTML attribute warning
     isRequired: _isRequired,
     ...inputProps
@@ -120,6 +124,8 @@ export const InputBase = ({
                 {...(inputProps as AriaInputProps)}
                 ref={ref}
                 placeholder={placeholder}
+                value={value}
+                onChange={(e) => onChange?.(e.target.value)}
                 className={cx(
                     "m-0 w-full bg-transparent text-md text-primary ring-0 outline-hidden placeholder:text-placeholder autofill:rounded-lg autofill:text-primary",
                     isDisabled && "cursor-not-allowed text-disabled",
