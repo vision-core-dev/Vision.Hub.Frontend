@@ -39,7 +39,7 @@ export default function ProfileSettings({ user }: Props) {
 
     return (
         <>
-            <AvatarProfilePhoto size="md" className="cursor-pointer" src={uploadedAvatar} onClick={() => setAvatarModal(true)} placeholderIcon={User} />
+            <AvatarProfilePhoto size="md" className="cursor-pointer" src={uploadedAvatar} onClick={() => setAvatarModal(true) } />
 
             <Input
                 label="Імʼя"

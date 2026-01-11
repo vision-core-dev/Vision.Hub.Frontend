@@ -77,7 +77,9 @@ export const AvatarProfilePhoto = ({
 
         if (initials) {
             return (
-                <div className={cx("flex size-full items-center justify-center rounded-full bg-tertiary ring-1 ring-secondary_alt", styles[size].content)}>
+                <div
+                    onClick={onClick ? onClick : undefined}
+                    className={cx("flex size-full items-center justify-center rounded-full bg-tertiary ring-1 ring-secondary_alt", styles[size].content)}>
                     <span className={cx("text-quaternary", styles[size].initials)}>{initials}</span>
                 </div>
             );
@@ -85,14 +87,18 @@ export const AvatarProfilePhoto = ({
 
         if (PlaceholderIcon) {
             return (
-                <div className={cx("flex size-full items-center justify-center rounded-full bg-tertiary ring-1 ring-secondary_alt", styles[size].content)}>
+                <div
+                    onClick={onClick ? onClick : undefined}
+                    className={cx("flex size-full items-center justify-center rounded-full bg-tertiary ring-1 ring-secondary_alt", styles[size].content)}>
                     <PlaceholderIcon className={cx("text-fg-quaternary", styles[size].icon)} />
                 </div>
             );
         }
 
         return (
-            <div className={cx("flex size-full items-center justify-center rounded-full bg-tertiary ring-1 ring-secondary_alt", styles[size].content)}>
+            <div
+                onClick={onClick ? onClick : undefined}
+                className={cx("flex size-full items-center justify-center rounded-full bg-tertiary ring-1 ring-secondary_alt", styles[size].content)}>
                 {placeholder || <User01 className={cx("text-fg-quaternary", styles[size].icon)} />}
             </div>
         );
