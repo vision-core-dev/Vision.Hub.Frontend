@@ -4,8 +4,9 @@ import type {MeUser} from "@/types/AuthUser.ts";
 import {Dialog, DialogTrigger, Modal, ModalOverlay} from "@/ui/application/modals/modal.tsx";
 import {useState} from "react";
 import {FileUploadDropZone} from "@/ui/application/file-upload/file-upload-base.tsx";
-import {User} from "lucide-react";
+import {Cake, User} from "lucide-react";
 import {api} from "@/utils/api.ts";
+import {safeDate} from "@/utils/safeDate.ts";
 
 interface Props {
     user: MeUser;
@@ -50,6 +51,15 @@ export default function ProfileSettings({ user }: Props) {
                     isDisabled
                     value={user.last_name || ""}
                     icon={User}
+                />
+            )}
+
+            {user.birthday && (
+                <Input
+                    label="День народження"
+                    isDisabled
+                    value={safeDate(user.birthday)}
+                    icon={Cake}
                 />
             )}
 

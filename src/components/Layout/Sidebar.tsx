@@ -22,6 +22,7 @@ import {
 import type { NavItemType } from "@/ui/application/app-navigation/config";
 import { SidebarNavigationSimple } from "@/ui/application/app-navigation/sidebar-navigation/sidebar-simple";
 import { getSidebarText } from "@/types/Messages.ts";
+import {Badge} from "@/ui/base/badges/badges.tsx";
 
 /* ================= ICON MAP ================= */
 
@@ -43,7 +44,7 @@ const iconMap: Record<string, FC<{ className?: string }>> = {
 /* ================= SIDEBAR ================= */
 
 const Sidebar: React.FC = () => {
-    const { role } = useAuth();
+    const { user, role } = useAuth();
     const location = useLocation();
 
     const navItems: NavItemType[] =
@@ -55,6 +56,14 @@ const Sidebar: React.FC = () => {
                 icon: iconMap[key] ?? ClipboardList,
                 isActive: location.pathname.startsWith(`/${key}`),
             })) ?? [];
+
+    navItems.map((item) => {
+        if (item?.href == "/dashboard") {
+            if (user && !user.birthday) {
+                item.badge = (<Badge size="sm" color="error">1</Badge>)
+            }
+        }
+    })
 
     return (
         <SidebarNavigationSimple

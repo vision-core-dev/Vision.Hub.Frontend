@@ -34,6 +34,7 @@
     "@untitledui/file-icons": "^0.0.9",
     "@untitledui/icons": "^0.0.19",
     "date-fns": "^4.1.0",
+    "input-otp": "^1.4.2",
     "lucide-react": "^0.546.0",
     "monaco-editor": "^0.52.2",
     "motion": "^12.24.10",
