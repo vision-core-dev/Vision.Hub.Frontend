@@ -191,19 +191,17 @@ const BoardPage = ({ is_public=false }: Props) => {
 
             </div>
 
-            {selectedTaskId && (
-                <TaskDetailsModal
-                    isOpen={isTaskModalOpen}
-                    onOpenChange={(open) => {
-                        if (!open) {
-                            setSelectedTaskId(null);
-                        }
-                    }}
-                    taskId={selectedTaskId ?? ""}
-                    boardTags={boardDetails.tags}
-                    boardLists={boardLists}
-                />
-            )}
+            <TaskDetailsModal
+                isOpen={isTaskModalOpen}
+                onOpenChange={(open) => {
+                    if (!open) {
+                        setSelectedTaskId(null);
+                    }
+                }}
+                taskId={selectedTaskId ?? ""}
+                boardTags={boardDetails.tags}
+                boardLists={boardLists}
+            />
 
         </div>
     );

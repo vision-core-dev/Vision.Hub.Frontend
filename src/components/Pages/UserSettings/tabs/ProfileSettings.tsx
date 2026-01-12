@@ -24,19 +24,24 @@ export default function ProfileSettings({ user }: Props) {
             formData.append("file", file);
 
             const res = await api.post("/v1/Hub/UserMe/UploadAvatar", formData);
-            const data: {file_url: string} = await res.json();
 
-            setUploadedAvatar(data.file_url);
-            setAvatarModal(false);
+            if (res.status === 200) {
+                window.location.reload();
+            } else {
+                console.error("Avatar upload failed", await res.text());
+            }
+
         } catch (error) {
             console.error("Avatar upload failed", error);
+
+            // rollback, якщо треба
             setUploadedAvatar(user.avatar_url ?? null);
         }
     };
 
     return (
         <>
-            <AvatarProfilePhoto size="md" className="cursor-pointer" src={uploadedAvatar} onClick={() => setAvatarModal(true) } />
+            <AvatarProfilePhoto size="md" className="cursor-pointer" src={uploadedAvatar} onClick={() => setAvatarModal(true)} placeholderIcon={User} />
 
             <Input
                 label="Імʼя"

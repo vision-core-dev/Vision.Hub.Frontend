@@ -3,6 +3,7 @@ import { Link as LinkIcon, Trash, File } from "lucide-react";
 import { api } from "@/utils/api";
 import { safeDatetime } from "@/utils/safeDate";
 import {ButtonUtility} from "@/ui/base/buttons/button-utility.tsx";
+import {Button} from "@/ui/base/buttons/button.tsx";
 
 /* ===================== TYPES ===================== */
 
@@ -202,13 +203,13 @@ const AttachmentsSection: React.FC<Props> = ({
                     </a>
                     <div className="flex items-center gap-3 text-xs text-tertiary">
                         {safeDatetime(file.created_at)}
-                        <button
+                        <Button
+                            color="tertiary-destructive"
                             onClick={() =>
                                 handleRemoveAttachment(file)
                             }
-                        >
-                            <Trash size={14} />
-                        </button>
+                            iconLeading={Trash}
+                        />
                     </div>
                 </div>
             ))}
@@ -227,13 +228,13 @@ const AttachmentsSection: React.FC<Props> = ({
                         <LinkIcon size={14} />
                         {link.name || link.url}
                     </a>
-                    <button
+                    <Button
+                        color="tertiary-destructive"
                         onClick={() =>
                             handleRemoveAttachment(link)
                         }
-                    >
-                        <Trash size={14} />
-                    </button>
+                        iconLeading={Trash}
+                    />
                 </div>
             ))}
 

@@ -8,6 +8,7 @@ import type { UserType } from "@/types/Users.ts";
 import { getTextColor } from "@/utils/colors.ts";
 import {useParams} from "react-router-dom";
 import {Button} from "@/ui/base/buttons/button.tsx";
+import {TextArea} from "@/ui/base/textarea/textarea.tsx";
 
 type ListProps = {
     isBoardPublic: boolean;
@@ -252,21 +253,26 @@ const ListItem = ({
             {!isBoardPublic && (
                 <>
                     {!showCreateTask ? (
-                        <button className={styles.addTask} onClick={() => setShowCreateTask(true)}>
-                            <Plus strokeWidth={2} size={16} /> Додати задачу
-                        </button>
+                        <Button color="tertiary" iconLeading={Plus}
+                            onClick={() => {
+                                setTaskName("")
+                                setShowCreateTask(true)
+                            }}
+                        >
+                            Додати задачу
+                        </Button>
                     ) : (
-                        <div className={styles.createTask}>
-                            <textarea
+                        <div>
+                            <TextArea
                                 autoFocus
                                 placeholder="Введіть назву задачі..."
                                 value={taskName}
-                                onChange={(e) => setTaskName(e.target.value)}
+                                onChange={(value) => setTaskName(value)}
                                 onKeyDown={(e) =>
                                     e.key === "Enter" && (e.preventDefault(), createTask())
                                 }
                             />
-                            <div className={styles.actions}>
+                            <div className="flex gap-2 mt-2">
                                 <Button color="primary" onClick={createTask} disabled={loading} isLoading={loading} showTextWhileLoading>
                                     Додати задачу
                                 </Button>

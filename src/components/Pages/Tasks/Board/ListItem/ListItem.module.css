@@ -78,27 +78,6 @@
     gap: 6px;
     margin-top: 10px;
 }
-.createTask textarea {
-    width: 100%;
-    min-height: 60px;
-    padding: 8px;
-    font-size: 14px;
-    border: 1px solid #dfe1e6;
-    border-radius: 8px;
-    box-sizing: border-box;
-    font-family: inherit;
-    resize: none;
-    text-align: start;
-}
-.createTask textarea:focus {
-    outline: none;
-    border-color: #00a86b;
-}
-.createTask div {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-}
 
 .taskWrapper {
     transition:

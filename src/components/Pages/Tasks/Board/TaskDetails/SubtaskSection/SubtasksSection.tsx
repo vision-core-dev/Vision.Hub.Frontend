@@ -183,6 +183,7 @@ const SubtasksSection: React.FC<Props> = ({ taskId, initialSubtasks }) => {
 
                 <div className={styles.addRow}>
                     <Input
+                        size="sm"
                         type="text"
                         value={newName}
                         placeholder="Нова підзадача..."

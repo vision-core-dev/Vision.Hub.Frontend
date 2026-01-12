@@ -3,6 +3,8 @@ import styles from "./SupportSidebar.module.css";
 import {useEffect, useState} from "react";
 import LoaderDots from "../../../basic/LoaderDots/LoaderDots.tsx";
 import {api} from "@/utils/api.ts";
+import {AvatarLabelGroup} from "@/ui/base/avatar/avatar-label-group.tsx";
+import {Badge} from "@/ui/base/badges/badges.tsx";
 
 interface VisionSupportUser {
     telegram_id: number
@@ -72,15 +74,10 @@ function SupportSidebar({ onSelectChat }: { onSelectChat?: () => void }) {
                                 if (onSelectChat) onSelectChat();
                             }}
                         >
-                            <div className={styles.text}>
-                                <span className={styles.title}>{u.username || `ID ${u.telegram_id}`}</span>
-                                <span className={styles.subtitle}>
-                                    {u.first_name || ""} {u.last_name || ""}
-                                </span>
-                            </div>
+                            <AvatarLabelGroup size="md" title={u.username || `ID ${u.telegram_id}`} subtitle={`${u.first_name || ""} ${u.last_name || ""}`} />
 
                             {u.new_messages > 0 && String(u.telegram_id) !== telegramUserId && (
-                                <span className={styles.badge}>{u.new_messages}</span>
+                                <Badge color="error">{u.new_messages}</Badge>
                             )}
                         </div>
                     ))}

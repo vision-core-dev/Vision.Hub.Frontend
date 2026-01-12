@@ -16,7 +16,7 @@
     flex-direction: row;
     gap: 2px;
     padding: 0.7rem;
-    background-color: #f8f8f8;
+    background-color: #fafafa;
     color: #374151;
     border-radius: 10px;
     cursor: pointer;
@@ -32,15 +32,9 @@
     gap: 2px;
 }
 
-.item:hover {
-    background: #e6f8ef;
-    color: #00a86b;
-}
-
 .item.active {
     background: #e6f8ef;
     color: #00a86b;
-    font-weight: 600;
 }
 
 .title {
