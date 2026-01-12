@@ -30,7 +30,6 @@ export default function ProfileSettings({ user }: Props) {
             } else {
                 console.error("Avatar upload failed", await res.text());
             }
-
         } catch (error) {
             console.error("Avatar upload failed", error);
 
