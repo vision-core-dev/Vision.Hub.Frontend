@@ -82,6 +82,7 @@ export const NavItemBase = ({ current, type, badge, href, icon: Icon, children, 
                 className={cx("py-2 pr-3 pl-10", styles.root, current && styles.rootSelected)}
                 onClick={onClick}
                 aria-current={current ? "page" : undefined}
+                data-nav-item
             >
                 {labelElement}
                 {externalIcon}

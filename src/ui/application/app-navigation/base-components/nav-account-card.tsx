@@ -93,7 +93,7 @@ const NavAccountCardMenuItem = ({
     shortcut?: string;
 } & HTMLAttributes<HTMLButtonElement>) => {
     return (
-        <button {...buttonProps} className={cx("group/item w-full cursor-pointer px-1.5 focus:outline-hidden", buttonProps.className)}>
+        <button data-nav-item {...buttonProps} className={cx("group/item w-full cursor-pointer px-1.5 focus:outline-hidden", buttonProps.className)}>
             <div
                 className={cx(
                     "flex w-full items-center justify-between gap-3 rounded-md p-2 group-hover/item:bg-primary_hover",

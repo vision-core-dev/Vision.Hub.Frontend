@@ -67,7 +67,7 @@ export const NavList = ({ activeUrl, items, className }: NavListProps) => {
                 }
 
                 return (
-                    <li key={item.label} className="py-0.5">
+                    <li key={item.label} className="py-0.5" data-nav-item>
                         <NavItemBase
                             type="link"
                             badge={item.badge}

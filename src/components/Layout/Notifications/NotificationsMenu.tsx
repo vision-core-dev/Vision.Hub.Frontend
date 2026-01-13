@@ -62,18 +62,17 @@ const NotificationsMenu: React.FC<Props> = ({ isOpen, setIsOpen, onReadAll }: Pr
 
                 <SlideoutMenu.Content>
                     {notifications.map((notif) => (
-                        <div
-                            key={notif.id}
+                        <div key={notif.id}
                             className={`${styles.notification} ${notif.is_read ? styles.read : ""}`}
                         >
-                            <div className={styles.notifContent}>
+                            <div className="z-110">
                                 <div className="flex items-center justify-between">
                                     <h3>{notif.title}</h3>
                                     {(!notif.is_read || notif.link) && (
                                         <Button
-                                            color={notif.is_read ? "link-gray" : "link-color"}
+                                            color={notif.is_read ? "tertiary" : "primary"}
                                             size="md"
-                                            onClick={() => {
+                                            onClickCapture={() => {
                                                 if (!notif.is_read) markAsRead(notif.id);
                                                 if (notif.link) {
                                                     navigate(notif.link)

@@ -90,11 +90,6 @@ export const SidebarNavigationSimple = ({
                 className,
             )}
         >
-            {/*<div className="flex flex-col gap-5 px-4 lg:px-5">*/}
-            {/*    <UntitledLogo className="h-8" />*/}
-            {/*    <Input shortcut size="sm" aria-label="Search" placeholder="Search" icon={SearchLg} />*/}
-            {/*</div>*/}
-
             <NavList activeUrl={activeUrl} items={items} />
 
             <div className="mt-auto flex flex-col gap-4 px-2 py-4 lg:px-4 lg:py-6">
@@ -108,7 +103,7 @@ export const SidebarNavigationSimple = ({
                     </li>
 
                     {footerItems.map((item) => (
-                        <li key={item.label} className="py-0.5">
+                        <li key={item.label} className="py-0.5" data-nav-item>
                             <NavItemBase badge={item.badge} icon={item.icon} type="link" current={item.href === activeUrl} onClick={() => navigate(item.href!)}>
                                 {item.label}
                             </NavItemBase>
@@ -120,23 +115,19 @@ export const SidebarNavigationSimple = ({
 
                 {showAccountCard && <NavAccountCard balanceEnabled={balanceEnabled} balance={balance} />}
             </div>
+
             <NotificationsMenu setIsOpen={setShowNotifs} isOpen={showNotifs} onReadAll={() => setUnreadCount(0)} />
         </aside>
     );
 
     return (
         <>
-            {/* Mobile header navigation */}
             <MobileNavigationHeader>{content}</MobileNavigationHeader>
 
-            {/* Desktop sidebar navigation */}
             <div className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:flex">{content}</div>
 
-            {/* Placeholder to take up physical space because the real sidebar has `fixed` position. */}
             <div
-                style={{
-                    paddingLeft: MAIN_SIDEBAR_WIDTH,
-                }}
+                style={{ paddingLeft: MAIN_SIDEBAR_WIDTH }}
                 className="invisible hidden lg:sticky lg:top-0 lg:bottom-0 lg:left-0 lg:block"
             />
         </>
