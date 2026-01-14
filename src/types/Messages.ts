@@ -16,6 +16,9 @@ const sidebarList: Record<string, string> = {
     "finance": "Фінанси",
     "reports": "Звіти",
     "settings": "Налаштування",
+    "drive": "Диск",
+    "forms": "Форми",
+    "chat": "Чат",
     "vision-bot": "Vision Bot",
     "vision-support": "Vision Support",
 };

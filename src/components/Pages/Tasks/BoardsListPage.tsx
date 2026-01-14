@@ -168,6 +168,7 @@ const CreateBoardModal = ({ isOpen, setIsOpen }: CreateUserModalProps) => {
                     <Dialog className="overflow-hidden">
                         <div className="relative w-full overflow-hidden rounded-2xl bg-primary shadow-xl sm:max-w-172 lg:max-w-100">
                             <CloseButton onClick={() => setIsOpen(false)} theme="light" size="lg" className="absolute top-3 right-3" />
+
                             <div className="flex flex-col gap-4 px-4 pt-5 sm:px-6 sm:pt-6">
                                 <div className="relative w-max max-sm:hidden">
                                     <FeaturedIcon color="gray" size="lg" theme="modern" icon={KanbanSquareDashed} />

@@ -16,13 +16,15 @@ import {
     BookMarked,
     Bot,
     Headset,
-    ClipboardList,
+    ClipboardList, Folder,
 } from "lucide-react";
 
 import type { NavItemType } from "@/ui/application/app-navigation/config";
 import { SidebarNavigationSimple } from "@/ui/application/app-navigation/sidebar-navigation/sidebar-simple";
 import { getSidebarText } from "@/types/Messages.ts";
 import {Badge} from "@/ui/base/badges/badges.tsx";
+import {File02} from "@untitledui/icons/File02";
+import {MessageTextSquare01} from "@untitledui/icons";
 
 /* ================= ICON MAP ================= */
 
@@ -37,6 +39,9 @@ const iconMap: Record<string, FC<{ className?: string }>> = {
     reports: BarChart3,
     settings: Settings,
     knowledge: BookMarked,
+    drive: Folder,
+    forms: File02,
+    chat: MessageTextSquare01,
     "vision-bot": Bot,
     "vision-support": Headset,
 };

@@ -41,6 +41,8 @@ import FormResultsView from "./components/Pages/forms/FormResultsView/FormResult
 
 import "./styles/globals.css";
 import UserSettingsPage from "@/components/Pages/UserSettings/UserSettingsPage.tsx";
+import DrivePage from "@/components/Pages/Drive/Drive.tsx";
+import ChatPage from "@/components/Pages/Chat/Chat.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
@@ -130,6 +132,12 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                             {/* forms */}
                             <Route path="forms/f/:formId/results" element={<FormResultsView />} />
                             <Route path="form/:formSlug/submit" element={<SubmitForm />} />
+
+                            {/* drive */}
+                            <Route path="drive/*" element={<DrivePage />} />
+
+                            {/* chat */}
+                            <Route path="chat" element={<ChatPage />} />
 
                         </Route>
                     </Route>
