@@ -11,11 +11,9 @@ import TransactionsListSection, {
 } from "../../Finance/TransactionsListSection/TransactionsListSection.tsx";
 import UserValue from "./UserValue/UserValue.tsx";
 import BadgesSection from "./BadgesSection/BadgesSection.tsx";
-import UserLabel from "../../../basic/User/UserLabel.tsx";
 import {Button} from "@/ui/base/buttons/button.tsx";
 import {Select} from "@/ui/base/select/select.tsx";
 import {AvatarLabelGroup} from "@/ui/base/avatar/avatar-label-group.tsx";
-import type {ValueType} from "motion";
 import type {Key} from "react-aria-components";
 
 export interface Badge {
@@ -296,7 +294,7 @@ const UserDetailsPage = () => {
                                         placeholder="Додати керівника"
                                     >
                                         {allUsers.filter(u => u.id !== user.id && user.is_active).map(u => (
-                                            <Select.Item key={u.id} value={u.id}>
+                                            <Select.Item key={u.id} id={u.id}>
                                                 {u.first_name} {u.last_name}
                                             </Select.Item>
                                         ))}
