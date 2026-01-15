@@ -13,6 +13,10 @@ import UserValue from "./UserValue/UserValue.tsx";
 import BadgesSection from "./BadgesSection/BadgesSection.tsx";
 import UserLabel from "../../../basic/User/UserLabel.tsx";
 import {Button} from "@/ui/base/buttons/button.tsx";
+import {Select} from "@/ui/base/select/select.tsx";
+import {AvatarLabelGroup} from "@/ui/base/avatar/avatar-label-group.tsx";
+import type {ValueType} from "motion";
+import type {Key} from "react-aria-components";
 
 export interface Badge {
     id: string;
@@ -51,7 +55,7 @@ const UserDetailsPage = () => {
     const [roles, setRoles] = useState<Role[]>([]);
     const [transactions, setTransactions] = useState<TransactionItem[]>([]);
 
-    const [selectedRole, setSelectedRole] = useState<string>("");
+    const [selectedRole, setSelectedRole] = useState<Key | null>("");
 
     const [allUsers, setAllUsers] = useState<SmallUser[]>([]);
 
@@ -122,7 +126,7 @@ const UserDetailsPage = () => {
         );
         setChangingRole(false);
     };
-    const handleAddSupervisor = async (supervisorId: string) => {
+    const handleAddSupervisor = async (supervisorId: Key | null) => {
         await api.post(`/v1/Hub/Users/${user?.id}/Supervisors/Add/${supervisorId}`);
         refreshUserData()
     };
@@ -132,7 +136,7 @@ const UserDetailsPage = () => {
         refreshUserData()
     };
 
-    const handleAddSubordinate = async (subordinateId: string) => {
+    const handleAddSubordinate = async (subordinateId: Key | null) => {
         await api.post(`/v1/Hub/Users/${user?.id}/Subordinates/Add/${subordinateId}`);
         refreshUserData()
     };
@@ -189,34 +193,32 @@ const UserDetailsPage = () => {
 
                         {(actions.includes("change_role") && showRoleChanger) && (
                             <div className={styles.roleChanger}>
-                                <div className={styles.customSelectWrapper}>
-                                    <select
-                                        value={selectedRole}
-                                        onChange={(e) => setSelectedRole(e.target.value)}
-                                        className={styles.customSelect}
-                                    >
-                                        {roles.map((role) => (
-                                            <option key={role.id} value={role.id}>
-                                                {role.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <span className={styles.selectArrow}>▼</span>
-                                </div>
-                                <button
-                                    className={styles.secondary}
+                                <Select
+                                    value={selectedRole}
+                                    onChange={(value) => setSelectedRole(value)}
+                                    placeholder="Виберіть роль"
+                                    className="w-full"
+                                >
+                                    {roles.map((role) => (
+                                        <Select.Item key={role.id} id={role.id} label={role.name} />
+                                    ))}
+                                </Select>
+                                <Button
+                                    color="secondary"
                                     onClick={handleChangeRole}
                                     disabled={changingRole}
+                                    isLoading={changingRole}
+                                    showTextWhileLoading
                                 >
-                                    {changingRole ? "⏳ Зміна..." : "Змінити роль"}
-                                </button>
-                                <button
-                                    className={styles.secondary}
+                                    Змінити роль
+                                </Button>
+                                <Button
+                                    color="secondary"
                                     onClick={() => setShowRoleChanger(false)}
                                     disabled={changingRole}
                                 >
                                     Скасувати
-                                </button>
+                                </Button>
                             </div>
                         )}
 
@@ -270,72 +272,46 @@ const UserDetailsPage = () => {
                         <section className={styles.section}>
                             <h3>Структура</h3>
 
-                            {/* Керівники */}
-                            {supervisors.length > 0 && (
-                                <div className={styles.userGroup}>
-                                    <p className={styles.groupTitle}>Керівники</p>
-                                    <div className={styles.userList}>
-                                        {supervisors.map((u) => (
-                                            <div key={u.id} className={styles.userRow}>
-                                                <UserLabel user_id={u.id} avatar_url={u.avatar_url} role={u.role?.name || ""} name={`${u.first_name} ${u.last_name || ""}`} />
+                            <UsersGroup
+                                title="Підлеглі"
+                                users={supervisors}
+                                actions={[]}
+                                editStructure={editStructure}
+                                handleRemoveUser={handleRemoveSupervisor}
+                            />
 
-                                                {(actions.includes("change_org_structure") && editStructure) && (
-                                                    <Button
-                                                        color="primary-destructive"
-                                                        onClick={() => handleRemoveSupervisor(u.id)}
-                                                    ><X /></Button>
-                                                )}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Підлеглі */}
-                            {subordinates.length > 0 && (
-                                <div className={styles.userGroup}>
-                                    <p className={styles.groupTitle}>Підлеглі</p>
-                                    <div className={styles.userList}>
-                                        {subordinates.map((u) => (
-                                            <div key={u.id} className={styles.userRow}>
-                                                <UserLabel user_id={u.id} avatar_url={u.avatar_url} role={u.role?.name || ""} name={`${u.first_name} ${u.last_name || ""}`} />
-
-                                                {(actions.includes("change_org_structure") && editStructure) && (
-                                                    <Button
-                                                        color="primary-destructive"
-                                                        onClick={() => handleRemoveSubordinate(u.id)}
-                                                    ><X /></Button>
-                                                )}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
+                            <UsersGroup
+                                title="Керівники"
+                                users={subordinates}
+                                actions={actions}
+                                editStructure={editStructure}
+                                handleRemoveUser={handleRemoveSubordinate}
+                            />
 
                             {/* Додавання, якщо можна */}
                             {(actions.includes("change_org_structure") && editStructure) && (
                                 <div className={styles.addBlock}>
-                                    <select
-                                        onChange={(e) => handleAddSupervisor(e.target.value)}
+                                    <Select
+                                        onChange={(value) => handleAddSupervisor(value)}
+                                        placeholder="Додати керівника"
                                     >
-                                        <option value="">+ Додати керівника</option>
                                         {allUsers.filter(u => u.id !== user.id && user.is_active).map(u => (
-                                            <option key={u.id} value={u.id}>
+                                            <Select.Item key={u.id} value={u.id}>
                                                 {u.first_name} {u.last_name}
-                                            </option>
+                                            </Select.Item>
                                         ))}
-                                    </select>
+                                    </Select>
 
-                                    <select
-                                        onChange={(e) => handleAddSubordinate(e.target.value)}
+                                    <Select
+                                        onChange={(value) => handleAddSubordinate(value)}
+                                        placeholder="Додати підлеглого"
                                     >
-                                        <option value="">+ Додати підлеглого</option>
                                         {allUsers.filter(u => u.id !== user.id && user.is_active).map(u => (
-                                            <option key={u.id} value={u.id}>
+                                            <Select.Item key={u.id} id={u.id}>
                                                 {u.first_name} {u.last_name}
-                                            </option>
+                                            </Select.Item>
                                         ))}
-                                    </select>
+                                    </Select>
                                 </div>
                             )}
                         </section>
@@ -345,206 +321,43 @@ const UserDetailsPage = () => {
                 </div>
             </div>
         </DefaultPage>
-    )
-
-    // return (
-    //     <DefaultPage isLoading={loading}>
-    //         {backButton}
-    //         <div className={styles.card}>
-    //             <div className={styles.header}>
-    //                 {user.avatar_url && (
-    //                     <img src={user.avatar_url} alt="Avatar" className={styles.avatar} />
-    //                 )}
-    //                 <div>
-    //                     <h1 className={styles.name}>
-    //                         {user.first_name} {user.last_name}
-    //                     </h1>
-    //                     <p className={styles.role}>{user.role?.name || "—"}</p>
-    //                 </div>
-    //             </div>
-    //
-    //             {badges.length > 0 && (
-    //                 <div className={styles.topBadges}>
-    //                     {badges.map((badge) => (
-    //                         <div key={badge.id} className={styles.badgeIcon}>
-    //                             <div className={styles.tooltip}>
-    //                                 <div className={styles.tooltipContent}>
-    //                                     <p className={styles.tooltipTitle}>{badge.name}</p>
-    //                                     <p className={styles.tooltipDesc}>{badge.description}</p>
-    //                                     <p className={styles.tooltipDate}>
-    //                                         📅 Отримано: {safeDatetime(badge.awarded_at)}
-    //                                     </p>
-    //                                 </div>
-    //                             </div>
-    //                             {badge.emoji ? (
-    //                                 <span className={styles.badgeEmoji}>{badge.emoji}</span>
-    //                             ) : (
-    //                                 <img src={badge.icon_url} alt={badge.name} className={styles.badgeImg} />
-    //                             )}
-    //                         </div>
-    //                     ))}
-    //                 </div>
-    //             )}
-    //
-    //             <div className={styles.info}>
-    //                 <div>
-    //                     <p className={styles.label}>📧 Email</p>
-    //                     <p className={styles.value}>{user.email}</p>
-    //                 </div>
-    //                 <div>
-    //                     <p className={styles.label}>🎉 День народження</p>
-    //                     <p className={styles.value}>
-    //                         {safeDate(user.birthday)} {getAge(user.birthday)}
-    //                     </p>
-    //                 </div>
-    //                 <div>
-    //                     <p className={styles.label}>🧭 Остання активність</p>
-    //                     <p className={styles.value}>{safeDatetime(user.last_login)}</p>
-    //                 </div>
-    //                 <div>
-    //                     <p className={styles.label}>📅 Зареєстрований</p>
-    //                     <p className={styles.value}>{safeDatetime(user.created_at)}</p>
-    //                 </div>
-    //                 <div>
-    //                     <p className={styles.label}>🔖 Статус</p>
-    //                     <p className={styles.value}>{user.is_active ? "Активний" : "Деактивований"}</p>
-    //                 </div>
-    //             </div>
-    //
-    //             {editStructure ? (
-    //                 <>
-    //                     <div className={styles.section}>
-    //                         <h3>👨‍💼 Керівники</h3>
-    //                         <div className={styles.userList}>
-    //                             {supervisors.map((s) => (
-    //                                 <div key={s.id} className={styles.userItem}>
-    //                                     <UserValue user={s} />
-    //                                     <button onClick={() => handleRemoveSupervisor(s.id)} className={styles.dangerSmall}>✖</button>
-    //                                 </div>
-    //                             ))}
-    //                         </div>
-    //
-    //                         <select onChange={(e) => handleAddSupervisor(e.target.value)} className={styles.addSelect}>
-    //                             <option value="">+ Додати керівника</option>
-    //                             {allUsers.filter(u => u.id !== user?.id).map(u => (
-    //                                 <option key={u.id} value={u.id}>{u.first_name} {u.last_name}</option>
-    //                             ))}
-    //                         </select>
-    //                     </div>
-    //
-    //                     <div className={styles.section}>
-    //                         <h3>👥 Підлеглі</h3>
-    //                         <div className={styles.userList}>
-    //                             {subordinates.map((s) => (
-    //                                 <div key={s.id} className={styles.userItem}>
-    //                                     <UserValue user={s} />
-    //                                     <button onClick={() => handleRemoveSubordinate(s.id)} className={styles.dangerSmall}>✖</button>
-    //                                 </div>
-    //                             ))}
-    //                         </div>
-    //
-    //                         <select onChange={(e) => handleAddSubordinate(e.target.value)} className={styles.addSelect}>
-    //                             <option value="">+ Додати підлеглого</option>
-    //                             {allUsers.filter(u => u.id !== user?.id).map(u => (
-    //                                 <option key={u.id} value={u.id}>{u.first_name} {u.last_name}</option>
-    //                             ))}
-    //                         </select>
-    //                     </div>
-    //                 </>
-    //             ) : (
-    //                 <>
-    //                     {supervisors.length > 0 && (
-    //                         <div className={styles.section}>
-    //                             <h3>👨‍💼 Керівники</h3>
-    //                                 <div className={styles.userList}>
-    //                                 {supervisors.map((s) => (
-    //                                     <UserValue key={s.id} user={s} />
-    //                                 ))}
-    //                             </div>
-    //                         </div>
-    //                     )}
-    //
-    //                     {subordinates.length > 0 && (
-    //                         <div className={styles.section}>
-    //                             <h3>👥 Підлеглі</h3>
-    //                             <div className={styles.userList}>
-    //                                 {subordinates.map((s) => (
-    //                                     <UserValue key={s.id} user={s} />
-    //                                 ))}
-    //                             </div>
-    //                         </div>
-    //                     )}
-    //                 </>
-    //             )}
-    //
-    //             {actions && actions.length > 0 && (
-    //                 <div className={styles.section}>
-    //                     <h3>⚙️ Дії</h3>
-    //
-    //                     {(actions.includes("change_role") && showRoleChanger) && (
-    //                         <div className={styles.roleChanger}>
-    //                             <div className={styles.customSelectWrapper}>
-    //                                 <select
-    //                                     value={selectedRole}
-    //                                     onChange={(e) => setSelectedRole(e.target.value)}
-    //                                     className={styles.customSelect}
-    //                                 >
-    //                                     {roles.map((role) => (
-    //                                         <option key={role.id} value={role.id}>
-    //                                             {role.name}
-    //                                         </option>
-    //                                     ))}
-    //                                 </select>
-    //                                 <span className={styles.selectArrow}>▼</span>
-    //                             </div>
-    //                             <button
-    //                                 className={styles.secondary}
-    //                                 onClick={handleChangeRole}
-    //                                 disabled={changingRole}
-    //                             >
-    //                                 {changingRole ? "⏳ Зміна..." : "Змінити роль"}
-    //                             </button>
-    //                             <button
-    //                                 className={styles.secondary}
-    //                                 onClick={() => setShowRoleChanger(false)}
-    //                                 disabled={changingRole}
-    //                             >
-    //                                 Скасувати
-    //                             </button>
-    //                         </div>
-    //                     )}
-    //
-    //                     <div className={styles.section2}>
-    //                         {(actions.includes("change_role") && !showRoleChanger) && (
-    //                             <button className={styles.secondary} onClick={() => setShowRoleChanger(true)}>
-    //                                 Змінити роль
-    //                             </button>
-    //                         )}
-    //
-    //                         {(actions.includes("change_org_structure")) && (
-    //                             <button className={styles.secondary} onClick={() => setEditStructure(!editStructure)}>
-    //                                 {editStructure ? "Не редагувати структуру" : "Редагувати структуру"}
-    //                             </button>
-    //                         )}
-    //
-    //                         {actions.includes("activate_user") && (
-    //                             <button className={styles.secondary} onClick={handleActivate}>
-    //                                 Активувати
-    //                             </button>
-    //                         )}
-    //
-    //                         {actions.includes("deactivate_user") && (
-    //                             <button className={styles.danger} onClick={handleDeactivate}>
-    //                                 Деактивувати
-    //                             </button>
-    //                         )}
-    //                     </div>
-    //                 </div>
-    //             )}
-    //
-    //
-
-    // );
+    );
 };
+
+
+interface UsersGroupProps {
+    title: string;
+    users: SmallUser[];
+    actions: string[];
+    editStructure: boolean;
+    handleRemoveUser: (userId: string) => void;
+}
+
+const UsersGroup = ({ title, users, actions, editStructure, handleRemoveUser }: UsersGroupProps) => {
+    const navigate = useNavigate();
+    if (users.length === 0) return null;
+    return (
+        <div className={styles.userGroup}>
+            <p className={styles.groupTitle}>{title}</p>
+            <div className="flex flex-col gap-4">
+                {users.map((u: SmallUser) => (
+                    <div className="flex gap-2">
+                        <AvatarLabelGroup size="lg" title={`${u.first_name} ${u.last_name || ""}`} subtitle={u.role?.name || ""} src={u.avatar_url} className="cursor-pointer"
+                                          onClick={() => navigate(`/users/u/${u.id}`)}
+                        />
+
+                        {(actions.includes("change_org_structure") && editStructure) && (
+                            <Button
+                                color="primary-destructive"
+                                onClick={() => handleRemoveUser(u.id)}
+                                iconLeading={X}
+                            />
+                        )}
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
 
 export default UserDetailsPage;
