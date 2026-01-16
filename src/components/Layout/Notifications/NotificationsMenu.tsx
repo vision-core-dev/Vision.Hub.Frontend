@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import styles from "./Notifs.module.css";
 import {Clock, CheckCheck} from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -52,6 +52,27 @@ const NotificationsMenu: React.FC<Props> = ({ isOpen, setIsOpen, onReadAll }: Pr
         fetchNotifications();
     }, []);
 
+
+    // --- helpers ---
+    const isTodayOrYesterday = (iso: string) => {
+        const d = new Date(iso);
+        if (Number.isNaN(d.getTime())) return false;
+
+        const now = new Date();
+        new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const startOfYesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+
+        return d >= startOfYesterday; // вчора або сьогодні (або навіть сьогодні+час)
+    };
+
+    // --- filtered list ---
+    const visibleNotifications = useMemo(() => {
+        return notifications.filter((n) => {
+            if (!n.is_read) return true; // всі непрочитані
+            return isTodayOrYesterday(n.created_at); // прочитані тільки за сьогодні/вчора
+        });
+    }, [notifications]);
+
     return (
         <SlideoutMenu.Trigger isOpen={isOpen} onOpenChange={setIsOpen}>
             <SlideoutMenu className="z-100" isDismissable>
@@ -61,7 +82,7 @@ const NotificationsMenu: React.FC<Props> = ({ isOpen, setIsOpen, onReadAll }: Pr
                 </SlideoutMenu.Header>
 
                 <SlideoutMenu.Content>
-                    {notifications.map((notif) => (
+                    {visibleNotifications.map((notif) => (
                         <div key={notif.id}
                             className={`${styles.notification} ${notif.is_read ? styles.read : ""}`}
                         >
@@ -110,69 +131,6 @@ const NotificationsMenu: React.FC<Props> = ({ isOpen, setIsOpen, onReadAll }: Pr
             </SlideoutMenu>
         </SlideoutMenu.Trigger>
     );
-
-    // return (
-    //     <div className={styles.overlay} onClick={handleClose}>
-    //         <div
-    //             className={`${styles.panel} ${closing ? styles.slideOut : ""}`}
-    //             onClick={(e) => e.stopPropagation()}
-    //         >
-    //             <div className={styles.header}>
-    //                 <h2>🔔 Сповіщення</h2>
-    //                 <button className={styles.close} onClick={handleClose}>
-    //                     <X size={20} />
-    //                 </button>
-    //             </div>
-    //
-    //             <div className={styles.list}>
-    //                 {notifications.map((notif) => (
-    //                     <div
-    //                         key={notif.id}
-    //                         className={`${styles.notification} ${notif.is_read ? styles.read : ""}`}
-    //                     >
-    //                         <div className={styles.notifContent}>
-    //                             <h3>{notif.title}</h3>
-    //                             <p
-    //                                 dangerouslySetInnerHTML={{ __html: notif.message }}
-    //                             />
-    //                             <span className={styles.timestamp}>
-    //                                 <Clock strokeWidth={2.5} /> {safeDatetime(notif.created_at)}{" "}
-    //                                 {notif.is_read && <CheckCheck strokeWidth={2.5} />}
-    //                             </span>
-    //                         </div>
-    //
-    //                         <div className={styles.actions}>
-    //                             {(!notif.is_read || notif.link) && (
-    //                                 <button
-    //                                     className={styles.linkButton}
-    //                                     onClick={() => {
-    //                                         if (!notif.is_read) markAsRead(notif.id);
-    //                                         if (notif.link) {
-    //                                             navigate(notif.link)
-    //                                             handleClose();
-    //                                         };
-    //                                     }}
-    //                                 >
-    //                                     {notif.link ? "Перейти" : "Добре"}
-    //                                 </button>
-    //                             )}
-    //                         </div>
-    //                     </div>
-    //                 ))}
-    //             </div>
-    //
-    //             <div className={styles.footer}>
-    //                 {notifications.some((n) => !n.is_read) ? (
-    //                     <button className={styles.markAll} onClick={markAllRead}>
-    //                         ✅ Позначити все як переглянуте
-    //                     </button>
-    //                 ) : (
-    //                     <span className={styles.allViewed}>👀 Всі сповіщення переглянуті</span>
-    //                 )}
-    //             </div>
-    //         </div>
-    //     </div>
-    // );
 };
 
 export default NotificationsMenu;
