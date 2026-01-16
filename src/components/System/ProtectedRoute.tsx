@@ -27,7 +27,7 @@ const ProtectedRoute = () => {
     }
 
     const currentPath = location.pathname.split("/").filter(Boolean)[0];
-    const allowedRoots = ["dashboard", "me"];
+    const allowedRoots = ["dashboard", "my"];
 
     if (allowedRoots.includes(currentPath) || currentPath === "") {
         return <Outlet />;

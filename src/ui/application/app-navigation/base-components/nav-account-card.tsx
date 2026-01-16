@@ -1,7 +1,7 @@
 import type { FC, HTMLAttributes } from "react";
 import { useCallback, useEffect, useRef } from "react";
 import type { Placement } from "@react-types/overlays";
-import { LogOut01, Settings01 } from "@untitledui/icons";
+import {BookOpen01, LogOut01, Settings01} from "@untitledui/icons";
 import { useFocusManager } from "react-aria";
 import type { DialogProps as AriaDialogProps } from "react-aria-components";
 import { Button as AriaButton, Dialog as AriaDialog, DialogTrigger as AriaDialogTrigger, Popover as AriaPopover } from "react-aria-components";
@@ -10,6 +10,7 @@ import { useBreakpoint } from "@/hooks/use-breakpoint";
 import { cx } from "@/utils/cx";
 import {useAuth} from "@/components/System/AuthContext.tsx";
 import {useNavigate} from "react-router-dom";
+import {Wallet} from "lucide-react";
 
 type NavAccountType = {
     /** Unique identifier for the nav item. */
@@ -70,8 +71,11 @@ export const NavAccountMenu = ({
             <div className="rounded-xl bg-primary ring-1 ring-secondary">
                 <div className="flex flex-col gap-0.5 py-1.5">
                     {/*<NavAccountCardMenuItem label="View profile" icon={User01} shortcut="⌘K->P" />*/}
-                    <NavAccountCardMenuItem label="Налаштування" icon={Settings01} onClick={() => navigate("/me/settings")} />
-                    {/*<NavAccountCardMenuItem label="Documentation" icon={BookOpen01} />*/}
+
+
+                    <NavAccountCardMenuItem label="Зарплата" icon={Wallet} onClick={() => navigate("/my/salary")} />
+                    <NavAccountCardMenuItem label="База знань" icon={BookOpen01} onClick={() => navigate("/knowledge")} />
+                    <NavAccountCardMenuItem label="Налаштування" icon={Settings01} onClick={() => navigate("/my/settings")} />
                 </div>
             </div>
 

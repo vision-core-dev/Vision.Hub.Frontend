@@ -22,7 +22,7 @@ const feed: FeedItemType[] = [
         unseen: false,
         date: "10 січня 2026",
         user: {
-            avatarUrl: "https://cdn.visioncore.dev/avatars/ca0413d7-6fa1-4bda-99de-d6be805d7ddd_59d3f2e8-8ead-466a-861b-92c43154d3a7.jpg",
+            avatarUrl: "https://cdn.visioncore.dev/avatars/ca0413d7-6fa1-4bda-99de-d6be805d7ddd_69d5b5fa-63cf-4ca7-a888-f4931efc74f1.jpg",
             name: "Кирило",
             href: "",
             badge: <Badge size="sm" color="brand">Генеральний директор</Badge>,
@@ -42,7 +42,7 @@ const feed: FeedItemType[] = [
         unseen: false,
         date: "07 січня 2026",
         user: {
-            avatarUrl: "https://cdn.visioncore.dev/avatars/ca0413d7-6fa1-4bda-99de-d6be805d7ddd_59d3f2e8-8ead-466a-861b-92c43154d3a7.jpg",
+            avatarUrl: "https://cdn.visioncore.dev/avatars/ca0413d7-6fa1-4bda-99de-d6be805d7ddd_69d5b5fa-63cf-4ca7-a888-f4931efc74f1.jpg",
             name: "Кирило",
             href: "",
             badge: <Badge size="sm" color="brand">Генеральний директор</Badge>,
@@ -61,7 +61,7 @@ const feed: FeedItemType[] = [
         id: "update-projects",
         date: "18 грудня 2025",
         user: {
-            avatarUrl: "https://cdn.visioncore.dev/avatars/ca0413d7-6fa1-4bda-99de-d6be805d7ddd_59d3f2e8-8ead-466a-861b-92c43154d3a7.jpg",
+            avatarUrl: "https://cdn.visioncore.dev/avatars/ca0413d7-6fa1-4bda-99de-d6be805d7ddd_69d5b5fa-63cf-4ca7-a888-f4931efc74f1.jpg",
             name: "Кирило",
             href: "",
             badge: <Badge size="sm" color="brand">Генеральний директор</Badge>,

@@ -8,7 +8,7 @@ import ProtectedRoute from "./components/System/ProtectedRoute";
 
 import Layout from "@/components/Layout/Layout";
 
-import Login from "./components/Pages/auth/Login/LoginPage.tsx";
+import Login from "./components/Pages/auth/LoginPage.tsx";
 
 import UsersListPage from "./components/Pages/Users/UsersListPage.tsx";
 import CreateUserPage from "./components/Pages/Users/CreateUserPage.tsx";
@@ -64,8 +64,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                             <Route path="dashboard" element={<DashboardPage />} />
 
                             {/* me */}
-                            <Route path="me">
+                            <Route path="my">
                                 <Route path="settings" element={<UserSettingsPage />} />
+                                <Route path="salary" element={<SalaryPage />} />
                             </Route>
 
                             {/* users */}
@@ -104,7 +105,6 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                             </Route>
 
                             {/* salary */}
-                            <Route path="salary" element={<SalaryPage />} />
 
                             {/* finance */}
                             <Route path="finance">
