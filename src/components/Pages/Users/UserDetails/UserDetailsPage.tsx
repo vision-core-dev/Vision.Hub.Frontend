@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { api } from "@/utils/api.ts";
 import styles from "./UserDetailsPage.module.css";
 import { safeDate, safeDatetime } from "@/utils/safeDate.ts";
-import type { SmallUser, UserType } from "@/types/Users.ts";
+import type { UserType } from "@/types/Users.ts";
 import DefaultPage from "../../../basic/DefaultPage/DefaultPage.tsx";
 import {ArrowLeft, X} from "lucide-react";
 import TransactionsListSection, {
@@ -15,6 +15,7 @@ import {Button} from "@/ui/base/buttons/button.tsx";
 import {Select} from "@/ui/base/select/select.tsx";
 import {AvatarLabelGroup} from "@/ui/base/avatar/avatar-label-group.tsx";
 import type {Key} from "react-aria-components";
+import {User01} from "@untitledui/icons";
 
 export interface Badge {
     id: string;
@@ -35,8 +36,8 @@ interface Response {
     ok: boolean;
     user: UserType;
     actions: string[];
-    supervisors: SmallUser[];
-    subordinates: SmallUser[];
+    supervisors: UserType[];
+    subordinates: UserType[];
     transactions: TransactionItem[];
     badges: Badge[];
 }
@@ -47,15 +48,15 @@ const UserDetailsPage = () => {
 
     const [user, setUser] = useState<UserType | null>(null);
     const [actions, setActions] = useState<string[]>([]);
-    const [supervisors, setSupervisors] = useState<SmallUser[]>([]);
-    const [subordinates, setSubordinates] = useState<SmallUser[]>([]);
+    const [supervisors, setSupervisors] = useState<UserType[]>([]);
+    const [subordinates, setSubordinates] = useState<UserType[]>([]);
     const [badges, setBadges] = useState<Badge[]>([]);
     const [roles, setRoles] = useState<Role[]>([]);
     const [transactions, setTransactions] = useState<TransactionItem[]>([]);
 
     const [selectedRole, setSelectedRole] = useState<Key | null>("");
 
-    const [allUsers, setAllUsers] = useState<SmallUser[]>([]);
+    const [allUsers, setAllUsers] = useState<UserType[]>([]);
 
     const [showRoleChanger, setShowRoleChanger] = useState(false);
     const [editStructure, setEditStructure] = useState(false);
@@ -74,24 +75,30 @@ const UserDetailsPage = () => {
     };
 
     const refreshUserData = async () => {
-        setLoading(true);
-        setShowRoleChanger(false);
-        setEditStructure(false);
-        api.get(`/v1/Hub/Users/${id}/Details`).then(async (res) => {
+        try {
+            setLoading(true);
+            setShowRoleChanger(false);
+            setEditStructure(false);
+
+            const res = await api.get(`/v1/Hub/Users/${id}/Details`);
             const data: Response = await res.json();
+
             setUser(data.user);
+
             setSupervisors(data.supervisors);
             setSubordinates(data.subordinates);
-            setBadges(data.badges);
-            setActions(data.actions);
-            setTransactions(data.transactions || []);
-            setLoading(false);
+
+            setBadges(data.badges ?? []);
+            setActions(data.actions ?? []);
+            setTransactions(data.transactions ?? []);
 
             if (data.user?.role?.id) {
                 setSelectedRole(data.user.role.id);
             }
-        });
-    }
+        } finally {
+            setLoading(false);
+        }
+    };
 
     // 📥 Завантаження користувача
     useEffect(() => {
@@ -207,10 +214,12 @@ const UserDetailsPage = () => {
                                     disabled={changingRole}
                                     isLoading={changingRole}
                                     showTextWhileLoading
+                                    className="w-full"
                                 >
                                     Змінити роль
                                 </Button>
                                 <Button
+                                    className="w-full"
                                     color="secondary"
                                     onClick={() => setShowRoleChanger(false)}
                                     disabled={changingRole}
@@ -220,13 +229,13 @@ const UserDetailsPage = () => {
                             </div>
                         )}
 
-                        {actions.includes("change_role") && (
+                        {(actions.includes("change_role") && !showRoleChanger) && (
                             <Button onClick={() => setShowRoleChanger(!showRoleChanger)}>
                                 Змінити роль
                             </Button>
                         )}
                         {actions.includes("change_org_structure") && (
-                            <Button onClick={() => setEditStructure(!editStructure)}>
+                            <Button onClick={() => setEditStructure(!editStructure)} color={editStructure ? "secondary" : "primary"}>
                                 Редагувати структуру
                             </Button>
                         )}
@@ -271,15 +280,15 @@ const UserDetailsPage = () => {
                             <h3>Структура</h3>
 
                             <UsersGroup
-                                title="Підлеглі"
+                                title="Керівники"
                                 users={supervisors}
-                                actions={[]}
+                                actions={actions}
                                 editStructure={editStructure}
                                 handleRemoveUser={handleRemoveSupervisor}
                             />
 
                             <UsersGroup
-                                title="Керівники"
+                                title="Підлеглі"
                                 users={subordinates}
                                 actions={actions}
                                 editStructure={editStructure}
@@ -288,29 +297,10 @@ const UserDetailsPage = () => {
 
                             {/* Додавання, якщо можна */}
                             {(actions.includes("change_org_structure") && editStructure) && (
-                                <div className={styles.addBlock}>
-                                    <Select
-                                        onChange={(value) => handleAddSupervisor(value)}
-                                        placeholder="Додати керівника"
-                                    >
-                                        {allUsers.filter(u => u.id !== user.id && user.is_active).map(u => (
-                                            <Select.Item key={u.id} id={u.id}>
-                                                {u.first_name} {u.last_name}
-                                            </Select.Item>
-                                        ))}
-                                    </Select>
-
-                                    <Select
-                                        onChange={(value) => handleAddSubordinate(value)}
-                                        placeholder="Додати підлеглого"
-                                    >
-                                        {allUsers.filter(u => u.id !== user.id && user.is_active).map(u => (
-                                            <Select.Item key={u.id} id={u.id}>
-                                                {u.first_name} {u.last_name}
-                                            </Select.Item>
-                                        ))}
-                                    </Select>
-                                </div>
+                                <>
+                                    <AddUser placeholder="Додати керівника" allUsers={allUsers} handleAdd={handleAddSupervisor} user={user} />
+                                    <AddUser placeholder="Додати підлеглого" allUsers={allUsers} handleAdd={handleAddSubordinate} user={user} />
+                                </>
                             )}
                         </section>
                     )}
@@ -323,9 +313,35 @@ const UserDetailsPage = () => {
 };
 
 
+interface AddUserProps {
+    placeholder: string;
+    allUsers: UserType[];
+    handleAdd: (userId: Key | null) => void;
+    user: UserType;
+}
+const AddUser = ({ placeholder, allUsers, handleAdd, user }: AddUserProps) => {
+    return (
+        <Select
+            onChange={(value) => handleAdd(value)}
+            placeholder={placeholder}
+            placeholderIcon={User01}
+        >
+            { allUsers
+                .filter(u => u.id !== user.id && u.is_active)
+                .map(u => (
+                        <Select.Item key={u.id} id={u.id} supportingText={u.role?.name} avatarUrl={u.avatar_url}>
+                            {u.first_name} {u.last_name}
+                        </Select.Item>
+                    )
+                )}
+        </Select>
+    )
+}
+
+
 interface UsersGroupProps {
     title: string;
-    users: SmallUser[];
+    users: UserType[];
     actions: string[];
     editStructure: boolean;
     handleRemoveUser: (userId: string) => void;
@@ -338,7 +354,7 @@ const UsersGroup = ({ title, users, actions, editStructure, handleRemoveUser }: 
         <div className={styles.userGroup}>
             <p className={styles.groupTitle}>{title}</p>
             <div className="flex flex-col gap-4">
-                {users.map((u: SmallUser) => (
+                {users.map((u) => (
                     <div className="flex gap-2">
                         <AvatarLabelGroup size="lg" title={`${u.first_name} ${u.last_name || ""}`} subtitle={u.role?.name || ""} src={u.avatar_url} className="cursor-pointer"
                                           onClick={() => navigate(`/users/u/${u.id}`)}
