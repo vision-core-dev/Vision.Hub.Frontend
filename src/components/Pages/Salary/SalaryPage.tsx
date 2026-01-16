@@ -152,6 +152,7 @@ const SalaryPage: React.FC = () => {
             action={
                 data.balance > 0 && (
                     <Button
+                        isDisabled={true}
                         color="primary"
                         onClick={() => setShowModal(true)}
                         iconLeading={HandCoins}
@@ -199,11 +200,14 @@ const SalaryPage: React.FC = () => {
                     />
                 </section>
 
-                <Alerts.AlertFloating
-                    color="error"
-                    title="Як вивести кошти?"
-                    description="На даний момент виплати зарплати здіснюються в ручному форматі. Ми самі зв'яжемось під час виплати ЗП."
-                />
+                {data.balance >= 0 && (
+                   <Alerts.AlertFloating
+                        color="error"
+                        title="Як вивести кошти?"
+                        description="На даний момент виплати зарплати здіснюються в ручному форматі. Ми самі зв'яжемось під час виплати ЗП."
+                    />         
+                )}
+
 
                 {/* === TRANSACTIONS === */}
                 <TransactionsListSection transactions={data.transactions} />
