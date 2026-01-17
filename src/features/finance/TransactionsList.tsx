@@ -6,7 +6,6 @@ import DefaultPage from "@/shared/ui/default-page/DefaultPage.tsx";
 import { useNavigate } from "react-router-dom";
 import { api } from "@/shared/utils/api.ts";
 import { safeDatetime } from "@/shared/utils/safeDate.ts";
-import UserLabel from "@/shared/ui/user/UserLabel.tsx";
 import type { UserType } from "@/shared/types/Users.ts";
 import { Button } from "@/shared/ui/buttons/button.tsx";
 import { AvatarLabelGroup } from "@/shared/ui/avatar/avatar-label-group";
