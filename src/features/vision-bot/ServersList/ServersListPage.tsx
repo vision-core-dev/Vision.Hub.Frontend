@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DefaultPage from "@/shared/ui/default-page/DefaultPage.tsx";
-import Table from "@/shared/ui/table/Table.tsx";
+import { Table } from "@/shared/components/table/table";
 import styles from "./ServersListPage.module.css";
 
 import type { VisionBotServer } from "@/shared/types/VisionBot.ts";
@@ -26,46 +26,6 @@ const ServersListPage: React.FC = () => {
         navigate(`/vision-bot/s/${server.guild_id}`);
     };
 
-    const columns = [
-        {
-            key: "name",
-            label: "Сервер",
-            render: (_: any, row: VisionBotServer) => (
-                <div className={styles.serverCell}>
-                    {row.icon_url && (
-                        <img
-                            src={row.icon_url}
-                            alt={row.name}
-                            className={styles.serverAvatar}
-                        />
-                    )}
-                    <div>
-                        <div className={styles.serverName}>{row.name}</div>
-                        <div className={styles.serverId}>ID: {row.guild_id}</div>
-                    </div>
-                </div>
-            ),
-        },
-        {
-            key: "language",
-            label: "Мова",
-            render: (v: string | null) => v || "—",
-        },
-        {
-            key: "logs_channel_id",
-            label: "Канал логів",
-            render: (v: string | null) => v || "—",
-        },
-        {
-            key: "modules_count",
-            label: "Модулі",
-        },
-        {
-            key: "store_items_count",
-            label: "Store",
-        }
-    ];
-
     if (loading) {
         return (
             <DefaultPage
@@ -83,14 +43,47 @@ const ServersListPage: React.FC = () => {
             description="Керуйте Discord-ботом прямо з Vision Core Hub."
         >
             {error && <div className={styles.error}>{error}</div>}
-            <Table<VisionBotServer>
-                columns={columns}
-                data={servers}
-                onRowClick={(row) => handleOpen(row)}
-                emptyText="Бот поки не підключений ні до одного сервера"
-                maxWidth="100%"
-            />
-        </DefaultPage>
+            <div className="overflow-hidden rounded-xl border border-secondary bg-primary shadow-sm">
+                <Table aria-label="Servers List">
+                    <Table.Header>
+                        <Table.Head isRowHeader>Сервер</Table.Head>
+                        <Table.Head>Мова</Table.Head>
+                        <Table.Head>Канал логів</Table.Head>
+                        <Table.Head>Модулі</Table.Head>
+                        <Table.Head>Store</Table.Head>
+                    </Table.Header>
+                    <Table.Body items={servers} renderEmptyState={() => (
+                        <div className="flex flex-col items-center justify-center p-8 text-center text-tertiary">
+                            <p>Бот поки не підключений ні до одного сервера</p>
+                        </div>
+                    )}>
+                        {(row) => (
+                            <Table.Row id={row.guild_id} onAction={() => handleOpen(row)} className="cursor-pointer">
+                                <Table.Cell>
+                                    <div className={styles.serverCell}>
+                                        {row.icon_url && (
+                                            <img
+                                                src={row.icon_url}
+                                                alt={row.name}
+                                                className={styles.serverAvatar}
+                                            />
+                                        )}
+                                        <div>
+                                            <div className={styles.serverName}>{row.name}</div>
+                                            <div className={styles.serverId}>ID: {row.guild_id}</div>
+                                        </div>
+                                    </div>
+                                </Table.Cell>
+                                <Table.Cell>{row.language || "—"}</Table.Cell>
+                                <Table.Cell>{row.logs_channel_id || "—"}</Table.Cell>
+                                <Table.Cell>{row.modules_count}</Table.Cell>
+                                <Table.Cell>{row.store_items_count}</Table.Cell>
+                            </Table.Row>
+                        )}
+                    </Table.Body>
+                </Table>
+            </div>
+        </DefaultPage >
     );
 };
 

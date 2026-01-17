@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { HandCoins } from "lucide-react";
 
 import DefaultPage from "@/shared/ui/default-page/DefaultPage";
-import Table from "@/shared/ui/table/Table";
+import { Table } from "@/shared/components/table/table";
 
 import SalaryWithdrawModal from "./SalaryWithdrawModal";
 import TransactionsListSection from "../finance/TransactionsListSection/TransactionsListSection";
@@ -10,7 +10,7 @@ import TransactionsListSection from "../finance/TransactionsListSection/Transact
 import { MetricsSimple, MetricsChart04 } from "@/shared/components/metrics/metrics";
 import { api } from "@/shared/utils/api";
 import { safeDatetime } from "@/shared/utils/safeDate";
-import {Button} from "@/shared/ui/buttons/button.tsx";
+import { Button } from "@/shared/ui/buttons/button.tsx";
 import * as Alerts from "@/shared/components/alerts/alerts.tsx";
 
 /* ===================== TYPES ===================== */
@@ -115,34 +115,7 @@ const SalaryPage: React.FC = () => {
 
     /* ===================== TABLE ===================== */
 
-    const withdrawColumns = [
-        {
-            key: "created_at",
-            label: "Дата",
-            render: (v: string) => safeDatetime(v),
-        },
-        {
-            key: "amount",
-            label: "Сума",
-            render: (v: number) => `${v.toFixed(2)} ₴`,
-        },
-        {
-            key: "status",
-            label: "Статус",
-            render: (v: string) =>
-                ({
-                    pending: "Очікує",
-                    approved: "Прийнято",
-                    paid: "Виплачено",
-                    rejected: "Відхилено",
-                }[v]),
-        },
-        {
-            key: "comment",
-            label: "Коментар",
-            render: (v: string) => v || "—",
-        },
-    ];
+
 
     /* ===================== RENDER ===================== */
 
@@ -201,11 +174,11 @@ const SalaryPage: React.FC = () => {
                 </section>
 
                 {data.balance >= 0 && (
-                   <Alerts.AlertFloating
+                    <Alerts.AlertFloating
                         color="error"
                         title="Як вивести кошти?"
                         description="На даний момент виплати зарплати здіснюються в ручному форматі. Ми самі зв'яжемось під час виплати ЗП."
-                    />         
+                    />
                 )}
 
 
@@ -218,10 +191,33 @@ const SalaryPage: React.FC = () => {
                         <h3 className="text-lg font-semibold">
                             Запити на вивід
                         </h3>
-                        <Table
-                            columns={withdrawColumns}
-                            data={data.withdraw_requests}
-                        />
+                        <div className="overflow-hidden rounded-xl border border-secondary bg-primary shadow-sm">
+                            <Table aria-label="Запити на вивід">
+                                <Table.Header>
+                                    <Table.Head isRowHeader>Дата</Table.Head>
+                                    <Table.Head>Сума</Table.Head>
+                                    <Table.Head>Статус</Table.Head>
+                                    <Table.Head>Коментар</Table.Head>
+                                </Table.Header>
+                                <Table.Body items={data.withdraw_requests}>
+                                    {(item: WithdrawRequest) => (
+                                        <Table.Row id={item.id}>
+                                            <Table.Cell>{safeDatetime(item.created_at)}</Table.Cell>
+                                            <Table.Cell>{item.amount.toFixed(2)} ₴</Table.Cell>
+                                            <Table.Cell>
+                                                {({
+                                                    pending: "Очікує",
+                                                    approved: "Прийнято",
+                                                    paid: "Виплачено",
+                                                    rejected: "Відхилено",
+                                                }[item.status])}
+                                            </Table.Cell>
+                                            <Table.Cell>{item.comment || "—"}</Table.Cell>
+                                        </Table.Row>
+                                    )}
+                                </Table.Body>
+                            </Table>
+                        </div>
                     </section>
                 )}
 

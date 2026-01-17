@@ -1,17 +1,19 @@
 import React, { useEffect } from "react";
 import styles from "./Finance.module.css";
-import {Plus, Undo2} from "lucide-react";
-import Table from "@/shared/ui/table/Table.tsx";
+import { Plus, Undo2 } from "lucide-react";
+import { Table } from "@/shared/components/table/table";
 import DefaultPage from "@/shared/ui/default-page/DefaultPage.tsx";
 import { useNavigate } from "react-router-dom";
 import { api } from "@/shared/utils/api.ts";
 import { safeDatetime } from "@/shared/utils/safeDate.ts";
 import UserLabel from "@/shared/ui/user/UserLabel.tsx";
 import type { UserType } from "@/shared/types/Users.ts";
-import {Button} from "@/shared/ui/buttons/button.tsx";
+import { Button } from "@/shared/ui/buttons/button.tsx";
+import { AvatarLabelGroup } from "@/shared/ui/avatar/avatar-label-group";
 
 interface Transaction {
     id: string;
+    user_id: string;
     name: string;
     type: string; // "credit" | "withdraw" | etc.
     amount: number;
@@ -62,63 +64,6 @@ const TransactionsList: React.FC = () => {
     const userMap = new Map<string, UserType>();
     data.users.forEach((u) => userMap.set(u.id, u));
 
-    const columns = [
-        {
-            key: "transaction_at",
-            label: "Дата і час",
-            render: (v: string) => safeDatetime(v),
-            sortable: true,
-        },
-        {
-            key: "user_id",
-            label: "Користувач",
-            render: (v: string) => {
-                const user = userMap.get(v);
-                return user ? (
-                    <UserLabel
-                        user_id={user.id}
-                        name={`${user.first_name || ""} ${user.last_name || ""}`}
-                        avatar_url={user.avatar_url || undefined}
-                    />
-                ) : (
-                    <span className={styles.unknownUser}>Невідомо</span>
-                );
-            },
-        },
-        {
-            key: "name",
-            label: "Назва",
-        },
-        {
-            key: "type",
-            label: "Тип",
-            render: (v: string) => (
-                <span
-                    className={`${styles.status} ${
-                        v === "income"
-                            ? styles.green
-                            : v === "withdrawal"
-                                ? styles.blue
-                                : styles.gray
-                    }`}
-                >
-                    {v === "income"
-                        ? "Надходження"
-                        : v === "withdrawal"
-                            ? "Вивід"
-                            : v}
-                </span>
-            ),
-            sortable: true,
-        },
-        {
-            key: "amount",
-            label: "Сума",
-            render: (v: number) => `${v.toFixed(2)} ₴`,
-            sortable: true,
-        },
-    ];
-
     return (
         <DefaultPage
             title="Транзакції акаунтів"
@@ -134,7 +79,57 @@ const TransactionsList: React.FC = () => {
                 </>
             }
         >
-            <Table columns={columns} data={data.transactions } />
+            <div className="min-w-full overflow-hidden rounded-xl border border-secondary bg-primary shadow-sm">
+                <Table aria-label="Транзакції">
+                    <Table.Header>
+                        <Table.Head isRowHeader>Дата і час</Table.Head>
+                        <Table.Head>Користувач</Table.Head>
+                        <Table.Head>Назва</Table.Head>
+                        <Table.Head>Тип</Table.Head>
+                        <Table.Head>Сума</Table.Head>
+                    </Table.Header>
+                    <Table.Body items={data.transactions}>
+                        {(item: Transaction & { user_id: string }) => (
+                            <Table.Row id={item.id}>
+                                <Table.Cell>{safeDatetime(item.transaction_at)}</Table.Cell>
+                                <Table.Cell>
+                                    {(() => {
+                                        const user = userMap.get(item.user_id);
+                                        return user ? (
+                                            <AvatarLabelGroup
+                                                src={user.avatar_url || undefined}
+                                                title={`${user.first_name || ""} ${user.last_name || ""}`}
+                                                size="sm"
+                                                onClick={() => navigate(`/users/u/${user.id}`)}
+                                            />
+                                        ) : (
+                                            <span className={styles.unknownUser}>Невідомо</span>
+                                        );
+                                    })()}
+                                </Table.Cell>
+                                <Table.Cell>{item.name}</Table.Cell>
+                                <Table.Cell>
+                                    <span
+                                        className={`${styles.status} ${item.type === "income"
+                                            ? styles.green
+                                            : item.type === "withdrawal"
+                                                ? styles.blue
+                                                : styles.gray
+                                            }`}
+                                    >
+                                        {item.type === "income"
+                                            ? "Надходження"
+                                            : item.type === "withdrawal"
+                                                ? "Вивід"
+                                                : item.type}
+                                    </span>
+                                </Table.Cell>
+                                <Table.Cell>{item.amount.toFixed(2)} ₴</Table.Cell>
+                            </Table.Row>
+                        )}
+                    </Table.Body>
+                </Table>
+            </div>
         </DefaultPage>
     );
 };

@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { api } from "@/shared/utils/api.ts";
 import { useNavigate } from "react-router-dom";
-import Table from "@/shared/ui/table/Table.tsx";
-import type {EventType} from "@/shared/types/Events.ts";
-import {formatTime, safeDate} from "@/shared/utils/safeDate.ts";
+import { Table } from "@/shared/components/table/table";
+import type { EventType } from "@/shared/types/Events.ts";
+import { formatTime, safeDate } from "@/shared/utils/safeDate.ts";
 import DefaultPage from "@/shared/ui/default-page/DefaultPage.tsx";
-import {Plus} from "lucide-react";
-import {Button} from "@/shared/ui/buttons/button.tsx";
+import { Plus } from "lucide-react";
+import { Button } from "@/shared/ui/buttons/button.tsx";
 
 const UsersListPage = () => {
     const [events, setEvents] = useState<EventType[]>([]);
@@ -23,7 +23,7 @@ const UsersListPage = () => {
 
     const actionButton = (
         <Button onClick={() => navigate("/events/create-event")}
-                iconLeading={Plus}
+            iconLeading={Plus}
         >Додати</Button>
     );
 
@@ -51,27 +51,45 @@ const UsersListPage = () => {
                 {events.length === 0 ? (
                     <p>Поки немає жодної події.</p>
                 ) : (
-                    <Table
-                        columns={[
-                            { key: "date", label: "Дата", render: (v) => safeDate(v) },
-                            { key: "time", label: "Час", render: (_v, row) => `${formatTime(row.time_from)} - ${formatTime(row.time_to)}` },
-                            { key: "name", label: "Назва події", render: (v) => v || "—" },
-                        ]}
-                        data={events.filter(e => !e.date || new Date(e.date) >= new Date())}
-                        onRowClick={(row) => navigate(`/events/e/${row.id}`)}
-                    />
+                    <div className="min-w-full overflow-hidden rounded-xl border border-secondary bg-primary shadow-sm">
+                        <Table aria-label="Заплановані події">
+                            <Table.Header>
+                                <Table.Head isRowHeader>Дата</Table.Head>
+                                <Table.Head>Час</Table.Head>
+                                <Table.Head>Назва події</Table.Head>
+                            </Table.Header>
+                            <Table.Body items={events.filter(e => !e.date || new Date(e.date) >= new Date())}>
+                                {(item) => (
+                                    <Table.Row id={item.id} onAction={() => navigate(`/events/e/${item.id}`)} className="cursor-pointer">
+                                        <Table.Cell>{safeDate(item.date)}</Table.Cell>
+                                        <Table.Cell>{formatTime(item.time_from)} - {formatTime(item.time_to)}</Table.Cell>
+                                        <Table.Cell>{item.name || "—"}</Table.Cell>
+                                    </Table.Row>
+                                )}
+                            </Table.Body>
+                        </Table>
+                    </div>
                 )}
             </DefaultPage>
             <DefaultPage title="Архівні події">
-                <Table
-                    columns={[
-                        { key: "date", label: "Дата", render: (v) => safeDate(v) },
-                        { key: "time", label: "Час", render: (_v, row) => `${formatTime(row.time_from)} - ${formatTime(row.time_to)}` },
-                        { key: "name", label: "Назва події", render: (v) => v || "—" },
-                    ]}
-                    data={events.filter(e => e.date && new Date(e.date) < new Date())}
-                    onRowClick={(row) => navigate(`/events/e/${row.id}`)}
-                />
+                <div className="min-w-full overflow-hidden rounded-xl border border-secondary bg-primary shadow-sm">
+                    <Table aria-label="Архівні події">
+                        <Table.Header>
+                            <Table.Head isRowHeader>Дата</Table.Head>
+                            <Table.Head>Час</Table.Head>
+                            <Table.Head>Назва події</Table.Head>
+                        </Table.Header>
+                        <Table.Body items={events.filter(e => e.date && new Date(e.date) < new Date())}>
+                            {(item) => (
+                                <Table.Row id={item.id} onAction={() => navigate(`/events/e/${item.id}`)} className="cursor-pointer">
+                                    <Table.Cell>{safeDate(item.date)}</Table.Cell>
+                                    <Table.Cell>{formatTime(item.time_from)} - {formatTime(item.time_to)}</Table.Cell>
+                                    <Table.Cell>{item.name || "—"}</Table.Cell>
+                                </Table.Row>
+                            )}
+                        </Table.Body>
+                    </Table>
+                </div>
             </DefaultPage>
         </>
     );

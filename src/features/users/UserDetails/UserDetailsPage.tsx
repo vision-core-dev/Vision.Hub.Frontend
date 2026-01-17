@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { api } from "@/shared/utils/api.ts";
-import styles from "./UserDetailsPage.module.css";
+// styles removed
 import { safeDate, safeDatetime } from "@/shared/utils/safeDate.ts";
 import type { UserType } from "@/shared/types/Users.ts";
 import DefaultPage from "@/shared/ui/default-page/DefaultPage.tsx";
@@ -161,7 +161,7 @@ const UserDetailsPage = () => {
         if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
             age--;
         }
-        return <span className={styles.age}>({age} років)</span>;
+        return <span className="text-tertiary">({age} років)</span>;
     };
 
 
@@ -182,22 +182,22 @@ const UserDetailsPage = () => {
         <DefaultPage>
             {backButton}
 
-            <div className={styles.layout}>
+            <div className="grid w-full grid-cols-1 gap-8 min-[900px]:grid-cols-[320px_1fr]">
                 {/* Ліва колонка */}
-                <div className={styles.left}>
-                    <img src={user.avatar_url} className={styles.avatarBig} />
+                <div className="flex flex-col items-center gap-5 rounded-xl border border-secondary bg-primary p-6">
+                    <img src={user.avatar_url || ""} className="h-[140px] w-[140px] rounded-full object-cover shadow-[0_0_0_4px_#fff,_0_2px_6px_rgba(0,0,0,0.08)]" />
 
-                    <h1 className={styles.name}>
+                    <h1 className="m-0 text-center text-xl font-semibold">
                         {user.first_name} {user.last_name}
                     </h1>
-                    <p className={styles.role}>{user.role?.name || "—"}</p>
+                    <p className="-mt-1.5 text-sm text-tertiary">{user.role?.name || "—"}</p>
 
                     <BadgesSection badges={badges} />
 
-                    <div className={styles.actionsBlock}>
+                    <div className="flex w-full flex-col gap-3">
 
                         {(actions.includes("change_role") && showRoleChanger) && (
-                            <div className={styles.roleChanger}>
+                            <div className="mt-3 flex flex-col items-center gap-3">
                                 <Select
                                     value={selectedRole}
                                     onChange={(value) => setSelectedRole(value)}
@@ -248,10 +248,10 @@ const UserDetailsPage = () => {
                 </div>
 
                 {/* Права колонка */}
-                <div className={styles.right}>
-                    <section className={styles.section}>
+                <div className="flex flex-col gap-6">
+                    <section className="flex flex-col gap-4 rounded-xl border border-secondary bg-primary px-6 py-5">
                         <h3>Основне</h3>
-                        <div className={styles.grid}>
+                        <div className="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] items-start gap-x-4 gap-y-3">
                             <UserValue label="Email" value={user.email} />
                             <UserValue
                                 label="День народження"
@@ -266,9 +266,9 @@ const UserDetailsPage = () => {
                         </div>
                     </section>
 
-                    <section className={styles.section}>
+                    <section className="flex flex-col gap-4 rounded-xl border border-secondary bg-primary px-6 py-5">
                         <h3>Фінанси</h3>
-                        <div className={styles.grid}>
+                        <div className="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] items-start gap-x-4 gap-y-3">
                             <UserValue label="Баланс" value={user.balance + " ₴"} />
                             <UserValue label="Вивів" value={user.withdrawn_amount + " ₴"} />
                             <UserValue label="Загалом заробив" value={user.balance + user.withdrawn_amount + " ₴"} />
@@ -276,7 +276,7 @@ const UserDetailsPage = () => {
                     </section>
 
                     {(supervisors.length > 0 || subordinates.length > 0) && (
-                        <section className={styles.section}>
+                        <section className="flex flex-col gap-4 rounded-xl border border-secondary bg-primary px-6 py-5">
                             <h3>Структура</h3>
 
                             <UsersGroup
@@ -351,8 +351,8 @@ const UsersGroup = ({ title, users, actions, editStructure, handleRemoveUser }: 
     const navigate = useNavigate();
     if (users.length === 0) return null;
     return (
-        <div className={styles.userGroup}>
-            <p className={styles.groupTitle}>{title}</p>
+        <div className="flex flex-col gap-2.5">
+            <p className="font-semibold text-primary">{title}</p>
             <div className="flex flex-col gap-4">
                 {users.map((u) => (
                     <div className="flex gap-2">

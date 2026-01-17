@@ -1,5 +1,5 @@
 import React from "react";
-import styles from "./UserValue.module.css";
+import { cx } from "@/shared/utils/cx";
 
 interface UserValueProps {
     label: string;
@@ -9,9 +9,9 @@ interface UserValueProps {
 
 const UserValue: React.FC<UserValueProps> = ({ label, value, align = "left" }) => {
     return (
-        <div className={`${styles.item} ${styles[align]}`}>
-            <p className={styles.label}>{label}</p>
-            <p className={styles.value}>
+        <div className={cx("flex flex-col gap-1", align === "right" ? "text-right" : "text-left")}>
+            <p className="text-sm font-medium text-tertiary">{label}</p>
+            <p className="break-words text-base font-medium text-primary">
                 {value ? value : "—"}
             </p>
         </div>

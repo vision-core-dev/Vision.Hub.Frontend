@@ -71,11 +71,11 @@ const styles = sortCx({
             xl: "size-14 rounded-xl",
         },
         colors: {
-            brand: "",
+            brand: "text-fg-brand-primary ring-secondary",
             gray: "text-fg-secondary ring-primary",
-            error: "",
-            warning: "",
-            success: "",
+            error: "text-fg-error-primary ring-secondary",
+            warning: "text-fg-warning-primary ring-secondary",
+            success: "text-fg-success-primary ring-secondary",
         },
     },
     "modern-neue": {

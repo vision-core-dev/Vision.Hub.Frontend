@@ -17,11 +17,11 @@ import {
     UserCheck,
     UserX
 } from "lucide-react";
-import Table from "@/shared/ui/table/Table.tsx";
+import { Table } from "@/shared/components/table/table";
 import UserLabel from "@/shared/ui/user/UserLabel.tsx";
 import { safeDatetime } from "@/shared/utils/safeDate.ts";
 import LoaderSpinner from "@/shared/ui/loader-spinner/LoaderSpinner.tsx";
-import {Button} from "@/shared/ui/buttons/button.tsx";
+import { Button } from "@/shared/ui/buttons/button.tsx";
 
 interface UserShort {
     id: string;
@@ -98,85 +98,6 @@ const ModerateEventDetails = () => {
         return <div className={styles.noAccess}>❌ Івент не знайдено</div>;
     }
 
-    const columns = [
-        {
-            key: "user",
-            label: "Користувач",
-            render: (_value: any, row: InviteeWithUser) =>
-                row.user && (
-                    <UserLabel
-                        avatar_url={row.user.avatar_url}
-                        name={`${row.user.first_name} ${row.user.last_name ?? ""}`}
-                        user_id={row.user.id}
-                    />
-                ),
-        },
-        {
-            key: "status",
-            label: "Статус",
-            render: (value: string) => {
-                switch (value) {
-                    case "accepted":
-                        return <span className={styles.statusAccepted}>✅ Прийняв</span>;
-                    case "declined":
-                        return <span className={styles.statusDeclined}>❌ Відмовився</span>;
-                    case "pending":
-                        return <span className={styles.statusPending}>⏳ Очікує</span>;
-                    case "attended":
-                        return <span className={styles.statusAttended}>🎉 Відвідав</span>;
-                    case "no_show":
-                        return <span className={styles.statusNoShow}>⚠️ Не зʼявився</span>;
-                    default:
-                        return <span>{value}</span>;
-                }
-            },
-        },
-        {
-            key: "responded_at",
-            label: "Відповів",
-            render: (value: string | null) =>
-                value ? safeDatetime(value) : "—",
-        },
-        {
-            key: "actions",
-            label: "",
-            render: (_value: any, row: InviteeWithUser) => (
-                <div className={styles.actionsCell}>
-                    {/* ✅ Відмітити присутність */}
-                    {(actions.includes("mark_attended") && row.status !== "attended") && (
-                        <Button
-                            color="primary"
-                            onClick={() => handleMark(row.user.id, true)}
-                            title="Відмітити як відвідав"
-                            disabled={!!userLoading}
-                        >
-                            {userLoading === row.user.id
-                                ? <LoaderSpinner size={18} />
-                                : <UserCheck size={18} />}
-                        </Button>
-                    )}
-
-                    {/* ❌ Відмітити відсутність */}
-                    {(actions.includes("mark_absent") &&
-                        row.status !== "no_show" &&
-                        row.status !== "declined" &&
-                        row.status !== "attended") && (
-                        <Button
-                            color="primary-destructive"
-                            onClick={() => handleMark(row.user.id, false)}
-                            title="Відмітити як відсутній"
-                            disabled={!!userLoading}
-                        >
-                            {userLoading === row.user.id
-                                ? <LoaderSpinner size={18} />
-                                : <UserX size={18} />}
-                        </Button>
-                    )}
-                </div>
-            ),
-        },
-    ];
-
     return (
         <DefaultPage isLoading={loading}>
             <div className={`${styles.page} ${styles.moderate}`}>
@@ -232,7 +153,84 @@ const ModerateEventDetails = () => {
                     </div>
                 </div>
 
-                <Table columns={columns} data={invitees} />
+                <div className="overflow-hidden rounded-xl border border-secondary bg-primary shadow-sm">
+                    <Table aria-label="Учасники">
+                        <Table.Header>
+                            <Table.Head isRowHeader>Користувач</Table.Head>
+                            <Table.Head>Статус</Table.Head>
+                            <Table.Head>Відповів</Table.Head>
+                            <Table.Head></Table.Head>
+                        </Table.Header>
+                        <Table.Body items={invitees}>
+                            {(item: InviteeWithUser) => (
+                                <Table.Row id={item.user.id}>
+                                    <Table.Cell>
+                                        {item.user && (
+                                            <UserLabel
+                                                avatar_url={item.user.avatar_url}
+                                                name={`${item.user.first_name} ${item.user.last_name ?? ""}`}
+                                                user_id={item.user.id}
+                                            />
+                                        )}
+                                    </Table.Cell>
+                                    <Table.Cell>
+                                        {(() => {
+                                            switch (item.status) {
+                                                case "accepted":
+                                                    return <span className={styles.statusAccepted}>✅ Прийняв</span>;
+                                                case "declined":
+                                                    return <span className={styles.statusDeclined}>❌ Відмовився</span>;
+                                                case "pending":
+                                                    return <span className={styles.statusPending}>⏳ Очікує</span>;
+                                                case "attended":
+                                                    return <span className={styles.statusAttended}>🎉 Відвідав</span>;
+                                                case "no_show":
+                                                    return <span className={styles.statusNoShow}>⚠️ Не зʼявився</span>;
+                                                default:
+                                                    return <span>{item.status}</span>;
+                                            }
+                                        })()}
+                                    </Table.Cell>
+                                    <Table.Cell>
+                                        {item.responded_at ? safeDatetime(item.responded_at) : "—"}
+                                    </Table.Cell>
+                                    <Table.Cell>
+                                        <div className={styles.actionsCell}>
+                                            {(actions.includes("mark_attended") && item.status !== "attended") && (
+                                                <Button
+                                                    color="primary"
+                                                    onClick={() => handleMark(item.user.id, true)}
+                                                    title="Відмітити як відвідав"
+                                                    disabled={!!userLoading}
+                                                >
+                                                    {userLoading === item.user.id
+                                                        ? <LoaderSpinner size={18} />
+                                                        : <UserCheck size={18} />}
+                                                </Button>
+                                            )}
+
+                                            {(actions.includes("mark_absent") &&
+                                                item.status !== "no_show" &&
+                                                item.status !== "declined" &&
+                                                item.status !== "attended") && (
+                                                    <Button
+                                                        color="primary-destructive"
+                                                        onClick={() => handleMark(item.user.id, false)}
+                                                        title="Відмітити як відсутній"
+                                                        disabled={!!userLoading}
+                                                    >
+                                                        {userLoading === item.user.id
+                                                            ? <LoaderSpinner size={18} />
+                                                            : <UserX size={18} />}
+                                                    </Button>
+                                                )}
+                                        </div>
+                                    </Table.Cell>
+                                </Table.Row>
+                            )}
+                        </Table.Body>
+                    </Table>
+                </div>
 
                 <Button color="link-color" onClick={() => navigate("/events/list")}>
                     <ArrowLeft size={20} /> Назад до списку

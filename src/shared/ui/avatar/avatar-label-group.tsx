@@ -18,7 +18,7 @@ interface AvatarLabelGroupProps extends AvatarProps {
 
 export const AvatarLabelGroup = ({ title, subtitle, className, ...props }: AvatarLabelGroupProps) => {
     return (
-        <figure className={cx("group flex min-w-0 flex-1 items-center", styles[props.size].root, className)} onClick={props.onClick}>
+        <figure className={cx("group flex min-w-0 flex-1 items-center", styles[props.size].root, props.onClick && "cursor-pointer", className)} onClick={props.onClick}>
             <Avatar {...props} />
             <figcaption className="min-w-0 flex-1">
                 <p className={cx("text-primary", styles[props.size].title)}>{title}</p>

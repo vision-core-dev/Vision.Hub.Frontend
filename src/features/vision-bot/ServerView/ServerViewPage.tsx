@@ -11,7 +11,7 @@ import type {
 } from "@/shared/types/VisionBot";
 import { visionBotApi } from "@/api/visionBot";
 import DefaultPage from "@/shared/ui/default-page/DefaultPage";
-import Table from "@/shared/ui/table/Table";
+import { Table } from "@/shared/components/table/table";
 import { Undo2 } from "lucide-react";
 import { Button } from "@/shared/ui/buttons/button";
 import { Select } from "@/shared/ui/select/select";
@@ -265,53 +265,47 @@ const ModulesTab: React.FC<ModulesTabProps> = ({ modules }) => {
     const { guildId } = useParams<{ guildId: string }>();
     const navigate = useNavigate();
 
-    const columns = [
-        {
-            key: "id",
-            label: "ID",
-        },
-        {
-            key: "name",
-            label: "Назва",
-        },
-        {
-            key: "status",
-            label: "Статус",
-            render: (value: boolean) => (
-                <span
-                    className={`${styles.statusBadge} ${value ? styles.statusActive : styles.statusInactive
-                        }`}
-                >
-                    {value ? "Активний" : "Вимкнений"}
-                </span>
-            ),
-        },
-        {
-            key: "type",
-            label: "Тип",
-            render: (_: any, row: VisionBotModule) =>
-                row.code.trim().includes("event(") ? "Event" : "Local cmd",
-        },
-        {
-            key: "actions",
-            label: "",
-            render: (_: any, row: VisionBotModule) => (
-                <Button onClick={() =>
-                    navigate(`/vision-bot/s/${guildId}/m/${row.id}`)
-                }>
-                    Редагувати
-                </Button>
-            ),
-        },
-    ];
-
     return (
-        <Table
-            columns={columns}
-            data={modules}
-            emptyText="Модулів поки немає."
-            maxWidth="100%"
-        />
+        <div className="overflow-hidden rounded-xl border border-secondary bg-primary shadow-sm">
+            <Table aria-label="Модулі">
+                <Table.Header>
+                    <Table.Head isRowHeader>ID</Table.Head>
+                    <Table.Head>Назва</Table.Head>
+                    <Table.Head>Статус</Table.Head>
+                    <Table.Head>Тип</Table.Head>
+                    <Table.Head></Table.Head>
+                </Table.Header>
+                <Table.Body items={modules} renderEmptyState={() => (
+                    <div className="flex flex-col items-center justify-center p-8 text-center text-tertiary">
+                        <p>Модулів поки немає.</p>
+                    </div>
+                )}>
+                    {(row: VisionBotModule) => (
+                        <Table.Row id={row.id}>
+                            <Table.Cell>{row.id}</Table.Cell>
+                            <Table.Cell>{row.name}</Table.Cell>
+                            <Table.Cell>
+                                <span
+                                    className={`${styles.statusBadge} ${row.status ? styles.statusActive : styles.statusInactive}`}
+                                >
+                                    {row.status ? "Активний" : "Вимкнений"}
+                                </span>
+                            </Table.Cell>
+                            <Table.Cell>
+                                {row.code.trim().includes("event(") ? "Event" : "Local cmd"}
+                            </Table.Cell>
+                            <Table.Cell>
+                                <Button onClick={() =>
+                                    navigate(`/vision-bot/s/${guildId}/m/${row.id}`)
+                                }>
+                                    Редагувати
+                                </Button>
+                            </Table.Cell>
+                        </Table.Row>
+                    )}
+                </Table.Body>
+            </Table>
+        </div>
     );
 };
 
@@ -325,39 +319,35 @@ type LogsTabProps = {
 const LogsTab: React.FC<LogsTabProps> = ({ logs, modules }) => {
     const moduleById = new Map(modules.map((m) => [m.id, m.name]));
 
-    const columns = [
-        {
-            key: "timestamp",
-            label: "Час",
-            render: (value: string) => new Date(value).toLocaleString(),
-        },
-        {
-            key: "module_id",
-            label: "Модуль",
-            render: (value: number) => moduleById.get(value) ?? value,
-        },
-        {
-            key: "level",
-            label: "Рівень",
-            render: (value: string) => (
-                <span className={`${styles.logLevel} ${styles[`log_${value}`]}`}>
-                    {value.toUpperCase()}
-                </span>
-            ),
-        },
-        {
-            key: "message",
-            label: "Повідомлення",
-        },
-    ];
-
     return (
-        <Table
-            columns={columns}
-            data={logs}
-            emptyText="Логів поки немає."
-            maxWidth="100%"
-        />
+        <div className="overflow-hidden rounded-xl border border-secondary bg-primary shadow-sm">
+            <Table aria-label="Логи">
+                <Table.Header>
+                    <Table.Head isRowHeader>Час</Table.Head>
+                    <Table.Head>Модуль</Table.Head>
+                    <Table.Head>Рівень</Table.Head>
+                    <Table.Head>Повідомлення</Table.Head>
+                </Table.Header>
+                <Table.Body items={logs} renderEmptyState={() => (
+                    <div className="flex flex-col items-center justify-center p-8 text-center text-tertiary">
+                        <p>Логів поки немає.</p>
+                    </div>
+                )}>
+                    {(row: ModuleLog) => (
+                        <Table.Row id={row.id}>
+                            <Table.Cell>{new Date(row.timestamp).toLocaleString()}</Table.Cell>
+                            <Table.Cell>{moduleById.get(row.module_id) ?? row.module_id}</Table.Cell>
+                            <Table.Cell>
+                                <span className={`${styles.logLevel} ${styles[`log_${row.level}`]}`}>
+                                    {row.level.toUpperCase()}
+                                </span>
+                            </Table.Cell>
+                            <Table.Cell>{row.message}</Table.Cell>
+                        </Table.Row>
+                    )}
+                </Table.Body>
+            </Table>
+        </div>
     );
 };
 
@@ -367,43 +357,39 @@ type StoreTabProps = {
 };
 
 const StoreTab: React.FC<StoreTabProps> = ({ items }) => {
-    const columns = [
-        {
-            key: "id",
-            label: "ID",
-        },
-        {
-            key: "scope",
-            label: "Scope",
-        },
-        {
-            key: "key",
-            label: "Key",
-        },
-        {
-            key: "data_type",
-            label: "Тип даних",
-        },
-        {
-            key: "value",
-            label: "Значення",
-            render: (value: any) => (
-                <code>
-                    {JSON.stringify(value)?.length > 80
-                        ? JSON.stringify(value).slice(0, 80) + "…"
-                        : JSON.stringify(value)}
-                </code>
-            ),
-        },
-    ];
-
     return (
-        <Table
-            columns={columns}
-            data={items}
-            emptyText="Записів поки немає."
-            maxWidth="100%"
-        />
+        <div className="overflow-hidden rounded-xl border border-secondary bg-primary shadow-sm">
+            <Table aria-label="Store">
+                <Table.Header>
+                    <Table.Head isRowHeader>ID</Table.Head>
+                    <Table.Head>Scope</Table.Head>
+                    <Table.Head>Key</Table.Head>
+                    <Table.Head>Тип даних</Table.Head>
+                    <Table.Head>Значення</Table.Head>
+                </Table.Header>
+                <Table.Body items={items} renderEmptyState={() => (
+                    <div className="flex flex-col items-center justify-center p-8 text-center text-tertiary">
+                        <p>Записів поки немає.</p>
+                    </div>
+                )}>
+                    {(row: UniversalStoreItem) => (
+                        <Table.Row id={row.id}>
+                            <Table.Cell>{row.id}</Table.Cell>
+                            <Table.Cell>{row.scope}</Table.Cell>
+                            <Table.Cell>{row.key}</Table.Cell>
+                            <Table.Cell>{row.data_type}</Table.Cell>
+                            <Table.Cell>
+                                <code>
+                                    {JSON.stringify(row.value)?.length > 80
+                                        ? JSON.stringify(row.value).slice(0, 80) + "…"
+                                        : JSON.stringify(row.value)}
+                                </code>
+                            </Table.Cell>
+                        </Table.Row>
+                    )}
+                </Table.Body>
+            </Table>
+        </div>
     );
 };
 

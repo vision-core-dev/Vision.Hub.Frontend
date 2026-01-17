@@ -1,13 +1,13 @@
 import React, { useEffect } from "react";
-import styles from "./Finance.module.css";
-import {ArrowLeftRight, HandCoins, Plus} from "lucide-react";
-import Table from "@/shared/ui/table/Table.tsx";
+
+import { ArrowLeftRight, HandCoins, Plus } from "lucide-react";
+import { Table } from "@/shared/components/table/table";
 import DefaultPage from "@/shared/ui/default-page/DefaultPage.tsx";
-import {useNavigate} from "react-router-dom";
-import UserLabel from "@/shared/ui/user/UserLabel.tsx";
+import { useNavigate } from "react-router-dom";
 import type { UserType } from "@/shared/types/Users.ts";
 import { api } from "@/shared/utils/api.ts";
-import {Button} from "@/shared/ui/buttons/button.tsx";
+import { Button } from "@/shared/ui/buttons/button.tsx";
+import { AvatarLabelGroup } from "@/shared/ui/avatar/avatar-label-group";
 
 interface NoWithdrawnDataRes {
     items: Array<{
@@ -23,68 +23,7 @@ const FinancePage: React.FC = () => {
 
     const [noWithdrawnData, setNoWithdrawnData] = React.useState<Array<any>>([]);
 
-    const withdrawColumns = [
-        {
-            key: "created_at",
-            label: "Дата",
-            render: (v: string) => new Date(v).toLocaleDateString("uk-UA"),
-        },
-        {
-            key: "amount",
-            label: "Сума",
-            render: (v: number) => `${v.toFixed(2)} ₴`,
-        },
-        {
-            key: "status",
-            label: "Статус",
-            render: (v: string) => (
-                <span className={`${styles.status} ${styles[v]}`}>
-                    {v === "pending"
-                        ? "Очікує"
-                        : v === "approved"
-                            ? "Прийнято"
-                            : v === "paid"
-                                ? "Перераховано"
-                                : "Відхилено"}
-                </span>
-            ),
-        },
-        {
-            key: "reason",
-            label: "Причина",
-            render: (v: string) => <span className={styles.requestDescription}>{v}</span>,
-        },
-    ];
 
-    const nowithdrawnColumns = [
-        {
-            key: "user",
-            label: "Користувач",
-            render: (user: UserType) => <UserLabel
-                        user_id={user.id}
-                        name={`${user.first_name || ""} ${user.last_name || ""}`}
-                        avatar_url={user.avatar_url || undefined}
-                    />,
-        },
-        {
-            key: "amount",
-            label: "Сума",
-            render: (v: number) => `${v.toFixed(2)} ₴`,
-            sortable: true,
-        },
-        {
-            key: "last_withdraw_amount",
-            label: "Остання сума виплати",
-            render: (v: number) => `${v.toFixed(2)} ₴`,
-            sortable: true,
-        },
-        {
-            key: "last_withdraw_at",
-            label: "Остання виплата",
-            render: (v: string) => new Date(v).toLocaleDateString("uk-UA") || "—",
-            sortable: true,
-        }
-    ]
 
     useEffect(() => {
         const fetchData = async () => {
@@ -99,23 +38,77 @@ const FinancePage: React.FC = () => {
     return (
         <>
             <DefaultPage title={`0.00 ₴`}
-                        action={(
-                             <>
-                                <Button color="primary" onClick={() => navigate('/finance/withdraws/list')} iconLeading={HandCoins}>
-                                    Запити на вивід
-                                </Button>
-                                <Button color="primary" onClick={() => navigate('/finance/transactions/list')} iconLeading={ArrowLeftRight}>
-                                    Транзакції
-                                </Button>
-                                <Button color="primary" onClick={() => navigate('/finance/spendings/add-spending')} iconLeading={Plus}>
-                                    Додати витрати
-                                </Button>
-                            </>
+                action={(
+                    <>
+                        <Button color="primary" onClick={() => navigate('/finance/withdraws/list')} iconLeading={HandCoins}>
+                            Запити на вивід
+                        </Button>
+                        <Button color="primary" onClick={() => navigate('/finance/transactions/list')} iconLeading={ArrowLeftRight}>
+                            Транзакції
+                        </Button>
+                        <Button color="primary" onClick={() => navigate('/finance/spendings/add-spending')} iconLeading={Plus}>
+                            Додати витрати
+                        </Button>
+                    </>
+                )}>
+                <div className="min-w-full overflow-hidden rounded-xl border border-secondary bg-primary shadow-sm">
+                    <Table aria-label="Історія виплат">
+                        <Table.Header>
+                            <Table.Head isRowHeader>Дата</Table.Head>
+                            <Table.Head>Сума</Table.Head>
+                            <Table.Head>Статус</Table.Head>
+                            <Table.Head>Причина</Table.Head>
+                        </Table.Header>
+                        <Table.Body items={[]} renderEmptyState={() => (
+                            <div className="flex flex-col items-center justify-center p-8 text-center text-tertiary">
+                                <p>Немає даних</p>
+                            </div>
                         )}>
-                <Table columns={withdrawColumns} data={[]} />
+                            {/* Empty items, this won't be called */}
+                            {(_item: any) => (<Table.Row><Table.Cell /></Table.Row>)}
+                        </Table.Body>
+                    </Table>
+                </div>
             </DefaultPage>
             <DefaultPage title="Невиплачені кошти">
-                <Table columns={nowithdrawnColumns} data={noWithdrawnData} />
+                <div className="min-w-full overflow-hidden rounded-xl border border-secondary bg-primary shadow-sm">
+                    <Table aria-label="Невиплачені кошти">
+                        <Table.Header>
+                            <Table.Head isRowHeader>Користувач</Table.Head>
+                            <Table.Head>Сума</Table.Head>
+                            <Table.Head>Остання сума виплати</Table.Head>
+                            <Table.Head>Остання виплата</Table.Head>
+                        </Table.Header>
+                        <Table.Body items={noWithdrawnData} renderEmptyState={() => (
+                            <div className="flex flex-col items-center justify-center p-8 text-center text-tertiary">
+                                <p>Немає даних</p>
+                            </div>
+                        )}>
+                            {(item: {
+                                user: UserType;
+                                amount: number;
+                                last_withdraw_amount: number;
+                                last_withdraw_at: string;
+                            }) => (
+                                <Table.Row id={item.user.id}>
+                                    <Table.Cell>
+                                        <AvatarLabelGroup
+                                            src={item.user.avatar_url || undefined}
+                                            title={`${item.user.first_name || ""} ${item.user.last_name || ""}`}
+                                            size="sm"
+                                            onClick={() => navigate(`/users/u/${item.user.id}`)}
+                                        />
+                                    </Table.Cell>
+                                    <Table.Cell>{item.amount.toFixed(2)} ₴</Table.Cell>
+                                    <Table.Cell>{item.last_withdraw_amount.toFixed(2)} ₴</Table.Cell>
+                                    <Table.Cell>
+                                        {item.last_withdraw_at ? new Date(item.last_withdraw_at).toLocaleDateString("uk-UA") : "—"}
+                                    </Table.Cell>
+                                </Table.Row>
+                            )}
+                        </Table.Body>
+                    </Table>
+                </div>
             </DefaultPage>
         </>
     );
