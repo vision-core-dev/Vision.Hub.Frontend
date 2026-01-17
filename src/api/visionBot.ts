@@ -4,9 +4,9 @@ import type {
     UniversalStoreItem,
     VisionBotModule,
     VisionBotServer
-} from "../types/VisionBot.ts";
+} from "@/shared/types/VisionBot.ts";
 
-import { api } from "../utils/api.ts";
+import { api } from "@/shared/utils/api.ts";
 
 const API_BASE = "/v1/Hub/VisionBot";
 
@@ -94,3 +94,11 @@ export const visionBotApi = {
             await api.post(`${API_BASE}/Store/${itemId}/Delete`)
         ),
 };
+
+
+
+
+
+
+
+
