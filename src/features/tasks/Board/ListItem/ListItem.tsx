@@ -6,9 +6,9 @@ import React, { useEffect, useState } from "react";
 import { api } from "@/shared/utils/api.ts";
 import type { UserType } from "@/shared/types/Users.ts";
 import { getTextColor } from "@/shared/utils/colors.ts";
-import {useParams} from "react-router-dom";
-import {Button} from "@/shared/ui/buttons/button.tsx";
-import {TextArea} from "@/shared/ui/textarea/textarea.tsx";
+import { useParams } from "react-router-dom";
+import { Button } from "@/shared/ui/buttons/button.tsx";
+import { TextArea } from "@/shared/ui/textarea/textarea.tsx";
 
 type ListProps = {
     isBoardPublic: boolean;
@@ -21,13 +21,13 @@ type ListProps = {
 };
 
 const ListItem = ({
-                      isBoardPublic=false,
-                      list,
-                      onSelectTask,
-                      boardTags,
-                      users,
-                      onTaskMove,
-                  }: ListProps) => {
+    isBoardPublic = false,
+    list,
+    onSelectTask,
+    boardTags,
+    users,
+    onTaskMove,
+}: ListProps) => {
     const { id } = useParams();
     const [localTasks, setLocalTasks] = useState<Task[]>(list.tasks || []);
     const [insertIndex, setInsertIndex] = useState<number | null>(null);
@@ -52,8 +52,10 @@ const ListItem = ({
     }, []);
 
     useEffect(() => {
-        setLocalTasks(list.tasks || []);
-    }, [list.id]);
+        if (!draggingTaskId && insertIndex === null) {
+            setLocalTasks(list.tasks || []);
+        }
+    }, [list.tasks, draggingTaskId, insertIndex]);
 
     // 🧠 Create
     const createTask = async () => {
@@ -138,6 +140,9 @@ const ListItem = ({
                 const normalizedTarget = fromIndex < toIndex ? toIndex - 1 : toIndex;
                 updated.splice(normalizedTarget, 0, moved);
                 setLocalTasks(updated);
+
+                // Call parent move handler to update parent state (and eventually list.tasks prop)
+                onTaskMove?.(taskId, list.id, normalizedTarget);
 
                 api.post(`/v1/Hub/Tasks/${taskId}/SetTaskOrder`, {
                     list_id: list.id,
@@ -235,9 +240,8 @@ const ListItem = ({
                                 onDragOver={(e) => handleDragOverTask(e, index)}
                                 onDragEnd={handleDragEnd} // 👈 вот это
                                 onDrop={(e) => handleDrop(e)} // 👈 чтоб точно сработал drop
-                                className={`${styles.taskWrapper} ${
-                                    (draggingTaskId === task.id && !isBoardPublic) ? styles.dragging : ""
-                                }`}
+                                className={`${styles.taskWrapper} ${(draggingTaskId === task.id && !isBoardPublic) ? styles.dragging : ""
+                                    }`}
                                 onClick={() => !isBoardPublic && onSelectTask(task)}
                             >
                                 <TaskItem isBoardPublic={isBoardPublic} boardTags={boardTags} users={users} task={task} />

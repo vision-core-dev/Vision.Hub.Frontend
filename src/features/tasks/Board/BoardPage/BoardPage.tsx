@@ -1,15 +1,15 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import styles from "./BoardPage.module.css";
 import ListItem from "../ListItem/ListItem";
 import { useParams } from "react-router-dom";
-import type {UserType} from "@/shared/types/Users.ts";
-import {api} from "@/shared/utils/api.ts";
+import type { UserType } from "@/shared/types/Users.ts";
+import { api } from "@/shared/utils/api.ts";
 import LoaderDots from "@/shared/ui/loader-dots/LoaderDots.tsx";
-import {useDragScroll} from "@/shared/utils/useDragScroll.ts";
-import {SlidersVertical} from "lucide-react";
+import { useDragScroll } from "@/shared/utils/useDragScroll.ts";
+import { SlidersVertical } from "lucide-react";
 import BoardSettings from "./BoardSettings/BoardSettings.tsx";
 import TaskDetailsModal from "../TaskDetails/TaskDetailsModal.tsx";
-import {ButtonUtility} from "@/shared/ui/buttons/button-utility.tsx";
+import { ButtonUtility } from "@/shared/ui/buttons/button-utility.tsx";
 
 
 export type Task = {
@@ -47,7 +47,7 @@ export type BoardDetails = {
         name: string;
         description?: string;
         banner_url?: string;
-        members: { [userId: string]: string};
+        members: { [userId: string]: string };
     };
     lists: List[];
     tasks: Task[];
@@ -60,7 +60,7 @@ interface Props {
     is_public: boolean;
 }
 
-const BoardPage = ({ is_public=false }: Props) => {
+const BoardPage = ({ is_public = false }: Props) => {
     const { id } = useParams();
     const [boardDetails, setBoardDetails] = useState<BoardDetails | null>(null);
     const [boardLists, setBoardLists] = useState<List[]>([]);
@@ -75,10 +75,10 @@ const BoardPage = ({ is_public=false }: Props) => {
     const scrollRef = useRef<HTMLDivElement | null>(null);
     useDragScroll(scrollRef, { axis: "x", speed: 1.2 });
 
-    const fetchBoard = async (silent = false) => {
+    const fetchBoard = useCallback(async (silent = false) => {
         try {
             if (!silent) setLoading(true);
-            const res = await api.get(`/v1/Hub/Boards/${id}/GetDetails`+(is_public ? "?only-public" : ""));
+            const res = await api.get(`/v1/Hub/Boards/${id}/GetDetails` + (is_public ? "?only-public" : ""));
             const data: BoardDetails = await res.json();
 
             setBoardLists(data.lists)
@@ -99,7 +99,7 @@ const BoardPage = ({ is_public=false }: Props) => {
         } finally {
             if (!silent) setLoading(false);
         }
-    };
+    }, [id, is_public]);
 
     // 🟦 Запит на бекенд
     useEffect(() => {
@@ -113,36 +113,41 @@ const BoardPage = ({ is_public=false }: Props) => {
         }
 
         return () => clearInterval(interval);
-    }, [id]);
+    }, [id, fetchBoard]);
 
     const handleTaskMove = (taskId: string, toListId: string, newIndex: number): Task | null => {
+        if (!boardDetails) return null;
+
         let movedTask: Task | null = null;
 
-        setBoardLists(prevLists => {
-            const updated = prevLists.map(list => {
-                const safeTasks = Array.isArray(list.tasks) ? list.tasks : [];
+        // Use boardDetails.lists as source of truth
+        const currentLists = boardDetails.lists;
 
-                // видаляємо зі старого списку
-                if (safeTasks.some(t => t.id === taskId)) {
-                    movedTask = safeTasks.find(t => t.id === taskId) || null;
-                    return { ...list, tasks: safeTasks.filter(t => t.id !== taskId) };
-                }
+        const updatedLists = currentLists.map(list => {
+            const safeTasks = Array.isArray(list.tasks) ? list.tasks : [];
 
-                return list;
-            }).map(list => {
-                // додаємо в новий список
-                const safeTasks = Array.isArray(list.tasks) ? list.tasks : [];
-                if (list.id === toListId && movedTask) {
-                    const newTasks = [...safeTasks];
-                    newTasks.splice(newIndex, 0, movedTask);
-                    return { ...list, tasks: newTasks };
-                }
-                return list;
-            });
+            // видаляємо зі старого списку
+            if (safeTasks.some(t => t.id === taskId)) {
+                movedTask = safeTasks.find(t => t.id === taskId) || null;
+                return { ...list, tasks: safeTasks.filter(t => t.id !== taskId) };
+            }
 
-            // повертаємо оновлений список у state
-            return updated;
+            return list;
+        }).map(list => {
+            // додаємо в новий список
+            const safeTasks = Array.isArray(list.tasks) ? list.tasks : [];
+            if (list.id === toListId && movedTask) {
+                const newTasks = [...safeTasks];
+                newTasks.splice(newIndex, 0, movedTask);
+                return { ...list, tasks: newTasks };
+            }
+            return list;
         });
+
+        if (movedTask) {
+            setBoardDetails({ ...boardDetails, lists: updatedLists });
+            setBoardLists(updatedLists);
+        }
 
         return movedTask;
     };
@@ -151,7 +156,7 @@ const BoardPage = ({ is_public=false }: Props) => {
     if (!boardDetails) return <div className={styles.error}>Дошку не знайдено 😔</div>;
 
     return (
-        <div className={`${is_public ? styles.publicPage : styles.page}`} style={{backgroundImage: `url(${boardDetails.board.banner_url || ""})`}}>
+        <div className={`${is_public ? styles.publicPage : styles.page}`} style={{ backgroundImage: `url(${boardDetails.board.banner_url || ""})` }}>
             <div className={styles.header}>
                 <h1 className={styles.title}>{boardDetails.board.name}</h1>
                 <div className={styles.extraActions}>

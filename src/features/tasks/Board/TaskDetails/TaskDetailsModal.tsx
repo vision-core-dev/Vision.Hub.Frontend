@@ -3,10 +3,11 @@ import { api } from "@/shared/utils/api";
 import type { List } from "../BoardPage/BoardPage";
 import LoaderDots from "@/shared/ui/loader-dots/LoaderDots";
 
-import {AssigneeSelector} from "./AssigneeSelector/AssigneeSelector";
+import { AssigneeSelector } from "./AssigneeSelector/AssigneeSelector";
 import TaskNameInput from "./TaskNameInput/TaskNameInput";
-import {TagSelector} from "./TagSelector/TagSelector";
+import { TagSelector } from "./TagSelector/TagSelector";
 import AttachmentsSection, { type Attachment } from "./AttachmentsSection/AttachmentsSection";
+import AccrualsSection, { type Accrual } from "./AccrualsSection/AccrualsSection";
 import SubtasksSection, { type Subtask } from "./SubtaskSection/SubtasksSection";
 
 import { useDebouncedCallback } from "use-debounce";
@@ -17,7 +18,7 @@ import type { DateValue } from "react-aria-components";
 
 import { Dialog, DialogTrigger, Modal, ModalOverlay } from "@/shared/components/modals/modal";
 import { TaskDetailsHeader } from "./TaskDetailsHeader";
-import {Label} from "@/shared/ui/input/label.tsx";
+import { Label } from "@/shared/ui/input/label.tsx";
 
 /* ===================== TYPES ===================== */
 
@@ -51,6 +52,7 @@ export interface TaskDetails {
     assignees: TaskUser[];
     attachments: Attachment[];
     subtasks: Subtask[];
+    accruals?: Accrual[];
     comments: Comment[];
     started_at?: string | null;
     deadline_at?: string | null;
@@ -69,12 +71,12 @@ interface Props {
 /* ===================== COMPONENT ===================== */
 
 const TaskDetailsModal: React.FC<Props> = ({
-                                               taskId,
-                                               boardLists,
-                                               boardTags,
-                                               isOpen,
-                                               onOpenChange,
-                                           }) => {
+    taskId,
+    boardLists,
+    boardTags,
+    isOpen,
+    onOpenChange,
+}) => {
     const [loading, setLoading] = useState(false);
     const [task, setTask] = useState<TaskDetails | null>(null);
 
@@ -236,105 +238,124 @@ const TaskDetailsModal: React.FC<Props> = ({
             <ModalOverlay isDismissable>
                 <Modal>
                     <Dialog>
-                        <div className="relative w-full max-w-[900px] overflow-hidden rounded-2xl bg-primary shadow-xl">
+                        <div className="relative w-full max-w-[900px] max-h-[90vh] flex flex-col overflow-hidden rounded-2xl bg-white dark:bg-[#1C1C1E] shadow-2xl">
                             {loading || !task ? (
-                                <div className="flex h-[200px] items-center justify-center">
+                                <div className="flex h-[400px] items-center justify-center">
                                     <LoaderDots />
                                 </div>
                             ) : (
                                 <>
-                                    <TaskDetailsHeader
-                                        task={task}
-                                        listItems={listItems}
-                                        currentListId={currentListId}
-                                        onMoveToList={handleMoveToList}
-                                        onUploadBanner={handleUploadBanner}
-                                        onSetBannerByUrl={handleBannerByUrl}
-                                        onArchive={handleArchive}
-                                        onClose={() => onOpenChange(false)}
-                                    />
-
-                                    <div className="flex flex-col gap-6 px-6 py-5">
-                                        <TaskNameInput value={task.name} onChange={handleNameChange} />
-
-                                        <section>
-                                            <Label>Учасники</Label>
-                                            <AssigneeSelector
-                                                taskId={task.id}
-                                                assignees={task.assignees}
-                                                onUpdate={(assignees) =>
-                                                    setTask({ ...task, assignees })
-                                                }
-                                            />
-                                        </section>
-
-                                        <section>
-                                            <Label>Мітки</Label>
-                                            <TagSelector
-                                                taskId={task.id}
-                                                boardTags={boardTags}
-                                                selectedTags={task.tags}
-                                                onUpdate={(tags) => setTask({ ...task, tags })}
-                                            />
-                                        </section>
-
-
-
-                                        <section className="flex flex-row gap-6">
-                                            <DatePicker
-                                                label="Початок"
-                                                value={startedAt}
-                                                onChange={(v) => setStartedAt(v)}
-                                                onApply={(v) => {
-                                                    setStartedAt(v);
-                                                    saveDates(v, deadlineAt);
-                                                }}
-                                            />
-
-                                            <DatePicker
-                                                label="Крайдата"
-                                                value={deadlineAt}
-                                                onChange={(v) => setDeadlineAt(v)}
-                                                onApply={(v) => {
-                                                    setDeadlineAt(v);
-                                                    saveDates(startedAt, v);
-                                                }}
-                                            />
-                                        </section>
-
-                                        <section>
-                                            <Label>Опис</Label>
-                                            <TextEditor.Root
-                                                placeholder="Додайте опис задачі..."
-                                                inputClassName="w-full"
-                                                content={description}
-                                                onUpdate={({ editor }) => {
-                                                    const html = editor.getHTML();
-                                                    setDescription(html);
-                                                    saveDescription(html);
-                                                }}
-                                            >
-                                                <TextEditor.Tooltip />
-                                                <div className="flex flex-col gap-2">
-                                                    <TextEditor.Toolbar type="advanced" />
-                                                    <TextEditor.Content />
-                                                </div>
-                                            </TextEditor.Root>
-                                        </section>
-
-                                        <AttachmentsSection
-                                            taskId={task.id}
-                                            attachments={task.attachments}
-                                            onChange={(attachments) =>
-                                                setTask({ ...task, attachments })
-                                            }
+                                    <div className="flex-none">
+                                        <TaskDetailsHeader
+                                            task={task}
+                                            listItems={listItems}
+                                            currentListId={currentListId}
+                                            onMoveToList={handleMoveToList}
+                                            onUploadBanner={handleUploadBanner}
+                                            onSetBannerByUrl={handleBannerByUrl}
+                                            onArchive={handleArchive}
+                                            onClose={() => onOpenChange(false)}
                                         />
+                                    </div>
 
-                                        <SubtasksSection
-                                            taskId={task.id}
-                                            initialSubtasks={task.subtasks}
-                                            users={[]}
-                                        />
+                                    <div className="flex-1 overflow-y-auto px-8 py-6 custom-scrollbar">
+                                        <div className="flex flex-col gap-8">
+                                            <TaskNameInput value={task.name} onChange={handleNameChange} />
+
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                                <section className="flex flex-col gap-2">
+                                                    <Label className="text-xs uppercase tracking-wider text-gray-500 font-semibold mb-1">Учасники</Label>
+                                                    <AssigneeSelector
+                                                        taskId={task.id}
+                                                        assignees={task.assignees}
+                                                        onUpdate={(assignees) =>
+                                                            setTask({ ...task, assignees })
+                                                        }
+                                                    />
+                                                </section>
+
+                                                <section className="flex flex-col gap-2">
+                                                    <Label className="text-xs uppercase tracking-wider text-gray-500 font-semibold mb-1">Мітки</Label>
+                                                    <TagSelector
+                                                        taskId={task.id}
+                                                        boardTags={boardTags}
+                                                        selectedTags={task.tags}
+                                                        onUpdate={(tags) => setTask({ ...task, tags })}
+                                                    />
+                                                </section>
+                                            </div>
+
+                                            <section className="flex flex-row gap-6">
+                                                <DatePicker
+                                                    label="Початок"
+                                                    value={startedAt}
+                                                    onChange={(v) => setStartedAt(v)}
+                                                    onApply={(v) => {
+                                                        setStartedAt(v);
+                                                        saveDates(v, deadlineAt);
+                                                    }}
+                                                />
+
+                                                <DatePicker
+                                                    label="Крайдата"
+                                                    value={deadlineAt}
+                                                    onChange={(v) => setDeadlineAt(v)}
+                                                    onApply={(v) => {
+                                                        setDeadlineAt(v);
+                                                        saveDates(startedAt, v);
+                                                    }}
+                                                />
+                                            </section>
+
+                                            <section className="flex flex-col gap-2">
+                                                <Label className="text-xs uppercase tracking-wider text-gray-500 font-semibold mb-1">Опис</Label>
+                                                <TextEditor.Root
+                                                    placeholder="Додайте опис задачі..."
+                                                    inputClassName="w-full min-h-[150px]"
+                                                    content={description}
+                                                    onUpdate={({ editor }) => {
+                                                        const html = editor.getHTML();
+                                                        setDescription(html);
+                                                        saveDescription(html);
+                                                    }}
+                                                >
+                                                    <TextEditor.Tooltip />
+                                                    <div className="flex flex-col gap-2 border border-gray-200 dark:border-gray-700 rounded-xl p-1 bg-gray-50/50 dark:bg-black/20">
+                                                        <TextEditor.Toolbar type="advanced" />
+                                                        <div className="px-3 py-2">
+                                                            <TextEditor.Content />
+                                                        </div>
+                                                    </div>
+                                                </TextEditor.Root>
+                                            </section>
+
+                                            <hr className="border-gray-100 dark:border-gray-800" />
+
+                                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                                <AttachmentsSection
+                                                    taskId={task.id}
+                                                    attachments={task.attachments}
+                                                    onChange={(attachments) =>
+                                                        setTask({ ...task, attachments })
+                                                    }
+                                                />
+
+                                                <AccrualsSection
+                                                    taskId={task.id}
+                                                    accruals={task.accruals || []}
+                                                    users={task.assignees}
+                                                    onUpdate={(accruals) => setTask({ ...task, accruals })}
+                                                />
+                                            </div>
+
+                                            <hr className="border-gray-100 dark:border-gray-800" />
+
+                                            <SubtasksSection
+                                                taskId={task.id}
+                                                initialSubtasks={task.subtasks}
+                                                users={[]}
+                                            />
+                                        </div>
                                     </div>
                                 </>
                             )}

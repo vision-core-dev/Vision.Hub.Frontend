@@ -14,12 +14,10 @@ import DashboardPage from "@/features/dashboard/Dashboard";
 
 // Users
 import UsersListPage from "@/features/users/UsersListPage";
-import CreateUserPage from "@/features/users/CreateUserPage";
 import UserDetailsPage from "@/features/users/UserDetails/UserDetailsPage";
 
 // Events
 import EventsListPage from "@/features/events/EventsListPage";
-import CreateEventPage from "@/features/events/CreateEventPage";
 import CalendarTimeline from "@/features/events/CalendarTimeline/CalendarTimeline";
 import PublicEventDetails from "@/features/events/EventDetails/PublicEventDetails";
 import ModerateEventDetails from "@/features/events/EventDetails/ModerateEventDetails";
@@ -27,7 +25,6 @@ import ModerateEventDetails from "@/features/events/EventDetails/ModerateEventDe
 // Tasks
 import BoardsListPage from "@/features/tasks/BoardsListPage";
 import BoardPage from "@/features/tasks/Board/BoardPage/BoardPage";
-import CreateBoardPage from "@/features/tasks/CreateBoardPage";
 
 // Knowledge
 import KnowledgeLayout from "@/features/knowledge/KnowledgeLayout/KnowledgeLayout";
@@ -64,6 +61,7 @@ import ChatPage from "@/features/chat/Chat";
 
 // Layouts
 import NotFound from "@/layouts/NotFound/NotFound";
+import CreateEventPage from "@/features/events/CreateEventPage";
 
 export function AppRoutes() {
     return (
@@ -91,7 +89,6 @@ export function AppRoutes() {
                     <Route path="users">
                         <Route index element={<Navigate to="list" replace />} />
                         <Route path="list" element={<UsersListPage />} />
-                        <Route path="add-user" element={<CreateUserPage />} />
                         <Route path="u/:id" element={<UserDetailsPage />} />
                     </Route>
 
@@ -112,7 +109,6 @@ export function AppRoutes() {
                         <Route index element={<Navigate to="list" replace />} />
                         <Route path="list" element={<BoardsListPage />} />
                         <Route path="b/:id" element={<BoardPage is_public={false} />} />
-                        <Route path="create-board" element={<CreateBoardPage />} />
                     </Route>
 
                     {/* knowledge */}
