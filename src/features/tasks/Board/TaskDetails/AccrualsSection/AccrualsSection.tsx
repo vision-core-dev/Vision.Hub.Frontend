@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { Plus, HandCoins, ChevronDown } from "lucide-react";
-import { Dropdown } from "@/shared/ui/base/dropdown/dropdown";
+import { Plus, HandCoins } from "lucide-react";
+
 import { api } from "@/shared/utils/api";
 import { ButtonUtility } from "@/shared/ui/buttons/button-utility.tsx";
 import { Button } from "@/shared/ui/buttons/button.tsx";
-import { Avatar } from "@/shared/ui/avatar/avatar";
+
 import AccrualItem from "../AccrualItem/AccrualItem";
 import type { TaskUser } from "../TaskDetailsModal";
 import { Input } from "@/shared/ui/input/input";
