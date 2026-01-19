@@ -330,13 +330,21 @@ interface BadgeWithButtonProps<T extends BadgeTypes> {
      */
     buttonLabel?: string;
     /**
+     * The style of the badge.
+     */
+    style?: React.CSSProperties;
+    /**
+     * The class name of the badge.
+     */
+    className?: string;
+    /**
      * The click event handler for the button.
      */
     onButtonClick?: MouseEventHandler<HTMLButtonElement>;
 }
 
 export const BadgeWithButton = <T extends BadgeTypes>(props: BadgeWithButtonProps<T>) => {
-    const { size = "md", color = "gray", type = "pill-color", icon: Icon = CloseX, buttonLabel, children } = props;
+    const { size = "md", color = "gray", type = "pill-color", icon: Icon = CloseX, buttonLabel, children, style } = props;
 
     const colors = withPillTypes[type];
 
@@ -358,7 +366,7 @@ export const BadgeWithButton = <T extends BadgeTypes>(props: BadgeWithButtonProp
     };
 
     return (
-        <span className={cx(colors.common, sizes[type][size], colors.styles[color].root)}>
+        <span className={cx(colors.common, sizes[type][size], colors.styles[color].root)} style={style}>
             {children}
             <button
                 type="button"

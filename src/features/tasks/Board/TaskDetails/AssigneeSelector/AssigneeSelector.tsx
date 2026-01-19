@@ -1,14 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { Plus, X, Search } from "lucide-react";
 import { Dropdown } from "@/shared/ui/dropdown/dropdown";
+import { Avatar } from "@/shared/ui/avatar/avatar";
 import { AvatarLabelGroup } from "@/shared/ui/avatar/avatar-label-group";
 import { ButtonUtility } from "@/shared/ui/buttons/button-utility";
 import { api } from "@/shared/utils/api";
 import styles from "./AssigneeSelector.module.css";
-import {Input} from "@/shared/ui/input/input.tsx";
-import type {TaskUser} from "@/features/tasks/Board/TaskDetails/TaskDetailsModal.tsx";
-import type {UserType} from "@/shared/types/Users.ts";
-import {Badge} from "@/shared/ui/badges/badges.tsx";
+import { Input } from "@/shared/ui/input/input.tsx";
+import type { TaskUser } from "@/features/tasks/Board/TaskDetails/TaskDetailsModal.tsx";
+import type { UserType } from "@/shared/types/Users.ts";
+// import { Badge } from "@/shared/ui/badges/badges.tsx"; // unused
 
 interface Props {
     taskId: string;
@@ -58,14 +59,25 @@ export const AssigneeSelector = ({ taskId, assignees, onUpdate }: Props) => {
             <div className={styles.chips}>
                 {assignees.map((u) => (
 
-                    <Badge color="gray" size="lg">
-                        <AvatarLabelGroup
-                            size="sm"
+                    <div
+                        key={u.id}
+                        className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white pl-1 pr-2 py-0.5 shadow-sm dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors"
+                    >
+                        <Avatar
+                            size="xs"
                             src={u.avatar_url}
-                            title={u.first_name}
+                            initials={(u.first_name[0] || "") + (u.last_name?.[0] || "")}
                         />
-                        <X size={14} onClick={() => unassign(u.id)} />
-                    </Badge>
+                        <span className="text-xs font-medium text-gray-700 dark:text-gray-200">
+                            {u.first_name}
+                        </span>
+                        <button
+                            className="ml-1 text-gray-400 hover:text-red-500 transition-colors"
+                            onClick={() => unassign(u.id)}
+                        >
+                            <X size={14} />
+                        </button>
+                    </div>
 
                     // <div key={u.id} className={styles.chip}>
                     //     <AvatarLabelGroup

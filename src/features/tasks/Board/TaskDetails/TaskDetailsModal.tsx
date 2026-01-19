@@ -320,7 +320,7 @@ const TaskDetailsModal: React.FC<Props> = ({
                                                     }}
                                                 >
                                                     <TextEditor.Tooltip />
-                                                    <div className="flex flex-col gap-2 border border-gray-200 dark:border-gray-700 rounded-xl p-1 bg-gray-50/50 dark:bg-black/20">
+                                                    <div className="flex flex-col gap-2">
                                                         <TextEditor.Toolbar type="advanced" />
                                                         <div className="px-3 py-2">
                                                             <TextEditor.Content />

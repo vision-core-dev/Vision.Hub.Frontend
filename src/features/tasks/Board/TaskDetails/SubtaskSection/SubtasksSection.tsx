@@ -3,7 +3,6 @@ import styles from "./SubtasksSection.module.css";
 import { Check, Ellipsis, Plus, Trash2, Calendar as CalendarIcon, UserRound, X } from "lucide-react";
 import { api } from "@/shared/utils/api.ts";
 import type { UserType } from "@/shared/types/Users.ts";
-import DropdownMenu from "@/shared/ui/dropdown-menu/DropdownMenu.tsx";
 import { Input } from "@/shared/ui/input/input.tsx";
 import { Button } from "@/shared/ui/buttons/button.tsx";
 import { ProgressBar } from "@/shared/ui/progress-indicators/progress-indicators.tsx";
@@ -12,6 +11,8 @@ import { Dropdown } from "@/shared/ui/dropdown/dropdown.tsx";
 import { DatePicker } from "@/shared/components/date-picker/date-picker.tsx";
 import { dateValueToLocalString, isoToDateValue } from "@/shared/utils/date.ts";
 import { getLocalTimeZone, today } from "@internationalized/date";
+import { Checkbox } from "@/shared/ui/base/checkbox/checkbox";
+import { cx } from "@/shared/utils/cx";
 
 export interface Subtask {
     id: string;
@@ -174,55 +175,62 @@ const SubtasksSection: React.FC<Props> = ({ taskId, initialSubtasks, users: init
                     const isOverdue = deadline && today(getLocalTimeZone()).compare(deadline) > 0 && s.status !== "completed";
 
                     return (
-                        <div key={s.id} className={styles.item}>
-                            <div
-                                className={`${styles.checkbox} ${s.status === "completed" ? styles.checked : ""}`}
-                                onClick={() => handleToggle(s)}
-                            >
-                                {s.status === "completed" && <Check className={styles.checkboxIcon} strokeWidth={3} />}
+                        <div key={s.id} className={cx(styles.item, "group flex items-start gap-3 py-3 border-b border-gray-100 last:border-0 hover:bg-gray-50/50 transition-colors")}>
+                            <Checkbox
+                                isSelected={s.status === "completed"}
+                                onChange={() => handleToggle(s)}
+                                className="mt-1"
+                            />
+
+                            <div className="flex-1 min-w-0 flex flex-col pt-0.5">
+                                {editingId === s.id ? (
+                                    <input
+                                        className={styles.editInput}
+                                        value={editingValue}
+                                        autoFocus
+                                        onChange={(e) => setEditingValue(e.target.value)}
+                                        onBlur={() => handleRename(s.id)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter") handleRename(s.id);
+                                            if (e.key === "Escape") setEditingId(null);
+                                        }}
+                                    />
+                                ) : (
+                                    <span
+                                        className={cx(
+                                            "text-sm font-medium text-gray-700 dark:text-gray-200 cursor-pointer break-words",
+                                            s.status === "completed" && "text-gray-400 line-through decoration-gray-400"
+                                        )}
+                                        onClick={() => {
+                                            setEditingId(s.id);
+                                            setEditingValue(s.name);
+                                        }}
+                                    >
+                                        {s.name}
+                                    </span>
+                                )}
                             </div>
 
-                            {editingId === s.id ? (
-                                <input
-                                    className={styles.editInput}
-                                    value={editingValue}
-                                    autoFocus
-                                    onChange={(e) => setEditingValue(e.target.value)}
-                                    onBlur={() => handleRename(s.id)}
-                                    onKeyDown={(e) => {
-                                        if (e.key === "Enter") handleRename(s.id);
-                                        if (e.key === "Escape") setEditingId(null);
-                                    }}
-                                />
-                            ) : (
-                                <span
-                                    className={`${styles.name} ${s.status === "completed" ? styles.completedText : ""}`}
-                                    onClick={() => {
-                                        setEditingId(s.id);
-                                        setEditingValue(s.name);
-                                    }}
-                                >
-                                    {s.name}
-                                </span>
-                            )}
-
-                            <div className={`${styles.actions} ${(assignee || deadline) ? styles.hasActive : ""}`}>
+                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 has-[[data-state=open]]:opacity-100 transition-opacity">
                                 {/* ASSIGNEE */}
                                 <Dropdown.Root>
-                                    <div
-                                        className={`${styles.actionTrigger} ${assignee ? styles.assigneeAvatar : ""}`}
-                                        title={assignee ? `${assignee.first_name} ${assignee.last_name || ""}` : "Призначити виконавця"}
+                                    <Button
+                                        color="tertiary"
+                                        size="sm"
+                                        className="!p-1.5"
+                                        title={assignee ? `${assignee.first_name} ${assignee.last_name}` : "Assignee"}
                                     >
                                         {assignee ? (
                                             <Avatar
-                                                size="sm"
+                                                size="xs"
                                                 src={assignee.avatar_url}
                                                 initials={(assignee.first_name[0] || "") + (assignee.last_name?.[0] || "")}
                                             />
                                         ) : (
-                                            <UserRound size={16} />
+                                            <UserRound size={16} className="text-gray-400" />
                                         )}
-                                    </div>
+                                    </Button>
+
                                     <Dropdown.Popover className={styles.dropdownPopover}>
                                         <div className="p-2 border-b border-gray-100 dark:border-gray-700">
                                             <Input
@@ -263,31 +271,35 @@ const SubtasksSection: React.FC<Props> = ({ taskId, initialSubtasks, users: init
                                     onChange={() => { }}
                                     onApply={(date) => handleSetDeadline(s.id, dateValueToLocalString(date))}
                                 >
-                                    <div
-                                        className={`${styles.dateBadge} ${isOverdue ? styles.overdue : ""}`}
-                                        title={deadline ? "Змінити дедлайн" : "Встановити дедлайн"}
+                                    <Button
+                                        color={isOverdue ? "primary-destructive" : "tertiary"}
+                                        size="sm"
+                                        className={cx("!p-1.5", isOverdue && "bg-red-50 text-red-600 ring-red-100 hover:bg-red-100")}
+                                        title="Deadline"
                                     >
-                                        <CalendarIcon size={14} />
-                                        {deadline && <span>{dateValueToLocalString(deadline)?.slice(0, 10)}</span>}
-                                    </div>
+                                        <CalendarIcon size={16} className={cx(isOverdue ? "text-red-600" : "text-gray-400")} />
+                                        {deadline && <span className="text-xs ml-1">{dateValueToLocalString(deadline)?.slice(0, 5)}</span>}
+                                    </Button>
                                 </DatePicker>
 
-                                {/* EXTENDED MENU */}
-                                <DropdownMenu
-                                    trigger={
-                                        <div className={styles.actionTrigger}>
-                                            <Ellipsis size={16} />
-                                        </div>
-                                    }
-                                    items={[
-                                        {
-                                            label: "Видалити",
-                                            icon: <Trash2 size={16} />,
-                                            danger: true,
-                                            onClick: () => handleDelete(s.id),
-                                        }
-                                    ]}
-                                />
+                                {/* MENU */}
+                                <Dropdown.Root>
+                                    <Button color="tertiary" size="sm" className="!p-1.5">
+                                        <Ellipsis size={16} className="text-gray-400" />
+                                    </Button>
+                                    <Dropdown.Popover>
+                                        <Dropdown.Menu onAction={(key) => {
+                                            if (key === "delete") handleDelete(s.id);
+                                        }}>
+                                            <Dropdown.Item key="delete" id="delete" className="text-red-500">
+                                                <div className="flex items-center gap-2">
+                                                    <Trash2 size={16} />
+                                                    <span>Видалити</span>
+                                                </div>
+                                            </Dropdown.Item>
+                                        </Dropdown.Menu>
+                                    </Dropdown.Popover>
+                                </Dropdown.Root>
                             </div>
                         </div>
                     );

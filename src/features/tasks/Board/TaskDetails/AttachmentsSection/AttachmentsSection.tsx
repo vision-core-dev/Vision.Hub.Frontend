@@ -1,8 +1,14 @@
-import React, { useRef, useState, useEffect } from "react";
-import { Link as LinkIcon, Trash, File as FileIcon, UploadCloud, Image as ImageIcon, ExternalLink } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Link as LinkIcon, Trash, File as FileIcon, Image as ImageIcon, ExternalLink, MoreVertical, Pencil } from "lucide-react";
 import { api } from "@/shared/utils/api";
 import { safeDatetime } from "@/shared/utils/safeDate";
 import { ButtonUtility } from "@/shared/ui/buttons/button-utility.tsx";
+import { FileUpload } from "@/shared/components/file-upload/file-upload-base.tsx";
+import { Dropdown } from "@/shared/ui/base/dropdown/dropdown";
+import { Input } from "@/shared/ui/input/input";
+import { Button } from "@/shared/ui/buttons/button";
+import FilePreviewModal from "@/features/drive/FilePreviewModal";
+import { cx } from "@/shared/utils/cx";
 
 
 
@@ -30,9 +36,9 @@ const AttachmentsSection: React.FC<Props> = ({
     onChange,
 }) => {
     const [localAttachments, setLocalAttachments] = useState<Attachment[]>(attachments);
-    const [isDragging, setIsDragging] = useState(false);
-    const [isUploading, setIsUploading] = useState(false);
-    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [isLinkPopoverOpen, setIsLinkPopoverOpen] = useState(false);
+    const [linkUrl, setLinkUrl] = useState("");
+    const [previewFile, setPreviewFile] = useState<Attachment | null>(null);
 
     useEffect(() => {
         setLocalAttachments(attachments);
@@ -45,58 +51,65 @@ const AttachmentsSection: React.FC<Props> = ({
 
     /* ===================== UPLOAD LOGIC ===================== */
 
-    const handleUploadFiles = async (files: FileList | null) => {
-        if (!files || files.length === 0) return;
+    const handleUploadFiles = async (files: FileList) => {
+        console.log("📁 Files received:", files, "Length:", files.length);
+        if (!files || files.length === 0) {
+            console.warn("No files to upload");
+            return;
+        }
 
-        setIsUploading(true);
-        try {
+        const newAttachments: Attachment[] = [];
+
+        // Upload files sequentially
+        for (let i = 0; i < files.length; i++) {
             const formData = new FormData();
-            // Assuming API handles one file at a time or check if it handles multiple.
-            // Based on prev code, let's upload one by one or all?
-            // Existing API usually expects 'file'.
-            for (let i = 0; i < files.length; i++) {
-                formData.append("file", files[i]);
-            }
+            formData.append("file", files[i]);
 
-            // Using api wrapper which handles Auth
-            const res = await api.post(`/v1/Hub/Tasks/${taskId}/Attachments/UploadFile`, formData);
-            if (res.ok) {
-                const data = await res.json();
-                // If API returns a single object
-                const newFile: Attachment = {
-                    id: data.id,
-                    name: data.name,
-                    url: data.url,
-                    type: "file",
-                    created_at: new Date().toISOString(),
-                };
-                notifyChange([...localAttachments, newFile]);
-            } else {
-                console.error("Upload failed");
+            console.log(`⬆️ Uploading file ${i + 1}/${files.length}:`, files[i].name);
+
+            try {
+                const res = await api.post(`/v1/Hub/Tasks/${taskId}/Attachments/UploadFile`, formData);
+                if (res.ok) {
+                    const data = await res.json();
+                    console.log("✅ Upload successful:", data);
+                    newAttachments.push({
+                        id: data.id,
+                        name: data.name,
+                        url: data.url,
+                        type: "file",
+                        created_at: new Date().toISOString(),
+                    });
+                } else {
+                    console.error(`❌ Failed to upload file: ${files[i].name}`, res.status);
+                }
+            } catch (e) {
+                console.error("❌ Upload error:", e);
             }
-        } catch (e) {
-            console.error(e);
-        } finally {
-            setIsUploading(false);
+        }
+
+        if (newAttachments.length > 0) {
+            console.log("✅ Adding attachments to list:", newAttachments);
+            notifyChange([...localAttachments, ...newAttachments]);
         }
     };
 
     const handleAddLink = async () => {
-        const url = prompt("Введіть посилання (URL)");
-        if (!url) return;
+        if (!linkUrl) return;
 
         try {
-            const res = await api.post(`/v1/Hub/Tasks/${taskId}/Attachments/AddLink`, { url });
+            const res = await api.post(`/v1/Hub/Tasks/${taskId}/Attachments/AddLink`, { url: linkUrl });
             if (res.ok) {
                 const data = await res.json();
                 const newLink: Attachment = {
                     id: data.id,
-                    name: data.name || url,
+                    name: data.name || linkUrl,
                     url: data.url,
                     type: "link",
                     created_at: new Date().toISOString(),
                 };
                 notifyChange([...localAttachments, newLink]);
+                setLinkUrl("");
+                setIsLinkPopoverOpen(false);
             }
         } catch (e) {
             console.error(e);
@@ -104,7 +117,6 @@ const AttachmentsSection: React.FC<Props> = ({
     };
 
     const handleRemove = async (att: Attachment) => {
-        if (!confirm("Видалити вкладення?")) return;
         try {
             await api.post(`/v1/Hub/Tasks/${taskId}/Attachments/${att.id}/Remove`);
             notifyChange(localAttachments.filter((a) => a.id !== att.id));
@@ -113,21 +125,16 @@ const AttachmentsSection: React.FC<Props> = ({
         }
     };
 
-    /* ===================== DND HANDLERS ===================== */
+    const handleRename = async (att: Attachment) => {
+        const newName = prompt("Введіть нову назву", att.name);
+        if (!newName || newName === att.name) return;
 
-    const onDragOver = (e: React.DragEvent) => {
-        e.preventDefault();
-        setIsDragging(true);
-    };
-
-    const onDragLeave = () => {
-        setIsDragging(false);
-    };
-
-    const onDrop = (e: React.DragEvent) => {
-        e.preventDefault();
-        setIsDragging(false);
-        handleUploadFiles(e.dataTransfer.files);
+        try {
+            // Assuming simplified update for now as discussed
+            notifyChange(localAttachments.map(a => a.id === att.id ? { ...a, name: newName } : a));
+        } catch (e) {
+            console.error(e);
+        }
     };
 
     /* ===================== RENDER ===================== */
@@ -139,35 +146,15 @@ const AttachmentsSection: React.FC<Props> = ({
             </div>
 
             {/* DROP ZONE */}
-            <div
-                className={`transition-all duration-200 border-2 border-dashed rounded-xl p-6 flex flex-col items-center justify-center gap-2 cursor-pointer
-                    ${isDragging ? "border-primary bg-primary/10" : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"}
-                `}
-                onDragOver={onDragOver}
-                onDragLeave={onDragLeave}
-                onDrop={onDrop}
-                onClick={() => fileInputRef.current?.click()}
-            >
-                <input
-                    type="file"
-                    multiple
-                    ref={fileInputRef}
-                    className="hidden"
-                    onChange={(e) => handleUploadFiles(e.target.files)}
+            <FileUpload.Root>
+                <FileUpload.DropZone
+                    hint="Будь-який файл"
+                    accept="*"
+                    maxSize={1024 * 1024 * 1000}
+                    allowsMultiple={true}
+                    onDropFiles={handleUploadFiles}
                 />
-
-                <div className="p-3 bg-gray-100 dark:bg-gray-800 rounded-full text-gray-500">
-                    {isUploading ? <LoaderIcon /> : <UploadCloud size={24} />}
-                </div>
-                <p className="text-sm text-gray-500 font-medium">
-                    {isUploading ? "Завантаження..." : "Натисніть або перетягніть файли"}
-                </p>
-            </div>
-
-            {/* LINKS ACTION */}
-            {/* <div className="flex gap-2">
-                <ButtonUtility size="sm" onClick={handleAddLink} icon={<LinkIcon size={16} />} />
-            </div> */}
+            </FileUpload.Root>
 
             {/* LIST */}
             {localAttachments.length > 0 && (
@@ -177,63 +164,98 @@ const AttachmentsSection: React.FC<Props> = ({
                             key={att.id}
                             className="group flex items-center justify-between p-3 rounded-lg border border-gray-100 bg-white dark:bg-gray-800 dark:border-gray-700 shadow-sm transition-all hover:shadow-md"
                         >
-                            <div className="flex items-center gap-3 overflow-hidden">
+                            <div
+                                className={cx(
+                                    "flex items-center gap-3 overflow-hidden flex-1 min-w-0",
+                                    att.type === "file" && "cursor-pointer hover:opacity-80 transition-opacity"
+                                )}
+                                onClick={() => {
+                                    if (att.type === "file") {
+                                        setPreviewFile(att);
+                                    }
+                                }}
+                            >
                                 <div className="p-2 rounded-md bg-gray-50 dark:bg-gray-900 text-primary">
                                     {att.type === "link" ? <LinkIcon size={18} /> :
                                         att.name.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? <ImageIcon size={18} /> : <FileIcon size={18} />}
                                 </div>
                                 <div className="flex flex-col min-w-0">
-                                    <a
-                                        href={att.url}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        className="text-sm font-medium hover:text-primary truncate"
-                                    >
-                                        {att.name}
-                                    </a>
+                                    {att.type === "link" ? (
+                                        <a
+                                            href={att.url}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="text-sm font-medium hover:text-primary truncate"
+                                        >
+                                            {att.name}
+                                        </a>
+                                    ) : (
+                                        <span className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                                            {att.name}
+                                        </span>
+                                    )}
                                     <span className="text-[10px] text-gray-400">
                                         {safeDatetime(att.created_at)}
                                     </span>
                                 </div>
                             </div>
 
-                            <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity gap-1">
-                                <a
-                                    href={att.url}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="p-1.5 text-gray-400 hover:text-primary transition-colors"
-                                >
-                                    <ExternalLink size={16} />
-                                </a>
-                                <button
-                                    onClick={() => handleRemove(att)}
-                                    className="p-1.5 text-gray-400 hover:text-red-500 transition-colors"
-                                >
-                                    <Trash size={16} />
-                                </button>
-                            </div>
+                            <Dropdown.Root>
+                                <Button size="sm" color="secondary" iconLeading={MoreVertical} />
+                                <Dropdown.Popover className="w-40">
+                                    <Dropdown.Menu onAction={(key) => {
+                                        if (key === "open") window.open(att.url, "_blank");
+                                        if (key === "rename") handleRename(att);
+                                        if (key === "delete") handleRemove(att);
+                                    }}>
+                                        <Dropdown.Item key="open" id="open" icon={ExternalLink} label="Відкрити" />
+                                        <Dropdown.Item key="rename" id="rename" icon={Pencil} label="Перейменувати" />
+                                        <Dropdown.Item key="delete" id="delete" icon={Trash} label="Видалити" />
+                                    </Dropdown.Menu>
+                                </Dropdown.Popover>
+                            </Dropdown.Root>
                         </div>
                     ))}
                 </div>
             )}
 
-            <ButtonUtility
-                className="w-full text-xs text-center justify-center opacity-70 hover:opacity-100"
-                onClick={handleAddLink}
-                icon={<LinkIcon size={14} />}
-            >Do you want to add a link?</ButtonUtility>
+            {/* ADD LINK BUTTON with POPOVER */}
+            <Dropdown.Root onOpenChange={setIsLinkPopoverOpen} isOpen={isLinkPopoverOpen}>
+                <ButtonUtility
+                    className="w-full text-xs text-center justify-center opacity-70 hover:opacity-100"
+                    icon={<LinkIcon size={14} />}
+                >
+                    Додати посилання
+                </ButtonUtility>
+                <Dropdown.Popover className="p-3 w-[320px]">
+                    <Input
+                        placeholder="google.com"
+                        value={linkUrl}
+                        onChange={(v) => setLinkUrl(v as string)}
+                        autoFocus
+                    />
+                    <div className="flex justify-end gap-2">
+                        <Button size="sm" color="tertiary" onClick={() => setIsLinkPopoverOpen(false)}>Скасувати</Button>
+                        <Button size="sm" color="primary" onClick={handleAddLink} disabled={!linkUrl}>Додати</Button>
+                    </div>
+                </Dropdown.Popover>
+            </Dropdown.Root>
 
+            {/* File Preview Modal */}
+            {previewFile && (
+                <FilePreviewModal
+                    url={previewFile.url}
+                    name={previewFile.name}
+                    type={previewFile.type}
+                    isOpen={!!previewFile}
+                    onClose={() => setPreviewFile(null)}
+                />
+            )}
         </section>
     );
 };
 
-const LoaderIcon = () => (
-    <svg className="animate-spin h-6 w-6 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-    </svg>
-);
+
 
 export default AttachmentsSection;
 

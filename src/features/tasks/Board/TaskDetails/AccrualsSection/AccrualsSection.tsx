@@ -1,10 +1,14 @@
 import React, { useState } from "react";
-import { Plus, HandCoins } from "lucide-react";
+import { Plus, HandCoins, ChevronDown } from "lucide-react";
+import { Dropdown } from "@/shared/ui/base/dropdown/dropdown";
 import { api } from "@/shared/utils/api";
 import { ButtonUtility } from "@/shared/ui/buttons/button-utility.tsx";
 import { Button } from "@/shared/ui/buttons/button.tsx";
+import { Avatar } from "@/shared/ui/avatar/avatar";
 import AccrualItem from "../AccrualItem/AccrualItem";
 import type { TaskUser } from "../TaskDetailsModal";
+import { Input } from "@/shared/ui/input/input";
+import { Select } from "@/shared/ui/select/select";
 
 /* ===================== TYPES ===================== */
 
@@ -101,30 +105,24 @@ const AccrualsSection: React.FC<Props> = ({ taskId, accruals = [], users, onUpda
                         <span className="text-sm font-medium">Нова виплата</span>
                     </div>
 
-                    <div className="flex flex-col gap-2">
-                        <label className="text-xs text-gray-500">Кому:</label>
-                        <select
-                            className="w-full p-2 text-sm rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-primary outline-none"
-                            value={selectedUserId}
-                            onChange={(e) => setSelectedUserId(e.target.value)}
-                        >
-                            <option value="" disabled>Оберіть учасника</option>
-                            {users.map(u => (
-                                <option key={u.id} value={u.id}>{u.first_name} {u.last_name}</option>
-                            ))}
-                        </select>
-                    </div>
+                    <Select
+                        label="Кому:"
+                        placeholder="Оберіть учасника"
+                        value={selectedUserId}
+                    >
+                        {users.map(u => (
+                            <Select.Item key={u.id} id={u.id} textValue={`${u.first_name} ${u.last_name}`} avatarUrl={u.avatar_url}>
+                                {u.first_name} {u.last_name}
+                            </Select.Item>
+                        ))}
+                    </Select>
 
-                    <div className="flex flex-col gap-2">
-                        <label className="text-xs text-gray-500">Сума (UAH):</label>
-                        <input
-                            type="number"
-                            className="w-full p-2 text-sm rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-primary outline-none"
-                            placeholder="0.00"
-                            value={amount}
-                            onChange={(e) => setAmount(e.target.value)}
-                        />
-                    </div>
+                    <Input
+                        label="Сума (UAH):"
+                        placeholder="Введіть суму"
+                        value={amount}
+                        onChange={(value) => setAmount(value)}
+                    />
 
                     <div className="flex gap-2 justify-end mt-2">
                         <Button color="tertiary" size="sm" onClick={() => setIsCreating(false)}>

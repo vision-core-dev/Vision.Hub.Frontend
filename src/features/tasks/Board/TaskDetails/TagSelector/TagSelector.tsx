@@ -3,7 +3,7 @@ import { Plus, Search } from "lucide-react";
 import { Dropdown } from "@/shared/ui/dropdown/dropdown";
 import { ButtonUtility } from "@/shared/ui/buttons/button-utility";
 import { Input } from "@/shared/ui/input/input";
-import {BadgeWithButton} from "@/shared/ui/badges/badges";
+import { BadgeWithButton } from "@/shared/ui/badges/badges";
 import { api } from "@/shared/utils/api";
 import styles from "./TagSelector.module.css";
 
@@ -59,7 +59,20 @@ export const TagSelector = ({
             <div className={styles.chips}>
                 {/* selected tags */}
                 {selectedTags.map((tag) => (
-                    <BadgeWithButton type="color" color="gray" size="lg" buttonLabel="Clear" onButtonClick={() => unassign(tag.id)}>
+                    <BadgeWithButton
+                        key={tag.id}
+                        type="pill-color" // Use pill style
+                        color="gray" // Fallback/Base
+                        size="md"
+                        style={{
+                            backgroundColor: `${tag.color}35`, // Increased opacity from 20 to 35
+                            color: tag.color,
+                            borderColor: `${tag.color}60` // Increased opacity from 40 to 60
+                        }}
+                        className="!ring-0 border border-transparent" // Remove default ring if needed
+                        buttonLabel="Remove"
+                        onButtonClick={() => unassign(tag.id)}
+                    >
                         {tag.name}
                     </BadgeWithButton >
                 ))}
