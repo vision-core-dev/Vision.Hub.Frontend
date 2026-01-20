@@ -7,7 +7,7 @@ import { DatePicker as AriaDatePicker, Dialog as AriaDialog, Group as AriaGroup,
 import { Button } from "@/shared/ui/buttons/button";
 import { cx } from "@/shared/utils/cx";
 import { Calendar } from "./calendar";
-import {Label} from "@/shared/ui/input/label.tsx";
+import { Label } from "@/shared/ui/input/label.tsx";
 
 const highlightedDates = [today(getLocalTimeZone())];
 
@@ -31,12 +31,14 @@ export const DatePicker = ({ value: valueProp, defaultValue, label, onChange, on
 
     return (
         <AriaDatePicker shouldCloseOnSelect={false} {...props} value={value} onChange={setValue}>
-            <AriaGroup aria-label="test">
-                {label && <Label>{label}</Label>}
-                <Button size="sm" color="secondary" iconLeading={CalendarIcon} className="w-full">
-                    {formattedDate}
-                </Button>
-            </AriaGroup>
+            {props.children || (
+                <AriaGroup aria-label="test">
+                    {label && <Label>{label}</Label>}
+                    <Button size="sm" color="secondary" iconLeading={CalendarIcon} className="w-full">
+                        {formattedDate}
+                    </Button>
+                </AriaGroup>
+            )}
             <AriaPopover
                 offset={8}
                 placement="bottom right"
@@ -44,9 +46,9 @@ export const DatePicker = ({ value: valueProp, defaultValue, label, onChange, on
                     cx(
                         "origin-(--trigger-anchor-point) will-change-transform",
                         isEntering &&
-                            "duration-150 ease-out animate-in fade-in placement-right:slide-in-from-left-0.5 placement-top:slide-in-from-bottom-0.5 placement-bottom:slide-in-from-top-0.5",
+                        "duration-150 ease-out animate-in fade-in placement-right:slide-in-from-left-0.5 placement-top:slide-in-from-bottom-0.5 placement-bottom:slide-in-from-top-0.5",
                         isExiting &&
-                            "duration-100 ease-in animate-out fade-out placement-right:slide-out-to-left-0.5 placement-top:slide-out-to-bottom-0.5 placement-bottom:slide-out-to-top-0.5",
+                        "duration-100 ease-in animate-out fade-out placement-right:slide-out-to-left-0.5 placement-top:slide-out-to-bottom-0.5 placement-bottom:slide-out-to-top-0.5",
                     )
                 }
             >

@@ -14,26 +14,25 @@ export interface TaskDetailsHeaderProps {
 
 import { Select } from "@/shared/ui/select/select";
 import { Dropdown } from "@/shared/ui/dropdown/dropdown";
-import {ArchiveIcon, ImageIcon, LinkIcon, MoreHorizontal, X} from "lucide-react";
-import {ButtonUtility} from "@/shared/ui/buttons/button-utility.tsx";
+import { ArchiveIcon, ImageIcon, LinkIcon, MoreHorizontal, X } from "lucide-react";
+import { ButtonUtility } from "@/shared/ui/buttons/button-utility.tsx";
 
 export const TaskDetailsHeader: React.FC<TaskDetailsHeaderProps> = ({
-                                                                        task,
-                                                                        listItems,
-                                                                        currentListId,
-                                                                        onMoveToList,
-                                                                        onUploadBanner,
-                                                                        onSetBannerByUrl,
-                                                                        onArchive,
-                                                                        onClose,
-                                                                    }) => {
+    task,
+    listItems,
+    currentListId,
+    onMoveToList,
+    onUploadBanner,
+    onSetBannerByUrl,
+    onArchive,
+    onClose,
+}) => {
     return (
         <div
-            className={`flex items-start justify-between gap-3 border-b border-secondary px-5 py-4 ${
-                task.banner_url
+            className={`flex items-start justify-between gap-3 border-b border-secondary px-5 py-4 ${task.banner_url
                     ? "min-h-[180px] bg-cover bg-center border-none"
                     : ""
-            }`}
+                }`}
             style={
                 task.banner_url
                     ? { backgroundImage: `url(${task.banner_url})` }

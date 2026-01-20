@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import styles from "./SubtasksSection.module.css";
 import { Check, Ellipsis, Plus, Trash2, Calendar as CalendarIcon, UserRound, X } from "lucide-react";
 import { api } from "@/shared/utils/api.ts";
 import type { UserType } from "@/shared/types/Users.ts";
@@ -37,6 +36,8 @@ const SubtasksSection: React.FC<Props> = ({ taskId, initialSubtasks, users: init
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editingValue, setEditingValue] = useState("");
     const [userSearch, setUserSearch] = useState("");
+
+    const [activeAction, setActiveAction] = useState<{ id: string; type: "assignee" | "date" } | null>(null);
 
     const completedCount = subtasks.filter((s) => s.status === "completed").length;
     const progress = subtasks.length > 0 ? Math.round((completedCount / subtasks.length) * 100) : 0;
@@ -127,6 +128,7 @@ const SubtasksSection: React.FC<Props> = ({ taskId, initialSubtasks, users: init
 
     const handleAssign = async (subtaskId: string, userId: string) => {
         setSubtasks((prev) => prev.map(s => s.id === subtaskId ? { ...s, assignee_id: userId } : s));
+        setActiveAction(null);
         try {
             await api.post(`/v1/Hub/Tasks/${taskId}/Subtasks/${subtaskId}/AssignUser`, { user_id: userId });
         } catch (e) {
@@ -136,6 +138,7 @@ const SubtasksSection: React.FC<Props> = ({ taskId, initialSubtasks, users: init
 
     const handleUnassign = async (subtaskId: string) => {
         setSubtasks((prev) => prev.map(s => s.id === subtaskId ? { ...s, assignee_id: null } : s));
+        setActiveAction(null);
         try {
             await api.post(`/v1/Hub/Tasks/${taskId}/Subtasks/${subtaskId}/UnassignUser`);
         } catch (e) {
@@ -145,6 +148,7 @@ const SubtasksSection: React.FC<Props> = ({ taskId, initialSubtasks, users: init
 
     const handleSetDeadline = async (subtaskId: string, date: string | null) => {
         setSubtasks((prev) => prev.map(s => s.id === subtaskId ? { ...s, deadline_at: date } : s));
+        setActiveAction(null);
         try {
             await api.post(`/v1/Hub/Tasks/${taskId}/Subtasks/${subtaskId}/UpdateDeadline`, { deadline_at: date });
         } catch (e) {
@@ -161,21 +165,21 @@ const SubtasksSection: React.FC<Props> = ({ taskId, initialSubtasks, users: init
     );
 
     return (
-        <section className={styles.section}>
+        <section className="flex flex-col">
             <h3>Підзадачі</h3>
 
             {subtasks.length > 0 && (
                 <ProgressBar labelPosition="right" min={0} max={100} value={progress} />
             )}
 
-            <div className={styles.list}>
+            <div className="flex flex-col">
                 {subtasks.map((s) => {
                     const assignee = getAssignee(s.assignee_id);
                     const deadline = s.deadline_at ? isoToDateValue(s.deadline_at) : null;
                     const isOverdue = deadline && today(getLocalTimeZone()).compare(deadline) > 0 && s.status !== "completed";
 
                     return (
-                        <div key={s.id} className={cx(styles.item, "group flex items-start gap-3 py-3 border-b border-gray-100 last:border-0 hover:bg-gray-50/50 transition-colors")}>
+                        <div key={s.id} className="group flex items-start gap-3 py-3 border-b border-gray-100 last:border-0 hover:bg-gray-50/50 transition-colors">
                             <Checkbox
                                 isSelected={s.status === "completed"}
                                 onChange={() => handleToggle(s)}
@@ -185,7 +189,7 @@ const SubtasksSection: React.FC<Props> = ({ taskId, initialSubtasks, users: init
                             <div className="flex-1 min-w-0 flex flex-col pt-0.5">
                                 {editingId === s.id ? (
                                     <input
-                                        className={styles.editInput}
+                                        className="flex-1 rounded border border-blue-500 px-1.5 py-0.5 text-sm leading-6 outline-none bg-white font-medium text-gray-700"
                                         value={editingValue}
                                         autoFocus
                                         onChange={(e) => setEditingValue(e.target.value)}
@@ -213,11 +217,14 @@ const SubtasksSection: React.FC<Props> = ({ taskId, initialSubtasks, users: init
 
                             <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 has-[[data-state=open]]:opacity-100 transition-opacity">
                                 {/* ASSIGNEE */}
-                                <Dropdown.Root>
+                                <Dropdown.Root
+                                    isOpen={activeAction?.id === s.id && activeAction.type === "assignee"}
+                                    onOpenChange={(isOpen) => setActiveAction(isOpen ? { id: s.id, type: "assignee" } : null)}
+                                >
                                     <Button
                                         color="tertiary"
                                         size="sm"
-                                        className="!p-1.5"
+                                        className={cx("!p-1.5", !assignee && !(activeAction?.id === s.id && activeAction?.type === "assignee") && "hidden")}
                                         title={assignee ? `${assignee.first_name} ${assignee.last_name}` : "Assignee"}
                                     >
                                         {assignee ? (
@@ -231,7 +238,7 @@ const SubtasksSection: React.FC<Props> = ({ taskId, initialSubtasks, users: init
                                         )}
                                     </Button>
 
-                                    <Dropdown.Popover className={styles.dropdownPopover}>
+                                    <Dropdown.Popover className="w-72 max-h-[300px] flex flex-col">
                                         <div className="p-2 border-b border-gray-100 dark:border-gray-700">
                                             <Input
                                                 size="sm"
@@ -241,9 +248,12 @@ const SubtasksSection: React.FC<Props> = ({ taskId, initialSubtasks, users: init
                                                 autoFocus
                                             />
                                         </div>
-                                        <div className={styles.userList}>
+                                        <div className="flex-1 overflow-y-auto p-1 flex flex-col gap-0.5">
                                             {s.assignee_id && (
-                                                <div className={styles.userOption} onClick={() => handleUnassign(s.id)}>
+                                                <div
+                                                    className="flex items-center gap-2 p-1.5 rounded-md cursor-pointer hover:bg-red-50"
+                                                    onClick={() => handleUnassign(s.id)}
+                                                >
                                                     <div className="flex items-center justify-center w-6 h-6 rounded-full bg-red-100 text-red-500">
                                                         <X size={14} />
                                                     </div>
@@ -251,7 +261,11 @@ const SubtasksSection: React.FC<Props> = ({ taskId, initialSubtasks, users: init
                                                 </div>
                                             )}
                                             {filteredUsers.map(u => (
-                                                <div key={u.id} className={styles.userOption} onClick={() => handleAssign(s.id, u.id)}>
+                                                <div
+                                                    key={u.id}
+                                                    className="flex items-center gap-2 p-1.5 rounded-md cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                                                    onClick={() => handleAssign(s.id, u.id)}
+                                                >
                                                     <Avatar
                                                         size="xs"
                                                         src={u.avatar_url}
@@ -267,6 +281,8 @@ const SubtasksSection: React.FC<Props> = ({ taskId, initialSubtasks, users: init
 
                                 {/* DEADLINE */}
                                 <DatePicker
+                                    isOpen={activeAction?.id === s.id && activeAction.type === "date"}
+                                    onOpenChange={(isOpen) => setActiveAction(isOpen ? { id: s.id, type: "date" } : null)}
                                     value={deadline}
                                     onChange={() => { }}
                                     onApply={(date) => handleSetDeadline(s.id, dateValueToLocalString(date))}
@@ -274,7 +290,7 @@ const SubtasksSection: React.FC<Props> = ({ taskId, initialSubtasks, users: init
                                     <Button
                                         color={isOverdue ? "primary-destructive" : "tertiary"}
                                         size="sm"
-                                        className={cx("!p-1.5", isOverdue && "bg-red-50 text-red-600 ring-red-100 hover:bg-red-100")}
+                                        className={cx("!p-1.5", isOverdue && "bg-red-50 text-red-600 ring-red-100 hover:bg-red-100", !deadline && !(activeAction?.id === s.id && activeAction?.type === "date") && "hidden")}
                                         title="Deadline"
                                     >
                                         <CalendarIcon size={16} className={cx(isOverdue ? "text-red-600" : "text-gray-400")} />
@@ -289,9 +305,21 @@ const SubtasksSection: React.FC<Props> = ({ taskId, initialSubtasks, users: init
                                     </Button>
                                     <Dropdown.Popover>
                                         <Dropdown.Menu onAction={(key) => {
+                                            if (key === "assign") setActiveAction({ id: s.id, type: "assignee" });
+                                            if (key === "deadline") setActiveAction({ id: s.id, type: "date" });
                                             if (key === "delete") handleDelete(s.id);
                                         }}>
-                                            <Dropdown.Item key="delete" id="delete" className="text-red-500">
+                                            <Dropdown.Item id="assign" icon={UserRound}>
+                                                Поставити відповідального
+                                            </Dropdown.Item>
+
+                                            <Dropdown.Item id="deadline" icon={CalendarIcon}>
+                                                Поставити дедлайн
+                                            </Dropdown.Item>
+
+                                            <Dropdown.Separator />
+
+                                            <Dropdown.Item addon="Del" key="delete" id="delete" className="text-red-500">
                                                 <div className="flex items-center gap-2">
                                                     <Trash2 size={16} />
                                                     <span>Видалити</span>
@@ -305,7 +333,7 @@ const SubtasksSection: React.FC<Props> = ({ taskId, initialSubtasks, users: init
                     );
                 })}
 
-                <div className={styles.addRow}>
+                <div className="flex items-center gap-2 mt-2">
                     <Input
                         size="sm"
                         type="text"
@@ -323,12 +351,3 @@ const SubtasksSection: React.FC<Props> = ({ taskId, initialSubtasks, users: init
 };
 
 export default SubtasksSection;
-
-
-
-
-
-
-
-
-
