@@ -47,6 +47,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
                 const { ok, data } = await authApi.checkMe();
 
                 if (ok) {
+                    if (!data.user.is_active) {
+                        navigate("/deactivated");
+                        return;
+                    }
+
                     setIsAuthenticated(true);
                     setUser(data.user);
                     setRole(data.role);

@@ -20,6 +20,7 @@ export interface MeUser {
     terms_accepted_at: string | null;
     created_at: string;
     updated_at: string;
+    is_active: boolean;
 }
 
 export interface CheckMeResponse {
