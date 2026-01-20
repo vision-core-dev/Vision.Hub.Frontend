@@ -19,7 +19,7 @@ interface DatePickerProps extends AriaDatePickerProps<DateValue> {
     label?: string;
 }
 
-export const DatePicker = ({ value: valueProp, defaultValue, label, onChange, onApply, onCancel, ...props }: DatePickerProps) => {
+export const DatePicker = ({ value: valueProp, defaultValue, label, onChange, onApply, onCancel, children, ...props }: DatePickerProps) => {
     const formatter = useDateFormatter({
         month: "short",
         day: "numeric",
@@ -31,14 +31,14 @@ export const DatePicker = ({ value: valueProp, defaultValue, label, onChange, on
 
     return (
         <AriaDatePicker shouldCloseOnSelect={false} {...props} value={value} onChange={setValue}>
-            {props.children || (
+            {(children || (
                 <AriaGroup aria-label="test">
                     {label && <Label>{label}</Label>}
                     <Button size="sm" color="secondary" iconLeading={CalendarIcon} className="w-full">
                         {formattedDate}
                     </Button>
                 </AriaGroup>
-            )}
+            )) as any}
             <AriaPopover
                 offset={8}
                 placement="bottom right"

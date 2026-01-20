@@ -1,5 +1,5 @@
+import { AvatarLabelGroup } from "@/shared/ui/avatar/avatar-label-group";
 import styles from "./AccrualItem.module.css";
-import { Avatar } from "@/shared/ui/avatar/avatar.tsx";
 
 interface Props {
     user: {
@@ -16,11 +16,8 @@ export default function AccrualItem({ user, amount }: Props) {
 
     return (
         <div className={styles.item}>
-            <Avatar size="sm" src={user.avatar_url} initials={initials} />
 
-            <div className={styles.name}>
-                {user.first_name} {user.last_name || ""}
-            </div>
+            <AvatarLabelGroup title={`${user.first_name} ${user.last_name || ""}`} size="sm" src={user.avatar_url} initials={initials} />
 
             <div
                 className={`${styles.amount} ${amount > 0 ? styles.plus : amount < 0 ? styles.minus : ""
