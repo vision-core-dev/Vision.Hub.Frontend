@@ -81,8 +81,8 @@
 
 .taskWrapper {
     transition:
-            transform 0.15s ease,
-            background 0.2s ease;
+        transform 0.15s ease,
+        background 0.2s ease;
     border-radius: 8px;
     /*cursor: grab;*/
 }
@@ -90,6 +90,7 @@
 .taskWrapper.dragging {
     opacity: 0.5;
     transform: scale(0.96);
+    pointer-events: none;
 }
 
 .insertLine {

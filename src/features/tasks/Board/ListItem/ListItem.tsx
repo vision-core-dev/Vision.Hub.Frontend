@@ -2,7 +2,7 @@ import styles from "./ListItem.module.css";
 import TaskItem from "../TaskItem/TaskItem";
 import { Plus, X } from "lucide-react";
 import type { List, Task, TaskTag } from "../BoardPage/BoardPage.tsx";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { api } from "@/shared/utils/api.ts";
 import type { UserType } from "@/shared/types/Users.ts";
 import { getTextColor } from "@/shared/utils/colors.ts";
@@ -57,6 +57,8 @@ const ListItem = ({
         }
     }, [list.tasks, draggingTaskId, insertIndex]);
 
+    const listRef = useRef<HTMLDivElement>(null);
+
     // 🧠 Create
     const createTask = async () => {
         if (isBoardPublic) {
@@ -82,36 +84,75 @@ const ListItem = ({
 
     // 🎯 start
     const handleDragStart = (e: React.DragEvent<HTMLDivElement>, taskId: string) => {
-        if (isBoardPublic) {
-            return;
-        }
+        if (isBoardPublic) return;
+
         e.dataTransfer.effectAllowed = "move";
         e.dataTransfer.setData("task_id", taskId);
         e.dataTransfer.setData("source_list_id", list.id);
-        setDraggingTaskId(taskId);
+
+        // Delay state update to allow browser to capture the element as drag image
+        requestAnimationFrame(() => {
+            setDraggingTaskId(taskId);
+        });
         setInsertIndex(null);
     };
 
-    // 🧲 over task
-    const handleDragOverTask = (e: React.DragEvent<HTMLDivElement>, index: number) => {
-        if (isBoardPublic) {
-            return;
-        }
+    // 🧲 Unified Drag Over Handler (Geometry-based)
+    const handleDragOverList = (e: React.DragEvent<HTMLDivElement>) => {
+        if (isBoardPublic) return;
+
         e.preventDefault();
         e.stopPropagation();
-        const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
-        const before = e.clientY - rect.top < rect.height / 2;
-        setInsertIndex(before ? index : index + 1);
-    };
 
-    // 🧲 over list
-    const handleDragOverList = (e: React.DragEvent<HTMLDivElement>) => {
-        if (isBoardPublic) {
-            return;
+        if (!listRef.current) return;
+
+        const tasks = Array.from(listRef.current.children).filter(child =>
+            child.classList.contains(styles.taskWrapper) // Ensure we only check task wrappers
+        ) as HTMLElement[];
+
+        // Finding the closest task to the cursor
+        const mouseY = e.clientY;
+
+        let closestIndex = tasks.length;
+        let minDistance = Number.POSITIVE_INFINITY;
+
+        tasks.forEach((task, index) => {
+            const rect = task.getBoundingClientRect();
+            // Metadata: check distance to the vertical center of the task
+            const center = rect.top + rect.height / 2;
+            const distance = mouseY - center;
+
+            // Logic: if we are above the center, we insert at this index.
+            // If below, we insert at index + 1.
+            // But simpler: we find the ONE task whose center is closest to mouse.
+            // If mouse > center, we insert AFTER (index + 1). 
+            // If mouse < center, we insert BEFORE (index).
+
+            // Distance approach:
+            // We want to find the simple insertion point.
+            // Let's iterate and find the first task whose center is BELOW the mouse.
+            // That task's index is the insertion index.
+
+            if (mouseY < center && index < closestIndex) {
+                closestIndex = index;
+            }
+        });
+
+        // Refined Logic using classic "closest" approach
+        // Reduce to find the element immediately *after* the cursor
+        const elementAfter = tasks.find(task => {
+            const rect = task.getBoundingClientRect();
+            const center = rect.top + rect.height / 2;
+            return mouseY < center;
+        });
+
+        const newIndex = elementAfter
+            ? tasks.indexOf(elementAfter)
+            : tasks.length;
+
+        if (newIndex !== insertIndex) {
+            setInsertIndex(newIndex);
         }
-        if (e.target !== e.currentTarget) return;
-        e.preventDefault();
-        setInsertIndex(localTasks.length);
     };
 
     // 💾 drop
@@ -125,7 +166,12 @@ const ListItem = ({
 
         const taskId = e.dataTransfer.getData("task_id");
         const sourceListId = e.dataTransfer.getData("source_list_id");
-        if (!taskId) return handleDragEnd();
+
+        // Cleanup state immediately
+        setDraggingTaskId(null);
+        setInsertIndex(null);
+
+        if (!taskId) return;
 
         const toIndex = Math.max(0, Math.min(insertIndex ?? localTasks.length, localTasks.length));
 
@@ -133,11 +179,16 @@ const ListItem = ({
             if (sourceListId === list.id) {
                 // 🔁 reorder у межах того ж списку
                 const fromIndex = localTasks.findIndex(t => t.id === taskId);
-                if (fromIndex === -1) return handleDragEnd();
+                if (fromIndex === -1) return;
+
+                // If dropping at same position, do nothing
+                if (fromIndex === toIndex || fromIndex === toIndex - 1) return;
 
                 const updated = [...localTasks];
                 const [moved] = updated.splice(fromIndex, 1);
+                // Adjust index if we moved from top to bottom
                 const normalizedTarget = fromIndex < toIndex ? toIndex - 1 : toIndex;
+
                 updated.splice(normalizedTarget, 0, moved);
                 setLocalTasks(updated);
 
@@ -173,8 +224,8 @@ const ListItem = ({
                     order: toIndex,
                 }).catch(console.error);
             }
-        } finally {
-            handleDragEnd();
+        } catch (err) {
+            console.error(err);
         }
     };
 
@@ -186,15 +237,13 @@ const ListItem = ({
         if (isBoardPublic) {
             return;
         }
+        // Only clear if we really left the list container (not entering a child)
         if (!e.currentTarget.contains(e.relatedTarget as Node)) {
             setInsertIndex(null);
         }
     };
 
     const handleDragEnd = () => {
-        if (isBoardPublic) {
-            return;
-        }
         setDraggingTaskId(null);
         setInsertIndex(null);
     };
@@ -202,21 +251,6 @@ const ListItem = ({
     return (
         <div
             className={styles.list}
-            onDragOver={(e) => {
-                if (isBoardPublic) {
-                    return;
-                }
-                e.preventDefault(); // 🧠 must have
-                handleDragOverList(e);
-            }}
-            onDrop={(e) => {
-                if (isBoardPublic) {
-                    return;
-                }
-                e.preventDefault();
-                handleDrop(e);
-            }}
-            onDragLeave={handleDragLeave}
             style={{ backgroundColor: list.color || "#f1f2f4" }}
         >
             <div className={styles.header}>
@@ -229,29 +263,42 @@ const ListItem = ({
                 <span className={styles.count}>{localTasks.length}</span>
             </div>
 
-            {localTasks.length > 0 && (
-                <div className={styles.tasks}>
-                    {localTasks.map((task, index) => (
-                        <React.Fragment key={task.id}>
-                            {insertIndex === index && <div className={styles.insertLine} />}
-                            <div
-                                draggable={!isBoardPublic}
-                                onDragStart={(e) => handleDragStart(e, task.id)}
-                                onDragOver={(e) => handleDragOverTask(e, index)}
-                                onDragEnd={handleDragEnd} // 👈 вот это
-                                onDrop={(e) => handleDrop(e)} // 👈 чтоб точно сработал drop
-                                className={`${styles.taskWrapper} ${(draggingTaskId === task.id && !isBoardPublic) ? styles.dragging : ""
-                                    }`}
-                                onClick={() => !isBoardPublic && onSelectTask(task)}
-                            >
-                                <TaskItem isBoardPublic={isBoardPublic} boardTags={boardTags} users={users} task={task} />
-                            </div>
-                        </React.Fragment>
-                    ))}
+            <div
+                className={styles.tasks}
+                ref={listRef}
+                onDragOver={handleDragOverList} // Handle all drag geometry here
+                onDrop={handleDrop}
+                onDragLeave={handleDragLeave}
+            >
+                {/* Visual placeholder for empty lists to easy drop */}
+                {localTasks.length === 0 && (
+                    <div className="h-full min-h-[50px] flex items-center justify-center text-gray-400 text-sm border-2 border-dashed border-gray-200 rounded-lg pointer-events-none">
+                        Перетягніть сюди
+                    </div>
+                )}
 
-                    {insertIndex === localTasks.length && <div className={styles.insertLine} />}
-                </div>
-            )}
+                {localTasks.map((task, index) => (
+                    <React.Fragment key={task.id}>
+                        {insertIndex === index && <div className={styles.insertLine} />}
+                        <div
+                            draggable={!isBoardPublic}
+                            onDragStart={(e) => handleDragStart(e, task.id)}
+                            // Removed individual onDragOver/onDrop
+                            onDragEnd={handleDragEnd}
+                            className={`${styles.taskWrapper} ${(draggingTaskId === task.id) ? styles.dragging : ""
+                                }`}
+                            onClick={() => !isBoardPublic && onSelectTask(task)}
+                        >
+                            <TaskItem isBoardPublic={isBoardPublic} boardTags={boardTags} users={users} task={task} />
+                        </div>
+                    </React.Fragment>
+                ))}
+
+                {/* Show insert line at the very bottom if index equals length */}
+                {insertIndex === localTasks.length && <div className={styles.insertLine} />}
+            </div>
+
+
 
 
             {!isBoardPublic && (
