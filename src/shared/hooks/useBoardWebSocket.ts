@@ -1,0 +1,163 @@
+import { useEffect, useRef, useCallback } from 'react';
+
+interface UseBoardWebSocketOptions {
+    boardId: string | undefined;
+    onUpdate?: () => void;
+    enabled?: boolean;
+}
+
+interface WebSocketMessage {
+    type: string;
+    action?: string;
+    data?: any;
+    message?: string;
+    board_id?: string;
+    timestamp?: string;
+}
+
+/**
+ * Custom hook for managing WebSocket connection to a board
+ * Automatically reconnects on disconnect and handles real-time updates
+ */
+export const useBoardWebSocket = ({ boardId, onUpdate, enabled = true }: UseBoardWebSocketOptions) => {
+    const wsRef = useRef<WebSocket | null>(null);
+    const reconnectTimeoutRef = useRef<number | undefined>(undefined);
+    const reconnectAttemptsRef = useRef(0);
+    const maxReconnectAttempts = 5;
+    const reconnectDelay = 3000; // 3 seconds
+
+    const connect = useCallback(() => {
+        if (!boardId || !enabled) return;
+
+        // Close existing connection if any
+        if (wsRef.current) {
+            wsRef.current.close();
+        }
+
+        try {
+            // Determine WebSocket URL based on environment
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const host = import.meta.env.VITE_API_URL?.replace(/^https?:\/\//, '') || 'localhost:8000';
+            const wsUrl = `${protocol}//${host}/v1/Hub/Boards/${boardId}/ws`;
+
+            console.log(`🔌 Connecting to WebSocket: ${wsUrl}`);
+
+            const ws = new WebSocket(wsUrl);
+            wsRef.current = ws;
+
+            ws.onopen = () => {
+                console.log(`✅ WebSocket connected to board ${boardId}`);
+                reconnectAttemptsRef.current = 0; // Reset reconnect attempts on successful connection
+            };
+
+            ws.onmessage = (event) => {
+                try {
+                    const message: WebSocketMessage = JSON.parse(event.data);
+                    console.log('📨 WebSocket message:', message);
+
+                    switch (message.type) {
+                        case 'connected':
+                            console.log('✅ WebSocket connection confirmed');
+                            break;
+
+                        case 'board_update':
+                            console.log(`🔄 Board update: ${message.action}`);
+                            if (onUpdate) {
+                                onUpdate();
+                            }
+                            break;
+
+                        case 'pong':
+                            // Heartbeat response
+                            break;
+
+                        case 'error':
+                            console.error('❌ WebSocket error:', message.message);
+                            break;
+
+                        default:
+                            console.log('Unknown message type:', message.type);
+                    }
+                } catch (error) {
+                    console.error('Error parsing WebSocket message:', error);
+                }
+            };
+
+            ws.onerror = (error) => {
+                console.error('❌ WebSocket error:', error);
+            };
+
+            ws.onclose = (event) => {
+                console.log(`🔌 WebSocket disconnected from board ${boardId}`, event.code, event.reason);
+                wsRef.current = null;
+
+                // Attempt to reconnect if not manually closed and within retry limit
+                if (event.code !== 1000 && reconnectAttemptsRef.current < maxReconnectAttempts && enabled) {
+                    reconnectAttemptsRef.current++;
+                    console.log(`🔄 Reconnecting... (Attempt ${reconnectAttemptsRef.current}/${maxReconnectAttempts})`);
+
+                    reconnectTimeoutRef.current = setTimeout(() => {
+                        connect();
+                    }, reconnectDelay);
+                }
+            };
+
+        } catch (error) {
+            console.error('Error creating WebSocket connection:', error);
+        }
+    }, [boardId, onUpdate, enabled]);
+
+    const disconnect = useCallback(() => {
+        if (reconnectTimeoutRef.current) {
+            clearTimeout(reconnectTimeoutRef.current);
+        }
+
+        if (wsRef.current) {
+            wsRef.current.close(1000, 'Component unmounted');
+            wsRef.current = null;
+        }
+    }, []);
+
+    const sendMessage = useCallback((message: WebSocketMessage) => {
+        if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+            wsRef.current.send(JSON.stringify(message));
+        } else {
+            console.warn('WebSocket is not connected');
+        }
+    }, []);
+
+    // Notify server when board changes locally
+    const notifyBoardChange = useCallback((action: string) => {
+        sendMessage({
+            type: 'board_changed',
+            action,
+            timestamp: new Date().toISOString()
+        });
+    }, [sendMessage]);
+
+    // Setup heartbeat to keep connection alive
+    useEffect(() => {
+        if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return;
+
+        const heartbeatInterval = setInterval(() => {
+            if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+                sendMessage({ type: 'ping' });
+            }
+        }, 30000); // Send ping every 30 seconds
+
+        return () => clearInterval(heartbeatInterval);
+    }, [sendMessage]);
+
+    // Connect on mount, disconnect on unmount
+    useEffect(() => {
+        connect();
+        return () => disconnect();
+    }, [connect, disconnect]);
+
+    return {
+        isConnected: wsRef.current?.readyState === WebSocket.OPEN,
+        sendMessage,
+        notifyBoardChange,
+        reconnect: connect
+    };
+};

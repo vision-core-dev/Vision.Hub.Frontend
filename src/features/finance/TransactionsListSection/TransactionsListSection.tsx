@@ -2,7 +2,7 @@ import React from "react";
 import { ArrowUpRight, ArrowDownRight, HandCoins, CheckSquare, Calendar, User } from "lucide-react";
 import { safeDatetime } from "@/shared/utils/safeDate.ts";
 import { FeaturedIcon } from "@/shared/assets/icons/featured-icon/featured-icon.tsx";
-import { AvatarLabelGroup } from "@/shared/ui/avatar/avatar-label-group.tsx";
+import { AvatarLabelGroupWithDropdown } from "@/shared/ui/avatar";
 import { cx } from "@/shared/utils/cx";
 
 export interface TransactionItem {
@@ -50,21 +50,35 @@ const TransactionsListSection: React.FC<TransactionsListSectionProps> = ({ trans
     };
 
     return (
-        <section className="flex flex-col gap-4 py-2">
-            <h3 className="font-semibold text-primary">Трансакції</h3>
-            <div className="flex flex-col gap-3">
-                {sortedList.map((t) => {
-                    const { icon, color } = getIconProps(t.type);
-                    const isIncome = t.type === "income";
+        <div className="flex flex-col gap-3">
+            {sortedList.map((t) => {
+                const { icon, color } = getIconProps(t.type);
+                const isIncome = t.type === "income";
 
-                    return (
-                        <div
-                            key={t.id}
-                            className="flex flex-col gap-3 rounded-xl border border-secondary bg-primary p-4 shadow-2xs sm:flex-row sm:items-start sm:gap-4"
-                        >
-                            <div className="flex w-full items-start justify-between gap-4 sm:w-auto sm:justify-start">
-                                <FeaturedIcon icon={icon} color={color} theme="modern" size="md" />
-                                <div className="block sm:hidden">
+                return (
+                    <div
+                        key={t.id}
+                        className="flex flex-col gap-3 rounded-xl border border-secondary bg-primary p-4 shadow-2xs sm:flex-row sm:items-start sm:gap-4"
+                    >
+                        <div className="flex w-full items-start justify-between gap-4 sm:w-auto sm:justify-start">
+                            <FeaturedIcon icon={icon} color={color} theme="modern" size="md" />
+                            <div className="block sm:hidden">
+                                <span className={cx("whitespace-nowrap font-semibold", isIncome ? "text-success-primary" : "text-primary")}>
+                                    {isIncome ? "+" : ""}
+                                    {t.amount.toFixed(2)} ₴
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className="flex flex-1 flex-col gap-1">
+                            <div className="flex items-start justify-between">
+                                <div className="flex flex-col">
+                                    <p className="font-semibold text-primary">{t.name}</p>
+                                    <div className="flex items-center gap-2 text-sm text-tertiary">
+                                        <span>{safeDatetime(t.transaction_at)}</span>
+                                    </div>
+                                </div>
+                                <div className="hidden sm:block">
                                     <span className={cx("whitespace-nowrap font-semibold", isIncome ? "text-success-primary" : "text-primary")}>
                                         {isIncome ? "+" : ""}
                                         {t.amount.toFixed(2)} ₴
@@ -72,64 +86,48 @@ const TransactionsListSection: React.FC<TransactionsListSectionProps> = ({ trans
                                 </div>
                             </div>
 
-                            <div className="flex flex-1 flex-col gap-1">
-                                <div className="flex items-start justify-between">
-                                    <div className="flex flex-col">
-                                        <p className="font-semibold text-primary">{t.name}</p>
-                                        <div className="flex items-center gap-2 text-sm text-tertiary">
-                                            <span>{safeDatetime(t.transaction_at)}</span>
+                            {(t.task || t.author) && (
+                                <div className="mt-2 flex flex-col gap-3 border-t border-secondary pt-3 sm:flex-row sm:items-center sm:gap-6">
+                                    {t.task && (
+                                        <div className="flex items-start gap-2 text-sm text-secondary">
+                                            <CheckSquare className="mt-0.5 size-4 shrink-0 text-tertiary" />
+                                            <div className="flex flex-col">
+                                                <span className="font-medium text-primary">{t.task.name}</span>
+                                                {(t.task.start_at || t.task.deadline_at) && (
+                                                    <div className="flex items-center gap-1.5 text-xs text-tertiary">
+                                                        <Calendar className="size-3" />
+                                                        <span>
+                                                            {t.task.start_at ? new Date(t.task.start_at).toLocaleDateString() : "..."}
+                                                            {" - "}
+                                                            {t.task.deadline_at ? new Date(t.task.deadline_at).toLocaleDateString() : "..."}
+                                                        </span>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div className="hidden sm:block">
-                                        <span className={cx("whitespace-nowrap font-semibold", isIncome ? "text-success-primary" : "text-primary")}>
-                                            {isIncome ? "+" : ""}
-                                            {t.amount.toFixed(2)} ₴
-                                        </span>
-                                    </div>
+                                    )}
+
+                                    {t.author && (
+                                        <div className="flex items-center gap-2 text-sm text-secondary sm:ml-auto">
+                                            <User className="size-4 shrink-0 text-tertiary sm:hidden" />
+                                            <div className="flex items-center gap-2">
+                                                <AvatarLabelGroupWithDropdown
+                                                    size="sm"
+                                                    src={t.author.avatar_url}
+                                                    title={t.author.name}
+                                                    userId={t.author.id}
+                                                // subtitle="Автор"
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
-
-                                {(t.task || t.author) && (
-                                    <div className="mt-2 flex flex-col gap-3 border-t border-secondary pt-3 sm:flex-row sm:items-center sm:gap-6">
-                                        {t.task && (
-                                            <div className="flex items-start gap-2 text-sm text-secondary">
-                                                <CheckSquare className="mt-0.5 size-4 shrink-0 text-tertiary" />
-                                                <div className="flex flex-col">
-                                                    <span className="font-medium text-primary">{t.task.name}</span>
-                                                    {(t.task.start_at || t.task.deadline_at) && (
-                                                        <div className="flex items-center gap-1.5 text-xs text-tertiary">
-                                                            <Calendar className="size-3" />
-                                                            <span>
-                                                                {t.task.start_at ? new Date(t.task.start_at).toLocaleDateString() : "..."}
-                                                                {" - "}
-                                                                {t.task.deadline_at ? new Date(t.task.deadline_at).toLocaleDateString() : "..."}
-                                                            </span>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {t.author && (
-                                            <div className="flex items-center gap-2 text-sm text-secondary sm:ml-auto">
-                                                <User className="size-4 shrink-0 text-tertiary sm:hidden" />
-                                                <div className="flex items-center gap-2">
-                                                    <AvatarLabelGroup
-                                                        size="sm"
-                                                        src={t.author.avatar_url}
-                                                        title={t.author.name}
-                                                    // subtitle="Автор"
-                                                    />
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
-                            </div>
+                            )}
                         </div>
-                    );
-                })}
-            </div>
-        </section>
+                    </div>
+                );
+            })}
+        </div>
     );
 };
 

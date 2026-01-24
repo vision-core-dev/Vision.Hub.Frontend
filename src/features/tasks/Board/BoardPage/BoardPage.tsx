@@ -10,6 +10,7 @@ import { SlidersVertical } from "lucide-react";
 import BoardSettings from "./BoardSettings/BoardSettings.tsx";
 import TaskDetailsModal from "../TaskDetails/TaskDetailsModal.tsx";
 import { ButtonUtility } from "@/shared/ui/buttons/button-utility.tsx";
+import { useBoardWebSocket } from "@/shared/hooks/useBoardWebSocket.ts";
 
 
 export type Task = {
@@ -101,19 +102,23 @@ const BoardPage = ({ is_public = false }: Props) => {
         }
     }, [id, is_public]);
 
-    // 🟦 Запит на бекенд
-    useEffect(() => {
-        let interval: ReturnType<typeof setInterval>;
+    // 🔌 WebSocket connection for real-time updates
+    const { notifyBoardChange } = useBoardWebSocket({
+        boardId: id,
+        onUpdate: () => {
+            console.log("📡 Received board update via WebSocket, refreshing...");
+            fetchBoard(true);
+        },
+        enabled: !is_public // Only enable WebSocket for non-public boards
+    });
 
+    // 🟦 Initial fetch
+    useEffect(() => {
         if (id) {
             fetchBoard();
-            interval = setInterval(() => {
-                fetchBoard(true);
-            }, 5000);
         }
-
-        return () => clearInterval(interval);
     }, [id, fetchBoard]);
+
 
     const handleTaskMove = (taskId: string, toListId: string, newIndex: number): Task | null => {
         if (!boardDetails) return null;
@@ -147,6 +152,9 @@ const BoardPage = ({ is_public = false }: Props) => {
         if (movedTask) {
             setBoardDetails({ ...boardDetails, lists: updatedLists });
             setBoardLists(updatedLists);
+
+            // Notify other clients via WebSocket
+            notifyBoardChange('task_moved');
         }
 
         return movedTask;

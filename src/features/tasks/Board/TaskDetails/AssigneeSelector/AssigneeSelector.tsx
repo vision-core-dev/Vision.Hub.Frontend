@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Plus, X, Search } from "lucide-react";
 import { Dropdown } from "@/shared/ui/dropdown/dropdown";
 import { Avatar } from "@/shared/ui/avatar/avatar";
-import { AvatarLabelGroup } from "@/shared/ui/avatar/avatar-label-group";
+import { AvatarLabelGroupWithDropdown } from "@/shared/ui/avatar";
 import { ButtonUtility } from "@/shared/ui/buttons/button-utility";
 import { api } from "@/shared/utils/api";
 import styles from "./AssigneeSelector.module.css";
@@ -110,11 +110,13 @@ export const AssigneeSelector = ({ taskId, assignees, onUpdate }: Props) => {
                                     className={styles.option}
                                     onClick={() => assign(u)}
                                 >
-                                    <AvatarLabelGroup
+                                    <AvatarLabelGroupWithDropdown
                                         size="md"
                                         src={u.avatar_url}
                                         title={`${u.first_name} ${u.last_name ?? ""}`}
                                         subtitle={u.role.name}
+                                        userId={u.id}
+                                        disableDropdown
                                     />
                                 </div>
                             ))}

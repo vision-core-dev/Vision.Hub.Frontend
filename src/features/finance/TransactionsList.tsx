@@ -8,7 +8,7 @@ import { api } from "@/shared/utils/api.ts";
 import { safeDatetime } from "@/shared/utils/safeDate.ts";
 import type { UserType } from "@/shared/types/Users.ts";
 import { Button } from "@/shared/ui/buttons/button.tsx";
-import { AvatarLabelGroup } from "@/shared/ui/avatar/avatar-label-group";
+import { AvatarLabelGroupWithDropdown } from "@/shared/ui/avatar";
 
 interface Transaction {
     id: string;
@@ -95,11 +95,12 @@ const TransactionsList: React.FC = () => {
                                     {(() => {
                                         const user = userMap.get(item.user_id);
                                         return user ? (
-                                            <AvatarLabelGroup
+                                            <AvatarLabelGroupWithDropdown
                                                 src={user.avatar_url || undefined}
                                                 title={`${user.first_name || ""} ${user.last_name || ""}`}
                                                 size="sm"
-                                                onClick={() => navigate(`/users/u/${user.id}`)}
+                                                userId={user.id}
+                                                onViewProfile={() => navigate(`/users/u/${user.id}`)}
                                             />
                                         ) : (
                                             <span className={styles.unknownUser}>Невідомо</span>

@@ -1,16 +1,16 @@
 import type { FC, HTMLAttributes } from "react";
 import { useCallback, useEffect, useRef } from "react";
 import type { Placement } from "@react-types/overlays";
-import {BookOpen01, LogOut01, Settings01} from "@untitledui/icons";
+import { BookOpen01, LogOut01, Settings01 } from "@untitledui/icons";
 import { useFocusManager } from "react-aria";
 import type { DialogProps as AriaDialogProps } from "react-aria-components";
 import { Button as AriaButton, Dialog as AriaDialog, DialogTrigger as AriaDialogTrigger, Popover as AriaPopover } from "react-aria-components";
-import { AvatarLabelGroup } from "@/shared/ui/avatar/avatar-label-group";
+import { AvatarLabelGroupWithDropdown } from "@/shared/ui/avatar";
 import { useBreakpoint } from "@/shared/hooks/use-breakpoint";
 import { cx } from "@/shared/utils/cx";
-import {useAuth} from "@/core/auth/AuthContext.tsx";
-import {useNavigate} from "react-router-dom";
-import {Wallet} from "lucide-react";
+import { useAuth } from "@/core/auth/AuthContext.tsx";
+import { useNavigate } from "react-router-dom";
+import { Wallet } from "lucide-react";
 
 type NavAccountType = {
     /** Unique identifier for the nav item. */
@@ -32,7 +32,7 @@ export const NavAccountMenu = ({
     const focusManager = useFocusManager();
     const dialogRef = useRef<HTMLDivElement>(null);
 
-    const {logout} = useAuth();
+    const { logout } = useAuth();
     const navigate = useNavigate();
 
     const onKeyDown = useCallback(
@@ -124,8 +124,8 @@ interface NavAccountCardProps {
 }
 
 export const NavAccountCard = ({
-                                   popoverPlacement, balance, balanceEnabled
-                               }: NavAccountCardProps) => {
+    popoverPlacement, balance, balanceEnabled
+}: NavAccountCardProps) => {
     const triggerRef = useRef<HTMLButtonElement>(null);
     const isDesktop = useBreakpoint("lg");
     const { user, role } = useAuth();
@@ -143,14 +143,16 @@ export const NavAccountCard = ({
                     "outline-focus-ring focus-visible:outline-2 focus-visible:outline-offset-2"
                 )}
             >
-                <AvatarLabelGroup
+                <AvatarLabelGroupWithDropdown
                     size="md"
                     src={user.avatar_url}
                     title={user.first_name}
                     subtitle={role.name}
+                    userId={user.id}
+                    disableDropdown
                 />
 
-                { balanceEnabled && (
+                {balanceEnabled && (
                     <div className="ml-auto text-right">
                         <div className="text-xs text-tertiary">Баланс</div>
                         <div className="text-sm font-semibold text-primary">

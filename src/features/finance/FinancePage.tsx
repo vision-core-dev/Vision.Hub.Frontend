@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import type { UserType } from "@/shared/types/Users.ts";
 import { api } from "@/shared/utils/api.ts";
 import { Button } from "@/shared/ui/buttons/button.tsx";
-import { AvatarLabelGroup } from "@/shared/ui/avatar/avatar-label-group";
+import { AvatarLabelGroupWithDropdown } from "@/shared/ui/avatar";
 
 interface NoWithdrawnDataRes {
     items: Array<{
@@ -92,11 +92,12 @@ const FinancePage: React.FC = () => {
                             }) => (
                                 <Table.Row id={item.user.id}>
                                     <Table.Cell>
-                                        <AvatarLabelGroup
+                                        <AvatarLabelGroupWithDropdown
                                             src={item.user.avatar_url || undefined}
                                             title={`${item.user.first_name || ""} ${item.user.last_name || ""}`}
                                             size="sm"
-                                            onClick={() => navigate(`/users/u/${item.user.id}`)}
+                                            userId={item.user.id}
+                                            onViewProfile={() => navigate(`/users/u/${item.user.id}`)}
                                         />
                                     </Table.Cell>
                                     <Table.Cell>{item.amount.toFixed(2)} ₴</Table.Cell>

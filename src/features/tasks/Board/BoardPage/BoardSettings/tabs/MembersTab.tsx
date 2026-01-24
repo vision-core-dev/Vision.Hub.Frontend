@@ -2,8 +2,8 @@ import { useMemo, useState } from "react";
 import { api } from "@/shared/utils/api";
 import { Trash } from "lucide-react";
 import { Select } from "@/shared/ui/select/select";
-import { AvatarLabelGroup } from "@/shared/ui/avatar/avatar-label-group";
-import {Button} from "@/shared/ui/buttons/button.tsx";
+import { AvatarLabelGroupWithDropdown } from "@/shared/ui/avatar";
+import { Button } from "@/shared/ui/buttons/button.tsx";
 
 /* ===================== TYPES ===================== */
 
@@ -42,11 +42,11 @@ const ROLE_ITEMS = [
 /* ===================== COMPONENT ===================== */
 
 export default function MembersTab({
-                                       boardId,
-                                       members,
-                                       users,
-                                       onUpdate,
-                                   }: MembersTabProps) {
+    boardId,
+    members,
+    users,
+    onUpdate,
+}: MembersTabProps) {
     const [newMemberId, setNewMemberId] = useState<string | null>(null);
     const [newMemberRole, setNewMemberRole] = useState("member");
     const [loading, setLoading] = useState(false);
@@ -70,9 +70,8 @@ export default function MembersTab({
         () =>
             availableUsers.map((u) => ({
                 id: u.id,
-                label: `${u.first_name || "Без імені"}${
-                    u.last_name ? ` ${u.last_name}` : ""
-                }`,
+                label: `${u.first_name || "Без імені"}${u.last_name ? ` ${u.last_name}` : ""
+                    }`,
                 supportingText: u?.role?.name,
                 avatarUrl: u.avatar_url,
             })),
@@ -209,14 +208,15 @@ export default function MembersTab({
                             className="flex items-center justify-between py-3"
                         >
                             <div className="flex items-center gap-3">
-                                <AvatarLabelGroup
+                                <AvatarLabelGroupWithDropdown
                                     size="md"
                                     src={m.avatar_url}
-                                    title={`${m.first_name}${
-                                        m.last_name
+                                    title={`${m.first_name}${m.last_name
                                             ? ` ${m.last_name}`
                                             : ""
-                                    }`}
+                                        }`}
+                                    userId={m.id}
+                                    disableDropdown
                                 />
 
                                 <Select

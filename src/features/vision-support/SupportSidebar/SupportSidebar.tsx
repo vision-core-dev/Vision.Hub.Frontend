@@ -1,10 +1,10 @@
 import { useNavigate, useParams } from "react-router-dom";
 import styles from "./SupportSidebar.module.css";
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import LoaderDots from "@/shared/ui/loader-dots/LoaderDots.tsx";
-import {api} from "@/shared/utils/api.ts";
-import {AvatarLabelGroup} from "@/shared/ui/avatar/avatar-label-group.tsx";
-import {Badge} from "@/shared/ui/badges/badges.tsx";
+import { api } from "@/shared/utils/api.ts";
+import { AvatarLabelGroupWithDropdown } from "@/shared/ui/avatar";
+import { Badge } from "@/shared/ui/badges/badges.tsx";
 
 interface VisionSupportUser {
     telegram_id: number
@@ -66,15 +66,14 @@ function SupportSidebar({ onSelectChat }: { onSelectChat?: () => void }) {
                     {botUsers.map(u => (
                         <div
                             key={u.telegram_id}
-                            className={`${styles.item} ${
-                                String(u.telegram_id) === telegramUserId ? styles.active : ""
-                            }`}
+                            className={`${styles.item} ${String(u.telegram_id) === telegramUserId ? styles.active : ""
+                                }`}
                             onClick={() => {
                                 navigate(`/vision-support/${u.telegram_id}`);
                                 if (onSelectChat) onSelectChat();
                             }}
                         >
-                            <AvatarLabelGroup size="md" title={u.username || `ID ${u.telegram_id}`} subtitle={`${u.first_name || ""} ${u.last_name || ""}`} />
+                            <AvatarLabelGroupWithDropdown size="md" title={u.username || `ID ${u.telegram_id}`} subtitle={`${u.first_name || ""} ${u.last_name || ""}`} userId={String(u.telegram_id)} disableDropdown />
 
                             {u.new_messages > 0 && String(u.telegram_id) !== telegramUserId && (
                                 <Badge color="error">{u.new_messages}</Badge>

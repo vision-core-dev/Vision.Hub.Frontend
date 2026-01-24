@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {Heading, type SortDescriptor} from "react-aria-components";
-import {Eye, Plus, User01} from "@untitledui/icons";
+import { Heading, type SortDescriptor } from "react-aria-components";
+import { Eye, Plus, User01 } from "@untitledui/icons";
 
 import { api } from "@/shared/utils/api";
 import DefaultPage from "@/shared/ui/default-page/DefaultPage";
@@ -12,26 +12,26 @@ import {
 } from "@/shared/components/table/table";
 
 import { Button } from "@/shared/ui/buttons/button";
-import type {UserType} from "@/shared/types/Users.ts";
-import {safeDate} from "@/shared/utils/safeDate.ts";
-import {getAge} from "@/shared/utils/date.ts";
-import {AvatarLabelGroup} from "@/shared/ui/avatar/avatar-label-group.tsx";
-import {Dialog, DialogTrigger, Modal, ModalOverlay} from "@/shared/components/modals/modal.tsx";
-import {BackgroundPattern} from "@/shared/assets/background-patterns";
-import {FeaturedIcon} from "@/shared/assets/icons/featured-icon/featured-icon.tsx";
-import {CloseButton} from "@/shared/ui/buttons/close-button.tsx";
-import {Input, InputBase} from "@/shared/ui/input/input.tsx";
-import {InputGroup} from "@/shared/ui/input/input-group.tsx";
-import {Shuffle} from "lucide-react";
-import type {Role} from "@/features/users/UserDetails/UserDetailsPage.tsx";
-import {Select} from "@/shared/ui/select/select.tsx";
+import type { UserType } from "@/shared/types/Users.ts";
+import { safeDate } from "@/shared/utils/safeDate.ts";
+import { getAge } from "@/shared/utils/date.ts";
+import { AvatarLabelGroupWithDropdown } from "@/shared/ui/avatar";
+import { Dialog, DialogTrigger, Modal, ModalOverlay } from "@/shared/components/modals/modal.tsx";
+import { BackgroundPattern } from "@/shared/assets/background-patterns";
+import { FeaturedIcon } from "@/shared/assets/icons/featured-icon/featured-icon.tsx";
+import { CloseButton } from "@/shared/ui/buttons/close-button.tsx";
+import { Input, InputBase } from "@/shared/ui/input/input.tsx";
+import { InputGroup } from "@/shared/ui/input/input-group.tsx";
+import { Shuffle } from "lucide-react";
+import type { Role } from "@/features/users/UserDetails/UserDetailsPage.tsx";
+import { Select } from "@/shared/ui/select/select.tsx";
 
 
 const UsersTable = ({
-                        title,
-                        users,
-                        onRowClick,
-                    }: {
+    title,
+    users,
+    onRowClick,
+}: {
     title: string;
     users: UserType[];
     onRowClick: (u: UserType) => void;
@@ -78,12 +78,14 @@ const UsersTable = ({
                     {(user) => (
                         <Table.Row id={user.id}>
                             <Table.Cell>
-                                <AvatarLabelGroup
+                                <AvatarLabelGroupWithDropdown
                                     src={user.avatar_url}
                                     alt={user.first_name}
                                     size="md"
                                     title={`${user.first_name} ${user.last_name || ""}`}
                                     subtitle={user.role.name}
+                                    userId={user.id}
+                                    onViewProfile={() => onRowClick(user)}
                                 />
                             </Table.Cell>
 
@@ -230,17 +232,17 @@ const CreateUserModal = ({ isOpen, setIsOpen }: CreateUserModalProps) => {
                             <div className="flex flex-col justify-start gap-4 px-4 pt-5 sm:px-6">
 
                                 <Input isRequired label="Ім'я користувача" placeholder="Тестовий"
-                                       value={form.first_name}
-                                       onChange={(value) =>
-                                           setForm({ ...form, first_name: value })
-                                       }
+                                    value={form.first_name}
+                                    onChange={(value) =>
+                                        setForm({ ...form, first_name: value })
+                                    }
                                 />
 
                                 <Input isRequired label="Email" type="email" placeholder="test@mail.com"
-                                       value={form.email}
-                                       onChange={(value) =>
-                                           setForm({ ...form, email: value })
-                                       }
+                                    value={form.email}
+                                    onChange={(value) =>
+                                        setForm({ ...form, email: value })
+                                    }
                                 />
 
                                 <InputGroup
@@ -262,7 +264,7 @@ const CreateUserModal = ({ isOpen, setIsOpen }: CreateUserModalProps) => {
                                     <InputBase
                                         value={form.password}
                                         onChange={(value: string) =>
-                                            setForm({...form, password: value})
+                                            setForm({ ...form, password: value })
                                         }
                                         placeholder="••••••••"
                                     />

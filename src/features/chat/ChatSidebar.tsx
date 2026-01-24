@@ -2,8 +2,8 @@ import { useState } from "react";
 import type { Key } from "react-aria-components";
 import { Tabs } from "@/shared/components/tabs/tabs";
 import { Button } from "@/shared/ui/buttons/button";
-import {PlusSquare} from "@untitledui/icons";
-import {AvatarLabelGroup} from "@/shared/ui/avatar/avatar-label-group.tsx";
+import { PlusSquare } from "@untitledui/icons";
+import { AvatarLabelGroupWithDropdown } from "@/shared/ui/avatar";
 
 const tabs = [
     { id: "direct", label: "Особисті" },
@@ -48,7 +48,7 @@ function ChatList({ type }: { type: "direct" | "group" }) {
     return (
         <div className="flex flex-col gap-4 p-2">
             {items.map((name) => (
-                <AvatarLabelGroup size="md" title={name} subtitle="Останнє повідомлення" />
+                <AvatarLabelGroupWithDropdown size="md" title={name} subtitle="Останнє повідомлення" />
             ))}
         </div>
     );
