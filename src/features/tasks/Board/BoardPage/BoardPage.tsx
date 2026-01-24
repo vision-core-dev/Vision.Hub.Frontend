@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import styles from "./BoardPage.module.css";
 import ListItem from "../ListItem/ListItem";
 import { useParams } from "react-router-dom";
@@ -9,10 +9,10 @@ import { useDragScroll } from "@/shared/utils/useDragScroll.ts";
 import { SlidersVertical } from "lucide-react";
 import BoardSettings from "./BoardSettings/BoardSettings.tsx";
 import TaskDetailsModal from "../TaskDetails/TaskDetailsModal.tsx";
-import { ButtonUtility } from "@/shared/ui/buttons/button-utility.tsx";
 import { useBoardWebSocket, type ActiveUser } from "@/shared/hooks/useBoardWebSocket.ts";
 import { useAuth } from "@/core/auth/AuthContext.tsx";
 import { Avatar } from "@/shared/ui/avatar/avatar.tsx";
+import { Button } from "@/shared/ui/buttons/button.tsx";
 
 
 export type Task = {
@@ -106,22 +106,28 @@ const BoardPage = ({ is_public = false }: Props) => {
         }
     }, [id, is_public]);
 
+    const currentUser = useMemo(() => user ? {
+        user_id: user.id,
+        name: `${user.first_name} ${user.last_name || ''}`.trim(),
+        avatar_url: user.avatar_url ?? undefined
+    } : undefined, [user]);
+
+    const handleBoardUpdate = useCallback(() => {
+        console.log("📡 Received board update via WebSocket, refreshing...");
+        fetchBoard(true);
+    }, [fetchBoard]);
+
+    const handleUserPresenceChange = useCallback((users: ActiveUser[]) => {
+        // console.log("👥 Active users updated:", users);
+        setActiveUsers(users);
+    }, []);
+
     // 🔌 WebSocket connection for real-time updates
     const { notifyBoardChange } = useBoardWebSocket({
         boardId: id,
-        currentUser: user ? {
-            user_id: user.id,
-            name: `${user.first_name} ${user.last_name || ''}`.trim(),
-            avatar_url: user.avatar_url ?? undefined
-        } : undefined,
-        onUpdate: () => {
-            console.log("📡 Received board update via WebSocket, refreshing...");
-            fetchBoard(true);
-        },
-        onUserPresenceChange: (users) => {
-            console.log("👥 Active users updated:", users);
-            setActiveUsers(users);
-        },
+        currentUser,
+        onUpdate: handleBoardUpdate,
+        onUserPresenceChange: handleUserPresenceChange,
         enabled: !is_public // Only enable WebSocket for non-public boards
     });
 
@@ -181,9 +187,8 @@ const BoardPage = ({ is_public = false }: Props) => {
             <div className={styles.header}>
                 <h1 className={styles.title}>{boardDetails.board.name}</h1>
 
-                {/* Active Users */}
-                {activeUsers.length > 0 && (
-                    <div className="flex items-center gap-2 ml-4">
+                <div className="flex items-center gap-2 ml-4">
+                    {activeUsers.length > 0 && (
                         <div className="flex -space-x-2">
                             {activeUsers.slice(0, 5).map((user) => (
                                 <Avatar
@@ -191,19 +196,13 @@ const BoardPage = ({ is_public = false }: Props) => {
                                     size="sm"
                                     src={user.avatar_url}
                                     initials={user.name.split(' ').map(n => n[0]).join('')}
-                                    className="ring-2 ring-primary"
                                 />
                             ))}
                         </div>
-                        <span className="text-sm text-tertiary">
-                            {activeUsers.length} {activeUsers.length === 1 ? 'користувач' : 'користувачів'} онлайн
-                        </span>
-                    </div>
-                )}
+                    )}
 
-                <div className={styles.extraActions}>
                     {is_public || (
-                        <ButtonUtility onClick={() => setShowSettings(!showSettings)} icon={SlidersVertical} />
+                        <Button color="secondary" onClick={() => setShowSettings(!showSettings)} iconLeading={SlidersVertical} />
                     )}
                 </div>
             </div>
@@ -250,7 +249,7 @@ const BoardPage = ({ is_public = false }: Props) => {
                 boardLists={boardLists}
             />
 
-        </div>
+        </div >
     );
 };
 

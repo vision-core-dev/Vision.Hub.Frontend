@@ -73,11 +73,23 @@ export const useBoardWebSocket = ({ boardId, onUpdate, onUserPresenceChange, ena
             ws.onmessage = (event) => {
                 try {
                     const message: WebSocketMessage = JSON.parse(event.data);
-                    console.log('📨 WebSocket message:', message);
+
+                    // Filter out ping/pong to reduce noise
+                    if (message.type !== 'pong') {
+                        console.log('📨 WebSocket message:', message);
+                    }
 
                     switch (message.type) {
                         case 'connected':
-                            console.log('✅ WebSocket connection confirmed');
+                            console.log('✅ WebSocket connection confirmed. Board:', message.board_id);
+                            // Ensure we identify if we haven't already
+                            if (currentUser && ws.readyState === WebSocket.OPEN) {
+                                console.log('🆔 Sending identification for:', currentUser.name);
+                                ws.send(JSON.stringify({
+                                    type: 'user_identify',
+                                    user: currentUser
+                                }));
+                            }
                             break;
 
                         case 'identified':
@@ -85,8 +97,9 @@ export const useBoardWebSocket = ({ boardId, onUpdate, onUserPresenceChange, ena
                             break;
 
                         case 'user_presence':
-                            console.log(`👥 Active users (${message.count}):`, message.users);
+                            // Handle user presence updates
                             const users = message.users || [];
+                            console.log(`👥 Active users update (${users.length}):`, users.map(u => u.name));
                             setActiveUsers(users);
                             if (onUserPresenceChange) {
                                 onUserPresenceChange(users);
@@ -101,15 +114,15 @@ export const useBoardWebSocket = ({ boardId, onUpdate, onUserPresenceChange, ena
                             break;
 
                         case 'pong':
-                            // Heartbeat response
+                            // Heartbeat response, ignore
                             break;
 
                         case 'error':
-                            console.error('❌ WebSocket error:', message.message);
+                            console.error('❌ WebSocket server error:', message.message);
                             break;
 
                         default:
-                            console.log('Unknown message type:', message.type);
+                            console.warn('Unknown message type received:', message.type);
                     }
                 } catch (error) {
                     console.error('Error parsing WebSocket message:', error);

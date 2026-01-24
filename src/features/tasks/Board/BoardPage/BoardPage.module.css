@@ -41,6 +41,7 @@
     user-select: none;
     touch-action: pan-y;
 }
+
 .lists.dragging,
 .lists.active {
     cursor: grabbing;
@@ -70,22 +71,6 @@
     gap: 4px;
 }
 
-.extraActions button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255, 255, 255, 0.3);
-    border: none;
-    border-radius: 6px;
-    color: #ffffff;
-    cursor: pointer;
-    font-size: 14px;
-    padding: 6px 12px;
-    transition: background 0.2s;
-}
-.extraActions button:hover {
-    background: rgba(255, 255, 255, 0.2);
-}
 
 .title {
     overflow: hidden;
