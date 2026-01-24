@@ -19,11 +19,9 @@ import {
     Activity,
     Users,
     DollarSign,
-    BarChart3,
     FileText,
     MessageSquare,
     ListTodo,
-    Filter,
     ChevronRight,
     Settings
 } from "lucide-react";
@@ -37,7 +35,6 @@ import { Select } from "@/shared/ui/select/select.tsx";
 import { AvatarLabelGroupWithDropdown } from "@/shared/ui/avatar";
 import type { Key } from "react-aria-components";
 import { User01 } from "@untitledui/icons";
-import { Avatar } from "@/shared/ui/avatar/avatar.tsx";
 import { Dialog, DialogTrigger, Modal, ModalOverlay } from "@/shared/components/modals/modal";
 import { isOnline } from "@/shared/utils/users-utils.ts";
 
@@ -92,8 +89,6 @@ const UserDetailsPage = () => {
     const [selectedRole, setSelectedRole] = useState<Key | null>("");
 
     const [allUsers, setAllUsers] = useState<UserType[]>([]);
-
-    const [editStructure, setEditStructure] = useState(false);
 
     const [loading, setLoading] = useState(true);
     const [changingRole, setChangingRole] = useState(false);
@@ -587,17 +582,17 @@ const FinanceCard = ({ label, value, highlight }: FinanceCardProps) => (
     </div>
 );
 
-interface PerformanceMetricProps {
-    label: string;
-    value: string;
-}
+// interface PerformanceMetricProps {
+//     label: string;
+//     value: string;
+// }
 
-const PerformanceMetric = ({ label, value }: PerformanceMetricProps) => (
-    <div className="flex items-center justify-between rounded-lg border border-secondary bg-secondary/30 px-4 py-3 transition-all hover:bg-secondary/50">
-        <span className="text-sm text-tertiary">{label}</span>
-        <span className="text-sm font-semibold text-primary">{value}</span>
-    </div>
-);
+// const PerformanceMetric = ({ label, value }: PerformanceMetricProps) => (
+//     <div className="flex items-center justify-between rounded-lg border border-secondary bg-secondary/30 px-4 py-3 transition-all hover:bg-secondary/50">
+//         <span className="text-sm text-tertiary">{label}</span>
+//         <span className="text-sm font-semibold text-primary">{value}</span>
+//     </div>
+// );
 
 interface ActivityItemProps {
     action: string;
@@ -846,7 +841,7 @@ interface TasksModalProps {
 const TasksModal = ({ isOpen, onOpenChange, userId, userName }: TasksModalProps) => {
     const [tasks, setTasks] = useState<UserTask[]>([]);
     const [filter, setFilter] = useState<'all' | 'active' | 'completed' | 'overdue'>('all');
-    const [loading, setLoading] = useState(false);
+    const [loading,] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
