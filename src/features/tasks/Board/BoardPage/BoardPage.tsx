@@ -10,7 +10,9 @@ import { SlidersVertical } from "lucide-react";
 import BoardSettings from "./BoardSettings/BoardSettings.tsx";
 import TaskDetailsModal from "../TaskDetails/TaskDetailsModal.tsx";
 import { ButtonUtility } from "@/shared/ui/buttons/button-utility.tsx";
-import { useBoardWebSocket } from "@/shared/hooks/useBoardWebSocket.ts";
+import { useBoardWebSocket, type ActiveUser } from "@/shared/hooks/useBoardWebSocket.ts";
+import { useAuth } from "@/core/auth/AuthContext.tsx";
+import { Avatar } from "@/shared/ui/avatar/avatar.tsx";
 
 
 export type Task = {
@@ -63,8 +65,10 @@ interface Props {
 
 const BoardPage = ({ is_public = false }: Props) => {
     const { id } = useParams();
+    const { user } = useAuth();
     const [boardDetails, setBoardDetails] = useState<BoardDetails | null>(null);
     const [boardLists, setBoardLists] = useState<List[]>([]);
+    const [activeUsers, setActiveUsers] = useState<ActiveUser[]>([]);
 
     const [loading, setLoading] = useState(true);
 
@@ -105,9 +109,18 @@ const BoardPage = ({ is_public = false }: Props) => {
     // 🔌 WebSocket connection for real-time updates
     const { notifyBoardChange } = useBoardWebSocket({
         boardId: id,
+        currentUser: user ? {
+            user_id: user.id,
+            name: `${user.first_name} ${user.last_name || ''}`.trim(),
+            avatar_url: user.avatar_url ?? undefined
+        } : undefined,
         onUpdate: () => {
             console.log("📡 Received board update via WebSocket, refreshing...");
             fetchBoard(true);
+        },
+        onUserPresenceChange: (users) => {
+            console.log("👥 Active users updated:", users);
+            setActiveUsers(users);
         },
         enabled: !is_public // Only enable WebSocket for non-public boards
     });
@@ -167,6 +180,27 @@ const BoardPage = ({ is_public = false }: Props) => {
         <div className={`${is_public ? styles.publicPage : styles.page}`} style={{ backgroundImage: `url(${boardDetails.board.banner_url || ""})` }}>
             <div className={styles.header}>
                 <h1 className={styles.title}>{boardDetails.board.name}</h1>
+
+                {/* Active Users */}
+                {activeUsers.length > 0 && (
+                    <div className="flex items-center gap-2 ml-4">
+                        <div className="flex -space-x-2">
+                            {activeUsers.slice(0, 5).map((user) => (
+                                <Avatar
+                                    key={user.user_id}
+                                    size="sm"
+                                    src={user.avatar_url}
+                                    initials={user.name.split(' ').map(n => n[0]).join('')}
+                                    className="ring-2 ring-primary"
+                                />
+                            ))}
+                        </div>
+                        <span className="text-sm text-tertiary">
+                            {activeUsers.length} {activeUsers.length === 1 ? 'користувач' : 'користувачів'} онлайн
+                        </span>
+                    </div>
+                )}
+
                 <div className={styles.extraActions}>
                     {is_public || (
                         <ButtonUtility onClick={() => setShowSettings(!showSettings)} icon={SlidersVertical} />

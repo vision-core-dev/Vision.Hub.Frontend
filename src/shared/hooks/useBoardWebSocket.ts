@@ -1,9 +1,15 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 
 interface UseBoardWebSocketOptions {
     boardId: string | undefined;
     onUpdate?: () => void;
+    onUserPresenceChange?: (users: ActiveUser[]) => void;
     enabled?: boolean;
+    currentUser?: {
+        user_id: string;
+        name: string;
+        avatar_url?: string;
+    };
 }
 
 interface WebSocketMessage {
@@ -13,18 +19,27 @@ interface WebSocketMessage {
     message?: string;
     board_id?: string;
     timestamp?: string;
+    users?: ActiveUser[];
+    count?: number;
+}
+
+export interface ActiveUser {
+    user_id: string;
+    name: string;
+    avatar_url?: string;
 }
 
 /**
  * Custom hook for managing WebSocket connection to a board
  * Automatically reconnects on disconnect and handles real-time updates
  */
-export const useBoardWebSocket = ({ boardId, onUpdate, enabled = true }: UseBoardWebSocketOptions) => {
+export const useBoardWebSocket = ({ boardId, onUpdate, onUserPresenceChange, enabled = true, currentUser }: UseBoardWebSocketOptions) => {
     const wsRef = useRef<WebSocket | null>(null);
     const reconnectTimeoutRef = useRef<number | undefined>(undefined);
     const reconnectAttemptsRef = useRef(0);
     const maxReconnectAttempts = 5;
     const reconnectDelay = 3000; // 3 seconds
+    const [activeUsers, setActiveUsers] = useState<ActiveUser[]>([]);
 
     const connect = useCallback(() => {
         if (!boardId || !enabled) return;
@@ -35,10 +50,7 @@ export const useBoardWebSocket = ({ boardId, onUpdate, enabled = true }: UseBoar
         }
 
         try {
-            // Determine WebSocket URL based on environment
-            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-            const host = import.meta.env.VITE_API_URL?.replace(/^https?:\/\//, '') || 'localhost:8000';
-            const wsUrl = `${protocol}//${host}/v1/Hub/Boards/${boardId}/ws`;
+            const wsUrl = `${import.meta.env.VITE_WS_URL}/v1/Hub/Boards/${boardId}/ws`;
 
             console.log(`🔌 Connecting to WebSocket: ${wsUrl}`);
 
@@ -48,6 +60,14 @@ export const useBoardWebSocket = ({ boardId, onUpdate, enabled = true }: UseBoar
             ws.onopen = () => {
                 console.log(`✅ WebSocket connected to board ${boardId}`);
                 reconnectAttemptsRef.current = 0; // Reset reconnect attempts on successful connection
+
+                // Send user identification
+                if (currentUser) {
+                    ws.send(JSON.stringify({
+                        type: 'user_identify',
+                        user: currentUser
+                    }));
+                }
             };
 
             ws.onmessage = (event) => {
@@ -58,6 +78,19 @@ export const useBoardWebSocket = ({ boardId, onUpdate, enabled = true }: UseBoar
                     switch (message.type) {
                         case 'connected':
                             console.log('✅ WebSocket connection confirmed');
+                            break;
+
+                        case 'identified':
+                            console.log('✅ User identified successfully');
+                            break;
+
+                        case 'user_presence':
+                            console.log(`👥 Active users (${message.count}):`, message.users);
+                            const users = message.users || [];
+                            setActiveUsers(users);
+                            if (onUserPresenceChange) {
+                                onUserPresenceChange(users);
+                            }
                             break;
 
                         case 'board_update':
@@ -90,6 +123,7 @@ export const useBoardWebSocket = ({ boardId, onUpdate, enabled = true }: UseBoar
             ws.onclose = (event) => {
                 console.log(`🔌 WebSocket disconnected from board ${boardId}`, event.code, event.reason);
                 wsRef.current = null;
+                setActiveUsers([]); // Clear active users on disconnect
 
                 // Attempt to reconnect if not manually closed and within retry limit
                 if (event.code !== 1000 && reconnectAttemptsRef.current < maxReconnectAttempts && enabled) {
@@ -98,14 +132,14 @@ export const useBoardWebSocket = ({ boardId, onUpdate, enabled = true }: UseBoar
 
                     reconnectTimeoutRef.current = setTimeout(() => {
                         connect();
-                    }, reconnectDelay);
+                    }, reconnectDelay) as unknown as number;
                 }
             };
 
         } catch (error) {
             console.error('Error creating WebSocket connection:', error);
         }
-    }, [boardId, onUpdate, enabled]);
+    }, [boardId, onUpdate, onUserPresenceChange, enabled, currentUser]);
 
     const disconnect = useCallback(() => {
         if (reconnectTimeoutRef.current) {
@@ -116,6 +150,7 @@ export const useBoardWebSocket = ({ boardId, onUpdate, enabled = true }: UseBoar
             wsRef.current.close(1000, 'Component unmounted');
             wsRef.current = null;
         }
+        setActiveUsers([]);
     }, []);
 
     const sendMessage = useCallback((message: WebSocketMessage) => {
@@ -156,6 +191,7 @@ export const useBoardWebSocket = ({ boardId, onUpdate, enabled = true }: UseBoar
 
     return {
         isConnected: wsRef.current?.readyState === WebSocket.OPEN,
+        activeUsers,
         sendMessage,
         notifyBoardChange,
         reconnect: connect
