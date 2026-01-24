@@ -114,24 +114,10 @@ const ListItem = ({
         const mouseY = e.clientY;
 
         let closestIndex = tasks.length;
-        let minDistance = Number.POSITIVE_INFINITY;
-
         tasks.forEach((task, index) => {
             const rect = task.getBoundingClientRect();
             // Metadata: check distance to the vertical center of the task
             const center = rect.top + rect.height / 2;
-            const distance = mouseY - center;
-
-            // Logic: if we are above the center, we insert at this index.
-            // If below, we insert at index + 1.
-            // But simpler: we find the ONE task whose center is closest to mouse.
-            // If mouse > center, we insert AFTER (index + 1). 
-            // If mouse < center, we insert BEFORE (index).
-
-            // Distance approach:
-            // We want to find the simple insertion point.
-            // Let's iterate and find the first task whose center is BELOW the mouse.
-            // That task's index is the insertion index.
 
             if (mouseY < center && index < closestIndex) {
                 closestIndex = index;
@@ -173,7 +159,9 @@ const ListItem = ({
 
         if (!taskId) return;
 
-        const toIndex = Math.max(0, Math.min(insertIndex ?? localTasks.length, localTasks.length));
+        if (insertIndex === null) return handleDragEnd();
+
+        const toIndex = Math.max(0, Math.min(insertIndex, localTasks.length));
 
         try {
             if (sourceListId === list.id) {
