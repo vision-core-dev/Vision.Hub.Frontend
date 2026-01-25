@@ -18,13 +18,14 @@ import {
     ListTodo,
     ChevronRight,
     Settings,
-    Activity
+    Activity,
 } from "lucide-react";
 import TransactionsListSection, {
     type TransactionItem
 } from "../../finance/TransactionsListSection/TransactionsListSection";
 import UserValue from "./UserValue/UserValue.tsx";
 import BadgesSection from "./BadgesSection/BadgesSection.tsx";
+import UserActivitySection from "./UserActivitySection.tsx";
 import { Button } from "@/shared/ui/buttons/button.tsx";
 import { Select } from "@/shared/ui/select/select.tsx";
 import { AvatarLabelGroupWithDropdown } from "@/shared/ui/avatar";
@@ -32,6 +33,9 @@ import type { Key } from "react-aria-components";
 import { User01 } from "@untitledui/icons";
 import { Dialog, DialogTrigger, Modal, ModalOverlay } from "@/shared/components/modals/modal";
 import { isOnline } from "@/shared/utils/users-utils.ts";
+import { CloseButton } from "@/shared/ui/buttons/close-button.tsx";
+import { NativeSelect } from "@/shared/ui/select/select-native.tsx";
+import { Tabs } from "@/shared/components/tabs/tabs.tsx";
 
 export interface Badge {
     id: string;
@@ -395,38 +399,7 @@ const UserDetailsPage = () => {
                     </section> */}
 
                     {/* Остання активність */}
-                    <section className="rounded-xl border border-secondary bg-primary px-6 py-5 shadow-sm">
-                        <div className="mb-4 flex items-center gap-2">
-                            <Clock size={18} className="text-brand-600" />
-                            <h3 className="m-0 text-base font-semibold">Остання активність</h3>
-                        </div>
-                        <div className="flex flex-col gap-3">
-                            {/* <ActivityItem
-                                action="Завершив задачу"
-                                title="Реалізація нового UI компонента"
-                                time="2 години тому"
-                                type="task"
-                            />
-                            <ActivityItem
-                                action="Додав коментар до"
-                                title="Обговорення архітектури проекту"
-                                time="5 годин тому"
-                                type="comment"
-                            />
-                            <ActivityItem
-                                action="Створив нову задачу"
-                                title="Оптимізація продуктивності"
-                                time="1 день тому"
-                                type="task"
-                            />
-                            <ActivityItem
-                                action="Завантажив файл до"
-                                title="Документація API"
-                                time="2 дні тому"
-                                type="file"
-                            /> */}
-                        </div>
-                    </section>
+                    <UserActivitySection userId={user.id} />
                 </div>
 
                 {/* Права колонка - Структура та транзакції */}
@@ -695,7 +668,7 @@ const RoleChangeModal = ({ isOpen, onOpenChange, roles, selectedRole, onRoleChan
                     <div className="relative w-full max-w-[300px] max-h-[90vh] flex flex-col overflow-hidden rounded-2xl bg-white dark:bg-[#1C1C1E] shadow-2xl p-6 gap-6">
                         <div className="flex items-center justify-between">
                             <h2 className="text-xl font-semibold">Змінити роль</h2>
-                            <Button color="link-color" onClick={() => onOpenChange(false)} iconLeading={X} />
+                            <CloseButton onClick={() => onOpenChange(false)} />
                         </div>
 
                         <Select
@@ -763,7 +736,7 @@ const StructureEditModal = ({
                         <div className="relative w-full max-w-[600px] max-h-[90vh] flex flex-col overflow-hidden rounded-2xl bg-white dark:bg-[#1C1C1E] shadow-2xl p-6 gap-6">
                             <div className="flex items-center justify-between">
                                 <h2 className="text-xl font-semibold">Редагувати структуру</h2>
-                                <Button color="link-color" onClick={() => onOpenChange(false)} iconLeading={X} />
+                                <CloseButton onClick={() => onOpenChange(false)} />
                             </div>
 
                             {/* Керівники */}
@@ -881,53 +854,43 @@ const TasksModal = ({ isOpen, onOpenChange, userName, tasks }: TasksModalProps) 
         overdue: tasks.filter(t => getTaskStatus(t) === 'overdue').length
     };
 
+    const FILTER_TABS = [
+        { id: "all", label: `Всі`, badge: counts.all },
+        { id: "active", label: `Активні`, badge: counts.active },
+        { id: "completed", label: `Завершені`, badge: counts.completed },
+        { id: "overdue", label: `Просрочені`, badge: counts.overdue },
+    ];
+
     return (
         <DialogTrigger isOpen={isOpen} onOpenChange={onOpenChange}>
             <ModalOverlay isDismissable>
                 <Modal className="max-w-3xl">
                     <Dialog>
-                        <div className="relative w-full max-w-[900px] max-h-[90vh] flex flex-col overflow-hidden rounded-2xl bg-white dark:bg-[#1C1C1E] shadow-2xl p-6 gap-6">
+                        <div className="relative w-full max-w-[900px] min-h-[40vh] max-h-[90vh] flex flex-col overflow-hidden rounded-2xl bg-white dark:bg-[#1C1C1E] shadow-2xl p-6 gap-6">
+
                             <div className="flex items-center justify-between">
-                                <div>
-                                    <h2 className="text-xl font-semibold">Задачі користувача</h2>
-                                    <p className="text-sm text-tertiary">{userName}</p>
-                                </div>
-                                <Button color="link-color" onClick={() => onOpenChange(false)} iconLeading={X} />
+                                <h2 className="text-xl font-semibold">Задачі користувача</h2>
+                                <CloseButton onClick={() => onOpenChange(false)} />
                             </div>
 
-                            {/* Фільтри */}
                             <div className="flex gap-2 flex-wrap">
-                                <Button
-                                    size="sm"
-                                    color={filter === 'all' ? 'primary' : 'secondary'}
-                                    onClick={() => setFilter('all')}
-                                >
-                                    Всі ({counts.all})
-                                </Button>
-                                <Button
-                                    size="sm"
-                                    color={filter === 'active' ? 'primary' : 'secondary'}
-                                    onClick={() => setFilter('active')}
-                                >
-                                    Активні ({counts.active})
-                                </Button>
-                                <Button
-                                    size="sm"
-                                    color={filter === 'completed' ? 'primary' : 'secondary'}
-                                    onClick={() => setFilter('completed')}
-                                >
-                                    Виконані ({counts.completed})
-                                </Button>
-                                <Button
-                                    size="sm"
-                                    color={filter === 'overdue' ? 'primary' : 'secondary'}
-                                    onClick={() => setFilter('overdue')}
-                                >
-                                    Прострочені ({counts.overdue})
-                                </Button>
+                                <NativeSelect
+                                    value={filter as string}
+                                    onChange={(e) => setFilter(e.target.value as any)}
+                                    options={FILTER_TABS.map(tab => ({
+                                        label: `${tab.label} (${tab.badge})`,
+                                        value: tab.id,
+                                    }))}
+                                    className="md:hidden"
+                                />
+
+                                <Tabs selectedKey={filter} onSelectionChange={(key) => setFilter(key as any)} className="max-md:hidden">
+                                    <Tabs.List type="underline" items={FILTER_TABS}>
+                                        {(tab) => <Tabs.Item {...tab} />}
+                                    </Tabs.List>
+                                </Tabs>
                             </div>
 
-                            {/* Список задач */}
                             <div className="flex flex-col gap-2 overflow-y-auto flex-1">
                                 {filteredTasks.length === 0 ? (
                                     <p className="text-center text-tertiary">Немає задач</p>
@@ -937,11 +900,12 @@ const TasksModal = ({ isOpen, onOpenChange, userName, tasks }: TasksModalProps) 
                                     ))
                                 )}
                             </div>
+
                         </div>
                     </Dialog>
                 </Modal>
             </ModalOverlay>
-        </DialogTrigger>
+        </DialogTrigger >
     );
 };
 

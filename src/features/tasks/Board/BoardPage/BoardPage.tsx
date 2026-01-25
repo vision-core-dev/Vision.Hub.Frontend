@@ -13,6 +13,7 @@ import { useBoardWebSocket, type ActiveUser } from "@/shared/hooks/useBoardWebSo
 import { useAuth } from "@/core/auth/AuthContext.tsx";
 import { Avatar } from "@/shared/ui/avatar/avatar.tsx";
 import { Button } from "@/shared/ui/buttons/button.tsx";
+import { Tooltip, TooltipTrigger } from "@/shared/ui/tooltip/tooltip.tsx";
 
 
 export type Task = {
@@ -191,12 +192,16 @@ const BoardPage = ({ is_public = false }: Props) => {
                     {activeUsers.length > 0 && (
                         <div className="flex -space-x-2">
                             {activeUsers.slice(0, 5).map((user) => (
-                                <Avatar
-                                    key={user.user_id}
-                                    size="sm"
-                                    src={user.avatar_url}
-                                    initials={user.name.split(' ').map(n => n[0]).join('')}
-                                />
+                                <Tooltip title={user.name}>
+                                    <TooltipTrigger className="group relative flex cursor-pointer flex-col items-center gap-2 text-fg-quaternary transition duration-100 ease-linear hover:text-fg-quaternary_hover focus:text-fg-quaternary_hover">
+                                        <Avatar
+                                            key={user.user_id}
+                                            size="sm"
+                                            src={user.avatar_url}
+                                            initials={user.name.split(' ').map(n => n[0]).join('')}
+                                        />
+                                    </TooltipTrigger>
+                                </Tooltip>
                             ))}
                         </div>
                     )}

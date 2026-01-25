@@ -5,6 +5,7 @@ import { cx } from "@/shared/utils/cx";
 import { Dropdown } from "@/shared/ui/dropdown/dropdown";
 import { AvatarLabelGroup } from "./avatar-label-group";
 import type { AvatarProps } from "./avatar";
+import { useOnlineUsers } from "@/shared/contexts/OnlineUsersContext";
 
 interface AvatarLabelGroupWithDropdownProps extends AvatarProps {
     size: "sm" | "md" | "lg" | "xl";
@@ -27,11 +28,17 @@ export const AvatarLabelGroupWithDropdown = ({
     onWriteMessage,
     disableDropdown = false,
     className,
+    status,
     ...avatarLabelGroupProps
 }: AvatarLabelGroupWithDropdownProps) => {
+    const { isUserOnline } = useOnlineUsers();
+
+    // Auto-detect online status if not explicitly provided
+    const computedStatus = status || (userId && isUserOnline(userId) ? "online" : "offline");
+
     // If dropdown is disabled, just render the AvatarLabelGroup
     if (disableDropdown) {
-        return <AvatarLabelGroup {...avatarLabelGroupProps} className={className} />;
+        return <AvatarLabelGroup {...avatarLabelGroupProps} status={computedStatus} className={className} />;
     }
 
     const handleViewProfile = () => {
