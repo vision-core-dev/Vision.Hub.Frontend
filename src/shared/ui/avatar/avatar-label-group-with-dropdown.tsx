@@ -12,13 +12,9 @@ interface AvatarLabelGroupWithDropdownProps extends AvatarProps {
     title: string | ReactNode;
     subtitle?: string | ReactNode;
     className?: string;
-    /** User ID for profile navigation */
     userId?: string;
-    /** Callback when "View Profile" is clicked */
     onViewProfile?: () => void;
-    /** Callback when "Write Message" is clicked */
     onWriteMessage?: () => void;
-    /** If true, disables the dropdown functionality */
     disableDropdown?: boolean;
 }
 
@@ -32,12 +28,8 @@ export const AvatarLabelGroupWithDropdown = ({
     ...avatarLabelGroupProps
 }: AvatarLabelGroupWithDropdownProps) => {
     const { isUserOnline } = useOnlineUsers();
-
-    // Auto-detect online status if not explicitly provided
     const computedStatus = (userId && isUserOnline(userId)) ? "online" : "offline";
-    console.log("computedStatus", computedStatus);
 
-    // If dropdown is disabled, just render the AvatarLabelGroup
     if (disableDropdown) {
         return <AvatarLabelGroup {...avatarLabelGroupProps} status={computedStatus} className={className} />;
     }
@@ -46,7 +38,6 @@ export const AvatarLabelGroupWithDropdown = ({
         if (onViewProfile) {
             onViewProfile();
         } else if (userId) {
-            // Default navigation to user profile
             window.location.href = `/users/${userId}`;
         }
     };
@@ -55,7 +46,6 @@ export const AvatarLabelGroupWithDropdown = ({
         if (onWriteMessage) {
             onWriteMessage();
         } else if (userId) {
-            // Default navigation to messages
             window.location.href = `/messages?userId=${userId}`;
         }
     };
