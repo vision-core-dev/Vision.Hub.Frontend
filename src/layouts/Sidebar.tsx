@@ -16,15 +16,15 @@ import {
     BookMarked,
     Bot,
     Headset,
-    ClipboardList, Folder,
+    ClipboardList, Folder, FolderTree
 } from "lucide-react";
 
 import type { NavItemType } from "@/shared/components/app-navigation/config";
 import { SidebarNavigationSimple } from "@/shared/components/app-navigation/sidebar-navigation/sidebar-simple";
 import { getSidebarText } from "@/shared/types/Messages.ts";
-import {Badge} from "@/shared/ui/badges/badges.tsx";
-import {File02} from "@untitledui/icons/File02";
-import {MessageTextSquare01} from "@untitledui/icons";
+import { Badge } from "@/shared/ui/badges/badges.tsx";
+import { File02 } from "@untitledui/icons/File02";
+import { MessageTextSquare01 } from "@untitledui/icons";
 
 /* ================= ICON MAP ================= */
 
@@ -44,6 +44,7 @@ const iconMap: Record<string, FC<{ className?: string }>> = {
     chat: MessageTextSquare01,
     "vision-bot": Bot,
     "vision-support": Headset,
+    "org-structure": FolderTree,
 };
 
 /* ================= SIDEBAR ================= */

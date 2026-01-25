@@ -16,9 +16,10 @@ interface AvatarLabelGroupProps extends AvatarProps {
     subtitle?: string | ReactNode;
     onClick?: () => void;
     userId?: string;
+    onAvatarClick?: () => void;
 }
 
-export const AvatarLabelGroup = ({ title, subtitle, className, userId, status, ...props }: AvatarLabelGroupProps) => {
+export const AvatarLabelGroup = ({ title, subtitle, className, userId, status, onAvatarClick, ...props }: AvatarLabelGroupProps) => {
     const { isUserOnline } = useOnlineUsers();
 
     // Auto-detect online status if not explicitly provided
@@ -26,7 +27,7 @@ export const AvatarLabelGroup = ({ title, subtitle, className, userId, status, .
 
     return (
         <figure className={cx("group flex min-w-0 flex-1 items-center", styles[props.size].root, props.onClick && "cursor-pointer", className)} onClick={props.onClick}>
-            <Avatar {...props} status={computedStatus} />
+            <Avatar {...props} status={computedStatus} onClick={onAvatarClick} focusable={onAvatarClick ? true : false} />
             <figcaption className="min-w-0 flex-1">
                 <p className={cx("text-primary", styles[props.size].title)}>{title}</p>
                 {subtitle && <p className={cx("truncate text-tertiary", styles[props.size].subtitle)}>{subtitle}</p>}

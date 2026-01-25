@@ -16,6 +16,7 @@ interface AvatarLabelGroupWithDropdownProps extends AvatarProps {
     onViewProfile?: () => void;
     onWriteMessage?: () => void;
     disableDropdown?: boolean;
+    onAvatarClick?: () => void;
 }
 
 export const AvatarLabelGroupWithDropdown = ({
@@ -25,6 +26,7 @@ export const AvatarLabelGroupWithDropdown = ({
     disableDropdown = false,
     className,
     status,
+    onAvatarClick,
     ...avatarLabelGroupProps
 }: AvatarLabelGroupWithDropdownProps) => {
     const { isUserOnline } = useOnlineUsers();
@@ -61,7 +63,7 @@ export const AvatarLabelGroupWithDropdown = ({
                     className
                 )}
             >
-                <AvatarLabelGroup status={computedStatus} {...avatarLabelGroupProps} className={cx("flex-1", !disableDropdown && "cursor-pointer")} />
+                <AvatarLabelGroup onAvatarClick={onAvatarClick} status={computedStatus} {...avatarLabelGroupProps} className={cx("flex-1", !disableDropdown && "cursor-pointer")} />
             </AriaButton>
             <Dropdown.Popover>
                 <Dropdown.Menu>

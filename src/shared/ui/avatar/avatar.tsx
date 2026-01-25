@@ -49,6 +49,7 @@ export interface AvatarProps {
      * @default false
      */
     focusable?: boolean;
+    onClick?: () => void;
 }
 
 const styles = {
@@ -72,6 +73,7 @@ export const Avatar = ({
     badge,
     status,
     verified,
+    onClick,
     focusable = false,
     className,
 }: AvatarProps) => {
@@ -113,9 +115,9 @@ export const Avatar = ({
     return (
         <div
             data-avatar
+            onClick={() => onClick?.()}
             className={cx(
                 "relative inline-flex shrink-0 items-center justify-center rounded-full bg-avatar-bg outline-transparent",
-                // Focus styles
                 focusable && "group-outline-focus-ring group-focus-visible:outline-2 group-focus-visible:outline-offset-2",
                 contrastBorder && "outline outline-avatar-contrast-border",
                 styles[size].root,

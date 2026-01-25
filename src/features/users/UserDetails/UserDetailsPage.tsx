@@ -36,6 +36,7 @@ import { isOnline } from "@/shared/utils/users-utils.ts";
 import { CloseButton } from "@/shared/ui/buttons/close-button.tsx";
 import { NativeSelect } from "@/shared/ui/select/select-native.tsx";
 import { Tabs } from "@/shared/components/tabs/tabs.tsx";
+import FilePreviewModal from "@/features/drive/FilePreviewModal.tsx";
 
 export interface Badge {
     id: string;
@@ -102,6 +103,7 @@ const UserDetailsPage = () => {
     const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
     const [isStructureModalOpen, setIsStructureModalOpen] = useState(false);
     const [isTasksModalOpen, setIsTasksModalOpen] = useState(false);
+    const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
 
     // Transactions pagination
     const [showAllTransactions, setShowAllTransactions] = useState(false);
@@ -265,7 +267,18 @@ const UserDetailsPage = () => {
                             status={isOnline(user.last_login) ? "online" : "offline"}
                             userId={user.id}
                             disableDropdown
+                            onAvatarClick={() => setIsAvatarModalOpen(true)}
                         />
+
+                        {user.avatar_url && (
+                            <FilePreviewModal
+                                isOpen={isAvatarModalOpen}
+                                onClose={() => setIsAvatarModalOpen(false)}
+                                url={user.avatar_url}
+                                name={`${user.first_name} ${user.last_name || ""}`}
+                                type="file"
+                            />
+                        )}
 
                         <div className="mt-1 flex items-center gap-1.5 text-xs text-tertiary">
                             <Clock size={14} />

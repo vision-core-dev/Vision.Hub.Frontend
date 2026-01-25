@@ -21,6 +21,7 @@ const sidebarList: Record<string, string> = {
     "chat": "Чат",
     "vision-bot": "Vision Bot",
     "vision-support": "Vision Support",
+    "org-structure": "Оргструктура",
 };
 
 export function getErrorText(code: string, fallback = "Сталася невідома помилка"): string {

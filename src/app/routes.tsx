@@ -63,6 +63,9 @@ import ChatPage from "@/features/chat/Chat";
 import NotFound from "@/layouts/NotFound/NotFound";
 import CreateEventPage from "@/features/events/CreateEventPage";
 
+// Org Structure
+import OrgStructurePage from "@/features/org-structure/OrgStructurePage";
+
 export function AppRoutes() {
     return (
         <Routes>
@@ -91,6 +94,9 @@ export function AppRoutes() {
                         <Route path="list" element={<UsersListPage />} />
                         <Route path="u/:id" element={<UserDetailsPage />} />
                     </Route>
+
+                    {/* org structure */}
+                    <Route path="org-structure" element={<OrgStructurePage />} />
 
                     {/* calendar */}
                     <Route path="calendar" element={<CalendarTimeline />} />
