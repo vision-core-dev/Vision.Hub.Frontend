@@ -34,7 +34,8 @@ export const AvatarLabelGroupWithDropdown = ({
     const { isUserOnline } = useOnlineUsers();
 
     // Auto-detect online status if not explicitly provided
-    const computedStatus = status || (userId && isUserOnline(userId) ? "online" : "offline");
+    const computedStatus = (userId && isUserOnline(userId)) ? "online" : "offline";
+    console.log("computedStatus", computedStatus);
 
     // If dropdown is disabled, just render the AvatarLabelGroup
     if (disableDropdown) {
@@ -70,7 +71,7 @@ export const AvatarLabelGroupWithDropdown = ({
                     className
                 )}
             >
-                <AvatarLabelGroup {...avatarLabelGroupProps} className={cx("flex-1", !disableDropdown && "cursor-pointer")} />
+                <AvatarLabelGroup status={computedStatus} {...avatarLabelGroupProps} className={cx("flex-1", !disableDropdown && "cursor-pointer")} />
             </AriaButton>
             <Dropdown.Popover>
                 <Dropdown.Menu>

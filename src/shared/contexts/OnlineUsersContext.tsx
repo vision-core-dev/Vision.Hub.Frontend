@@ -119,6 +119,7 @@ export const OnlineUsersProvider = ({ children }: OnlineUsersProviderProps) => {
     }, [user?.id, connect]);
 
     const isUserOnline = useCallback((userId: string) => {
+        console.log("isUserOnline", userId, onlineUserIds.has(userId));
         return onlineUserIds.has(userId);
     }, [onlineUserIds]);
 
