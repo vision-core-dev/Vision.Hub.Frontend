@@ -1,15 +1,15 @@
-import {type ReactNode, useEffect, useState} from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { cx } from "@/shared/utils/cx";
 import { MobileNavigationHeader } from "../base-components/mobile-header";
 import { NavAccountCard } from "../base-components/nav-account-card";
 import { NavItemBase } from "../base-components/nav-item";
 import { NavList } from "../base-components/nav-list";
 import type { NavItemType } from "../config";
-import {useNavigate} from "react-router-dom";
-import {api} from "@/shared/utils/api.ts";
-import {Bell} from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { api } from "@/shared/utils/api.ts";
+import { Bell, MessageCircle } from "lucide-react";
 import NotificationsMenu from "@/layouts/Notifications/NotificationsMenu.tsx";
-import {Badge} from "@/shared/ui/badges/badges.tsx";
+import { Badge } from "@/shared/ui/badges/badges.tsx";
 
 interface SidebarNavigationProps {
     /** URL of the currently active item. */
@@ -95,6 +95,12 @@ export const SidebarNavigationSimple = ({
             <div className="mt-auto flex flex-col gap-4 px-2 py-4 lg:px-4 lg:py-6">
 
                 <ul className="flex flex-col">
+
+                    <li key="chat" className="py-0.5">
+                        <NavItemBase icon={MessageCircle} type="link" current={showNotifs} onClick={() => navigate("/chat")}>
+                            Чат
+                        </NavItemBase>
+                    </li>
 
                     <li key="notifs" className="py-0.5">
                         <NavItemBase badge={unreadCount > 0 && <Badge color="error">{unreadCount}</Badge>} icon={Bell} type="link" current={showNotifs} onClick={() => setShowNotifs(true)}>
