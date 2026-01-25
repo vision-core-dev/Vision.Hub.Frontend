@@ -859,7 +859,7 @@ interface TasksModalProps {
     tasks: UserTask[];
 }
 
-const TasksModal = ({ isOpen, onOpenChange, userId, userName, tasks }: TasksModalProps) => {
+const TasksModal = ({ isOpen, onOpenChange, userName, tasks }: TasksModalProps) => {
     const [filter, setFilter] = useState<'all' | 'active' | 'completed' | 'overdue'>('all');
 
     const getTaskStatus = (task: UserTask) => {
