@@ -10,20 +10,15 @@ import {
     Mail,
     Calendar,
     Clock,
-    TrendingUp,
     CheckCircle2,
     Target,
     Phone,
-    MapPin,
-    Briefcase,
-    Activity,
     Users,
     DollarSign,
-    FileText,
-    MessageSquare,
     ListTodo,
     ChevronRight,
-    Settings
+    Settings,
+    Activity
 } from "lucide-react";
 import TransactionsListSection, {
     type TransactionItem
@@ -61,16 +56,19 @@ interface Response {
     subordinates: UserType[];
     transactions: TransactionItem[];
     badges: Badge[];
+    tasks: UserTask[];
+    tasks_total_completed: number;
+    tasks_total_active: number;
 }
 
 // Task interface for user tasks
 export interface UserTask {
     id: string;
     name: string;
-    list_name: string;
+    list_name?: string;
     deadline_at?: string;
-    is_overdue?: boolean;
-    status: 'active' | 'completed' | 'overdue';
+    board_id: string;
+    status: string; // backend status string: backlog, in_progress, review, done
 }
 
 const UserDetailsPage = () => {
@@ -84,8 +82,11 @@ const UserDetailsPage = () => {
     const [badges, setBadges] = useState<Badge[]>([]);
     const [roles, setRoles] = useState<Role[]>([]);
     const [transactions, setTransactions] = useState<TransactionItem[]>([]);
-    const [activeTasks, setActiveTasks] = useState<UserTask[]>([]);
+    const [tasks, setTasks] = useState<UserTask[]>([]); // Store all tasks
+    const [activeTasks, setActiveTasks] = useState<UserTask[]>([]); // Filtered for preview
+    const [taskStats, setTaskStats] = useState({ completed: 0, active: 0 });
 
+    // ... (other states)
     const [selectedRole, setSelectedRole] = useState<Key | null>("");
 
     const [allUsers, setAllUsers] = useState<UserType[]>([]);
@@ -102,6 +103,7 @@ const UserDetailsPage = () => {
     const [showAllTransactions, setShowAllTransactions] = useState(false);
     const TRANSACTIONS_PREVIEW_COUNT = 5;
 
+    // ... (handlers)
     const handleDeactivate = async () => {
         await api.post(`/v1/Hub/Users/${user?.id}/Deactivate`);
         refreshUserData()
@@ -127,19 +129,32 @@ const UserDetailsPage = () => {
             setBadges(data.badges ?? []);
             setActions(data.actions ?? []);
             setTransactions(data.transactions ?? []);
+            setTaskStats({
+                completed: data.tasks_total_completed,
+                active: data.tasks_total_active
+            });
+
+            const allTasks = data.tasks ?? [];
+            setTasks(allTasks);
+
+            // Filter for Active Tasks preview (excluding done)
+            // Limit to 4 for the preview card
+            const active = allTasks
+                .filter(t => t.status !== 'done')
+                .sort((a, b) => {
+                    // Sort by deadline (nearest first), nulls last
+                    if (!a.deadline_at) return 1;
+                    if (!b.deadline_at) return -1;
+                    return new Date(a.deadline_at).getTime() - new Date(b.deadline_at).getTime();
+                })
+                .slice(0, 4);
+
+            setActiveTasks(active);
 
             if (data.user?.role?.id) {
                 setSelectedRole(data.user.role.id);
             }
 
-            // Mock active tasks - replace with real API call
-            // TODO: Replace with: const tasksRes = await api.get(`/v1/Hub/Users/${id}/Tasks?status=active&limit=5`);
-            setActiveTasks([
-                { id: '1', name: 'Реалізація нового UI компонента', list_name: 'В роботі', deadline_at: '2026-01-25T18:00:00Z', status: 'active' },
-                { id: '2', name: 'Рефакторинг API endpoints', list_name: 'В роботі', deadline_at: '2026-01-26T18:00:00Z', status: 'active' },
-                { id: '3', name: 'Code review PR #234', list_name: 'На перевірці', deadline_at: '2026-01-24T12:00:00Z', status: 'overdue', is_overdue: true },
-                { id: '4', name: 'Оновлення документації', list_name: 'Заплановано', deadline_at: '2026-01-28T18:00:00Z', status: 'active' },
-            ]);
         } finally {
             setLoading(false);
         }
@@ -282,10 +297,10 @@ const UserDetailsPage = () => {
                             <h3 className="m-0 text-base font-semibold">Статистика активності</h3>
                         </div>
                         <div className="flex flex-col gap-3">
-                            <StatItem icon={CheckCircle2} label="Завершено задач" value="47" trend="+12%" />
-                            <StatItem icon={Target} label="Активних задач" value="8" />
-                            <StatItem icon={Users} label="Проектів" value="5" />
-                            <StatItem icon={TrendingUp} label="Продуктивність" value="94%" trend="+5%" />
+                            <StatItem icon={CheckCircle2} label="Завершено задач" value={taskStats.completed.toString()} />
+                            <StatItem icon={Target} label="Активних задач" value={taskStats.active.toString()} />
+                            {/* <StatItem icon={Users} label="Проектів" value="5" />
+                            <StatItem icon={TrendingUp} label="Продуктивність" value="94%" trend="+5%" /> */}
                         </div>
                     </div>
                 </div>
@@ -328,8 +343,8 @@ const UserDetailsPage = () => {
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                             <InfoItem icon={Mail} label="Email" value={user.email} />
                             <InfoItem icon={Phone} label="Телефон" value="+380 (67) 123-45-67" />
-                            <InfoItem icon={MapPin} label="Локація" value="Київ, Україна" />
-                            <InfoItem icon={Briefcase} label="Відділ" value="Development Team" />
+                            {/* <InfoItem icon={MapPin} label="Локація" value="Київ, Україна" />
+                            <InfoItem icon={Briefcase} label="Відділ" value="Development Team" /> */}
                         </div>
                     </section>
 
@@ -386,7 +401,7 @@ const UserDetailsPage = () => {
                             <h3 className="m-0 text-base font-semibold">Остання активність</h3>
                         </div>
                         <div className="flex flex-col gap-3">
-                            <ActivityItem
+                            {/* <ActivityItem
                                 action="Завершив задачу"
                                 title="Реалізація нового UI компонента"
                                 time="2 години тому"
@@ -409,7 +424,7 @@ const UserDetailsPage = () => {
                                 title="Документація API"
                                 time="2 дні тому"
                                 type="file"
-                            />
+                            /> */}
                         </div>
                     </section>
                 </div>
@@ -417,8 +432,8 @@ const UserDetailsPage = () => {
                 {/* Права колонка - Структура та транзакції */}
                 <div className="flex flex-col gap-6">
                     {(supervisors.length > 0 || subordinates.length > 0) && (
-                        <section className="rounded-xl border border-secondary bg-primary px-6 py-5 shadow-sm">
-                            <div className="mb-4 flex items-center gap-2">
+                        <section className="flex flex-col gap-4 rounded-xl border border-secondary bg-primary px-6 py-5 shadow-sm">
+                            <div className="flex items-center gap-2">
                                 <Users size={18} className="text-brand-600" />
                                 <h3 className="m-0 text-base font-semibold">Організаційна структура</h3>
                             </div>
@@ -488,6 +503,7 @@ const UserDetailsPage = () => {
                 onOpenChange={setIsTasksModalOpen}
                 userId={user.id}
                 userName={`${user.first_name} ${user.last_name || ''}`}
+                tasks={tasks}
             />
         </DefaultPage>
     );
@@ -525,19 +541,23 @@ interface TaskItemProps {
 }
 
 const TaskItem = ({ task }: TaskItemProps) => {
+    const isDone = task.status === 'done';
+    const isOverdue = !isDone && task.deadline_at && new Date(task.deadline_at) < new Date();
+
     const getStatusColor = () => {
-        if (task.is_overdue) return 'text-red-600 bg-red-50 border-red-200';
+        if (isOverdue) return 'text-red-600 bg-red-50 border-red-200';
+        if (isDone) return 'text-gray-500 bg-gray-50 border-gray-200 opacity-70';
         return 'text-primary bg-secondary/30 border-secondary';
     };
 
     return (
         <div className={`flex items-center justify-between rounded-lg border p-3 transition-all hover:bg-secondary/50 ${getStatusColor()}`}>
             <div className="flex flex-col gap-0.5 flex-1">
-                <span className="text-sm font-medium">{task.name}</span>
+                <span className={`text-sm font-medium ${isDone ? 'line-through text-tertiary' : ''}`}>{task.name}</span>
                 <span className="text-xs text-tertiary">{task.list_name}</span>
             </div>
             {task.deadline_at && (
-                <div className="flex items-center gap-1 text-xs text-tertiary">
+                <div className={`flex items-center gap-1 text-xs ${isOverdue ? 'text-red-600 font-medium' : 'text-tertiary'}`}>
                     <Clock size={12} />
                     <span>{safeDatetime(task.deadline_at)}</span>
                 </div>
@@ -594,38 +614,38 @@ const FinanceCard = ({ label, value, highlight }: FinanceCardProps) => (
 //     </div>
 // );
 
-interface ActivityItemProps {
-    action: string;
-    title: string;
-    time: string;
-    type: 'task' | 'comment' | 'file';
-}
 
-const ActivityItem = ({ action, title, time, type }: ActivityItemProps) => {
-    const getIcon = () => {
-        switch (type) {
-            case 'task': return CheckCircle2;
-            case 'comment': return MessageSquare;
-            case 'file': return FileText;
-        }
-    };
+//     action: string;
+//     title: string;
+//     time: string;
+//     type: 'task' | 'comment' | 'file';
+// }
 
-    const Icon = getIcon();
+// const ActivityItem = ({ action, title, time, type }: ActivityItemProps) => {
+//     const getIcon = () => {
+//         switch (type) {
+//             case 'task': return CheckCircle2;
+//             case 'comment': return MessageSquare;
+//             case 'file': return FileText;
+//         }
+//     };
 
-    return (
-        <div className="flex gap-3 rounded-lg border border-secondary bg-secondary/30 p-3 transition-all hover:bg-secondary/50">
-            <div className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-brand-50">
-                <Icon size={14} className="text-brand-600" />
-            </div>
-            <div className="flex flex-1 flex-col gap-0.5">
-                <p className="text-sm text-primary">
-                    <span className="text-tertiary">{action}</span> <span className="font-medium">{title}</span>
-                </p>
-                <span className="text-xs text-tertiary">{time}</span>
-            </div>
-        </div>
-    );
-};
+//     const Icon = getIcon();
+
+//     return (
+//         <div className="flex gap-3 rounded-lg border border-secondary bg-secondary/30 p-3 transition-all hover:bg-secondary/50">
+//             <div className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-brand-50">
+//                 <Icon size={14} className="text-brand-600" />
+//             </div>
+//             <div className="flex flex-1 flex-col gap-0.5">
+//                 <p className="text-sm text-primary">
+//                     <span className="text-tertiary">{action}</span> <span className="font-medium">{title}</span>
+//                 </p>
+//                 <span className="text-xs text-tertiary">{time}</span>
+//             </div>
+//         </div>
+//     );
+// };
 
 interface UsersGroupProps {
     title: string;
@@ -836,41 +856,30 @@ interface TasksModalProps {
     onOpenChange: (open: boolean) => void;
     userId: string;
     userName: string;
+    tasks: UserTask[];
 }
 
-const TasksModal = ({ isOpen, onOpenChange, userId, userName }: TasksModalProps) => {
-    const [tasks, setTasks] = useState<UserTask[]>([]);
+const TasksModal = ({ isOpen, onOpenChange, userId, userName, tasks }: TasksModalProps) => {
     const [filter, setFilter] = useState<'all' | 'active' | 'completed' | 'overdue'>('all');
-    const [loading,] = useState(false);
 
-    useEffect(() => {
-        if (isOpen) {
-            // TODO: Replace with real API call
-            // const fetchTasks = async () => {
-            //     setLoading(true);
-            //     const res = await api.get(`/v1/Hub/Users/${userId}/Tasks?status=${filter}`);
-            //     const data = await res.json();
-            //     setTasks(data.tasks);
-            //     setLoading(false);
-            // };
-            // fetchTasks();
-
-            // Mock data
-            setTasks([
-                { id: '1', name: 'Реалізація нового UI компонента', list_name: 'В роботі', deadline_at: '2026-01-25T18:00:00Z', status: 'active' },
-                { id: '2', name: 'Рефакторинг API endpoints', list_name: 'В роботі', deadline_at: '2026-01-26T18:00:00Z', status: 'active' },
-                { id: '3', name: 'Code review PR #234', list_name: 'На перевірці', deadline_at: '2026-01-24T12:00:00Z', status: 'overdue', is_overdue: true },
-                { id: '4', name: 'Оновлення документації', list_name: 'Заплановано', deadline_at: '2026-01-28T18:00:00Z', status: 'active' },
-                { id: '5', name: 'Виправлення бага #123', list_name: 'Завершено', status: 'completed' },
-                { id: '6', name: 'Налаштування CI/CD', list_name: 'Завершено', status: 'completed' },
-            ]);
-        }
-    }, [isOpen, filter, userId]);
+    const getTaskStatus = (task: UserTask) => {
+        if (task.status === 'done') return 'completed';
+        if (task.deadline_at && new Date(task.deadline_at) < new Date()) return 'overdue';
+        return 'active';
+    };
 
     const filteredTasks = tasks.filter(task => {
+        const computedStatus = getTaskStatus(task);
         if (filter === 'all') return true;
-        return task.status === filter;
+        return computedStatus === filter;
     });
+
+    const counts = {
+        all: tasks.length,
+        active: tasks.filter(t => getTaskStatus(t) === 'active').length,
+        completed: tasks.filter(t => getTaskStatus(t) === 'completed').length,
+        overdue: tasks.filter(t => getTaskStatus(t) === 'overdue').length
+    };
 
     return (
         <DialogTrigger isOpen={isOpen} onOpenChange={onOpenChange}>
@@ -893,36 +902,34 @@ const TasksModal = ({ isOpen, onOpenChange, userId, userName }: TasksModalProps)
                                     color={filter === 'all' ? 'primary' : 'secondary'}
                                     onClick={() => setFilter('all')}
                                 >
-                                    Всі ({tasks.length})
+                                    Всі ({counts.all})
                                 </Button>
                                 <Button
                                     size="sm"
                                     color={filter === 'active' ? 'primary' : 'secondary'}
                                     onClick={() => setFilter('active')}
                                 >
-                                    Активні ({tasks.filter(t => t.status === 'active').length})
+                                    Активні ({counts.active})
                                 </Button>
                                 <Button
                                     size="sm"
                                     color={filter === 'completed' ? 'primary' : 'secondary'}
                                     onClick={() => setFilter('completed')}
                                 >
-                                    Виконані ({tasks.filter(t => t.status === 'completed').length})
+                                    Виконані ({counts.completed})
                                 </Button>
                                 <Button
                                     size="sm"
                                     color={filter === 'overdue' ? 'primary' : 'secondary'}
                                     onClick={() => setFilter('overdue')}
                                 >
-                                    Прострочені ({tasks.filter(t => t.status === 'overdue').length})
+                                    Прострочені ({counts.overdue})
                                 </Button>
                             </div>
 
                             {/* Список задач */}
                             <div className="flex flex-col gap-2 overflow-y-auto flex-1">
-                                {loading ? (
-                                    <p className="text-center text-tertiary">Завантаження...</p>
-                                ) : filteredTasks.length === 0 ? (
+                                {filteredTasks.length === 0 ? (
                                     <p className="text-center text-tertiary">Немає задач</p>
                                 ) : (
                                     filteredTasks.map((task) => (
