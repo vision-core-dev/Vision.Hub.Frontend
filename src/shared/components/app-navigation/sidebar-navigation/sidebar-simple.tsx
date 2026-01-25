@@ -28,6 +28,7 @@ interface SidebarNavigationProps {
     className?: string;
 }
 
+
 export const SidebarNavigationSimple = ({
     activeUrl,
     items,
