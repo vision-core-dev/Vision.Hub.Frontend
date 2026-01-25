@@ -1,8 +1,6 @@
-import React, { memo } from 'react';
+import { memo } from 'react';
 import type { OrgNode } from './types';
-import { Avatar } from '@/shared/ui/avatar/avatar';
 import { Building2, Briefcase, User as UserIcon, MoreHorizontal, Plus } from 'lucide-react';
-import { Button } from '@/shared/ui/buttons/button';
 import { cx } from '@/shared/utils/cx';
 
 // --- Types ---

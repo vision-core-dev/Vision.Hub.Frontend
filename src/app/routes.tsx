@@ -155,7 +155,10 @@ export function AppRoutes() {
                     <Route path="drive/*" element={<DrivePage />} />
 
                     {/* chat */}
-                    <Route path="chat" element={<ChatPage />} />
+                    <Route path="chat">
+                        <Route index element={<ChatPage />} />
+                        <Route path=":chatId" element={<ChatPage />} />
+                    </Route>
 
                 </Route>
             </Route>

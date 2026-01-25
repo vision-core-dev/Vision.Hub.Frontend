@@ -1,10 +1,69 @@
-import type { ComponentPropsWithRef, ReactNode } from "react";
+import { type ComponentPropsWithRef, type ReactNode, useRef, useState, useEffect } from "react";
 import { FileIcon } from "@untitledui/file-icons";
-import { Copy01, DownloadCloud02, Edit04, Link03, RefreshCcw02, Stars02 } from "@untitledui/icons";
+import { Copy01, DownloadCloud02, Edit04, Link03, RefreshCcw02, Stars02, PauseCircle } from "@untitledui/icons";
 import { Button as AriaButton } from "react-aria-components";
 import { Avatar } from "@/shared/ui/avatar/avatar";
 import { Tooltip } from "@/shared/ui/tooltip/tooltip";
 import { cx } from "@/shared/utils/cx";
+
+// Simple Audio Player Component
+const AudioPlayer = ({ src, duration }: { src?: string; duration: string }) => {
+    const [isPlaying, setIsPlaying] = useState(false);
+    const audioRef = useRef<HTMLAudioElement | null>(null);
+
+    const togglePlay = () => {
+        if (!audioRef.current || !src) return;
+
+        if (isPlaying) {
+            audioRef.current.pause();
+        } else {
+            audioRef.current.play();
+        }
+        setIsPlaying(!isPlaying);
+    };
+
+    useEffect(() => {
+        const audio = audioRef.current;
+        if (!audio) return;
+
+        const handleEnded = () => setIsPlaying(false);
+        audio.addEventListener("ended", handleEnded);
+        return () => audio.removeEventListener("ended", handleEnded);
+    }, []);
+
+    return (
+        <>
+            {src && <audio ref={audioRef} src={src} className="hidden" />}
+            <button
+                onClick={togglePlay}
+                aria-label={isPlaying ? "Pause audio message" : "Play audio message"}
+                className="flex size-8 cursor-pointer items-center justify-center rounded-full bg-fg-brand-primary_alt outline-focus-ring focus-visible:outline-2 focus-visible:outline-offset-2 transition-transform active:scale-95"
+            >
+                {isPlaying ? (
+                    <PauseCircle className="size-4 text-fg-white" />
+                ) : (
+                    <svg width="12.8" height="14" viewBox="0 0 16 16" fill="none" className="translate-x-[1px] text-fg-white">
+                        <path
+                            d="M2.19995 2.86327C2.19995 1.61155 3.57248 0.844595 4.63851 1.50061L12.9856 6.63731C14.0009 7.26209 14.0009 8.73784 12.9856 9.36262L4.63851 14.4993C3.57247 15.1553 2.19995 14.3884 2.19995 13.1367V2.86327Z"
+                            fill="currentColor"
+                        />
+                    </svg>
+                )}
+            </button>
+
+            <svg width="206" height="34" viewBox="0 0 206 34" fill="none" className="flex-1 text-fg-brand-primary_alt opacity-50">
+                <path
+                    d="M1 15V19M5 15V19M9 15V19M13 15V19M17 9.00005V25M21 5.00005V29M25 1.00005V33M29 1.00005V33M33 5.00005V29M37 13V21M41 9.00005V25M45 13V21M49 5.00005V29M53 5.00005V29M57 9.00005V25M61 9.00005V25M65 1.00005V33M69 1.00005V33M73 5.00005V29M77 1.00005V33M81 9.00005V25M85 13V21M89 15V19.0001M93 15V19.0001M97 13V21.0001M101 13V21.0001M105 9V25.0001M109 5V29.0001M113 1V33.0001M117 5V29.0001M121 5V29.0001M125 5V29.0001M129 9V25.0001M133 13V21.0001M137 9V25.0001M141 13V21.0001M145 9V25.0001M149 5V29.0001M153 5V29.0001M157 9V25.0001M161 1V33.0001M165 5V29.0001M169 9V25.0001M173 13V21.0001M177 15V19.0001M181 9V25.0001M185 5V29.0001M189 5V29.0001M193 9V25.0001M197 15V19.0001M201 15V19.0001M205 15V19.0001"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    className={cx("transition-opacity duration-300", isPlaying ? "opacity-100 animate-pulse" : "")}
+                />
+            </svg>
+
+            <p className="text-xs text-tertiary">{duration}</p>
+        </>
+    );
+};
 
 export type Message = {
     id: string;
@@ -21,6 +80,7 @@ export type Message = {
     text?: ReactNode;
     audio?: {
         duration: string;
+        src?: string;
     };
     image?: {
         src: string;
@@ -86,12 +146,13 @@ export const MessageStatus = ({ status, readAt }: MessageStatusProps) => {
     );
 };
 
-interface MessageItemProps extends ComponentPropsWithRef<"li"> {
+export interface MessageItemProps {
     msg: Message;
     showUserLabel?: boolean;
+    className?: string; // Add className prop
 }
 
-export const MessageItem = ({ msg, showUserLabel = true, ...props }: MessageItemProps) => {
+export const MessageItem = ({ msg, showUserLabel = true, className, ...props }: MessageItemProps & ComponentPropsWithRef<"li">) => {
     const renderActions = () => (
         <div className="dark-mode absolute right-2 -bottom-5 z-1 flex gap-1.5 rounded-lg bg-primary_alt px-2 py-1.5 opacity-0 shadow-xl transition duration-100 ease-linear group-hover/msg:opacity-100">
             <button
@@ -130,7 +191,7 @@ export const MessageItem = ({ msg, showUserLabel = true, ...props }: MessageItem
     );
 
     return (
-        <li key={msg.id} {...props} className={cx("relative flex items-start gap-3", msg.user?.me ? "self-end pl-10" : "pr-8 lg:pr-10", props.className)}>
+        <li key={msg.id} className={cx("relative flex items-start gap-3", msg.user?.me ? "self-end pl-10" : "pr-8 lg:pr-10", className)} {...props}>
             {msg.user && !msg.user.me && <Avatar src={msg.user.avatarUrl} alt={msg.user.name!} size="md" status={msg.user.status} />}
 
             <article className="flex min-w-0 flex-1 flex-col gap-1.5">
@@ -211,28 +272,7 @@ export const MessageItem = ({ msg, showUserLabel = true, ...props }: MessageItem
                     </figure>
                 ) : msg.audio ? (
                     <div className="group/msg relative flex items-center gap-2 rounded-lg rounded-tl-none bg-primary p-3 ring-1 ring-secondary">
-                        <button
-                            aria-label="Play audio message"
-                            className="flex size-8 cursor-pointer items-center justify-center rounded-full bg-fg-brand-primary_alt outline-focus-ring focus-visible:outline-2 focus-visible:outline-offset-2"
-                        >
-                            <svg width="12.8" height="14" viewBox="0 0 16 16" fill="none" className="translate-x-[1px] text-fg-white">
-                                <path
-                                    d="M2.19995 2.86327C2.19995 1.61155 3.57248 0.844595 4.63851 1.50061L12.9856 6.63731C14.0009 7.26209 14.0009 8.73784 12.9856 9.36262L4.63851 14.4993C3.57247 15.1553 2.19995 14.3884 2.19995 13.1367V2.86327Z"
-                                    fill="currentColor"
-                                />
-                            </svg>
-                        </button>
-
-                        <svg width="206" height="34" viewBox="0 0 206 34" fill="none" className="flex-1 text-fg-brand-primary_alt">
-                            <path
-                                d="M1 15V19M5 15V19M9 15V19M13 15V19M17 9.00005V25M21 5.00005V29M25 1.00005V33M29 1.00005V33M33 5.00005V29M37 13V21M41 9.00005V25M45 13V21M49 5.00005V29M53 5.00005V29M57 9.00005V25M61 9.00005V25M65 1.00005V33M69 1.00005V33M73 5.00005V29M77 1.00005V33M81 9.00005V25M85 13V21M89 15V19.0001M93 15V19.0001M97 13V21.0001M101 13V21.0001M105 9V25.0001M109 5V29.0001M113 1V33.0001M117 5V29.0001M121 5V29.0001M125 5V29.0001M129 9V25.0001M133 13V21.0001M137 9V25.0001M141 13V21.0001M145 9V25.0001M149 5V29.0001M153 5V29.0001M157 9V25.0001M161 1V33.0001M165 5V29.0001M169 9V25.0001M173 13V21.0001M177 15V19.0001M181 9V25.0001M185 5V29.0001M189 5V29.0001M193 9V25.0001M197 15V19.0001M201 15V19.0001M205 15V19.0001"
-                                stroke="currentColor"
-                                strokeLinecap="round"
-                            />
-                        </svg>
-
-                        <p className="text-xs text-tertiary">{msg.audio.duration}</p>
-
+                        <AudioPlayer src={msg.audio.src} duration={msg.audio.duration} />
                         {/*{renderActions()}*/}
                     </div>
                 ) : null}
