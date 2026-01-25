@@ -30,7 +30,7 @@ export const OnlineUsersProvider = ({ children }: OnlineUsersProviderProps) => {
     const connect = useCallback(() => {
         if (!user?.id) return;
 
-        const wsUrl = `ws://localhost:8000/api/v1/Hub/ws/online`;
+        const wsUrl = `${import.meta.env.VITE_WS_URL}/v1/Hub/ws/online`;
         const websocket = new WebSocket(wsUrl);
 
         websocket.onopen = () => {
