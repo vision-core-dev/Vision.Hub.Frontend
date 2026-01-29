@@ -66,6 +66,9 @@ import CreateEventPage from "@/features/events/CreateEventPage";
 // Org Structure
 import OrgStructurePage from "@/features/org-structure/OrgStructurePage";
 
+// Jobs
+import JobsPage from "@/features/jobs/JobsPage";
+
 export function AppRoutes() {
     return (
         <Routes>
@@ -74,6 +77,7 @@ export function AppRoutes() {
             <Route path="/deactivated" element={<AccountDeactivated />} />
             <Route path="/offer-agreement" element={<OfferAgreementPage />} />
             <Route path="/public/boards/b/:id" element={<BoardPage is_public />} />
+            <Route path="/jobs/:slug?" element={<JobsPage />} />
 
             {/* PROTECTED */}
             <Route element={<ProtectedRoute />}>
