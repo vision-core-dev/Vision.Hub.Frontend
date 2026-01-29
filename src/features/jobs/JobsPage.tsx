@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import { Send, CheckCircle, Zap, Globe, Users, MessageCircle } from "lucide-react";
 import { Button } from "@/shared/ui/buttons/button";
 import { JobCard } from "./components/JobCard";
@@ -113,7 +114,26 @@ const JobsPageContent: React.FC = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-950 font-sans selection:bg-brand-solid/30">
+        <div className="min-h-screen bg-white dark:bg-black font-sans selection:bg-brand-solid/30">
+            <Helmet>
+                <title>Kareria | Vision Core Dev</title>
+                <meta name="description" content="Join our team of visionaries and builders. Explore open positions at Vision Core Dev." />
+
+                {/* Open Graph / Facebook */}
+                <meta property="og:type" content="website" />
+                <meta property="og:url" content="https://hub.vcore.dev/jobs" />
+                <meta property="og:title" content="Kareria | Vision Core Dev" />
+                <meta property="og:description" content="Join our team of visionaries and builders. Explore open positions at Vision Core Dev." />
+                <meta property="og:image" content="https://hub.vcore.dev/og-image.jpg" />
+
+                {/* Twitter */}
+                <meta property="twitter:card" content="summary_large_image" />
+                <meta property="twitter:url" content="https://hub.vcore.dev/jobs" />
+                <meta property="twitter:title" content="Kareria | Vision Core Dev" />
+                <meta property="twitter:description" content="Join our team of visionaries and builders. Explore open positions at Vision Core Dev." />
+                <meta property="twitter:image" content="https://hub.vcore.dev/og-image.jpg" />
+            </Helmet>
+
             {/* Header with Language Switcher */}
             <div className="fixed top-4 right-4 z-50">
                 <LanguageSwitcher />

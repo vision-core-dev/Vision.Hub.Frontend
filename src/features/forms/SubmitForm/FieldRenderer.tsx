@@ -1,6 +1,7 @@
 import styles from "./SubmitForm.module.css";
 import type { FormField } from "./SubmitForm";
-import Input from "@/shared/ui/input-basic/Input";
+import { Input } from "@/shared/ui/input/input";
+import { TextArea } from "@/shared/ui/textarea/textarea";
 
 interface Props {
     field: FormField;
@@ -19,18 +20,16 @@ export default function FieldRenderer({
         case "text":
             return (
                 <Input
-                    type="text"
                     value={value ?? ""}
-                    onChange={(e) => onChange(e.target.value)}
+                    onChange={(value) => onChange(value)}
                 />
             );
 
         case "long_text":
             return (
-                <Input
-                    type="textarea"
+                <TextArea
                     value={value ?? ""}
-                    onChange={(e) => onChange(e.target.value)}
+                    onChange={(value) => onChange(value)}
                 />
             );
 

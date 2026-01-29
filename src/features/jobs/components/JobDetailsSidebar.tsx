@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { X, CheckCircle2, MapPin, DollarSign, Clock } from "lucide-react";
+import { Helmet } from "react-helmet-async";
+import { CheckCircle2, MapPin, DollarSign, Clock } from "lucide-react";
 import { Button } from "@/shared/ui/buttons/button";
 import { Input } from "@/shared/ui/input/input";
 import { TextArea } from "@/shared/ui/textarea/textarea";
@@ -92,6 +93,26 @@ export const JobDetailsSidebar: React.FC<JobDetailsSidebarProps> = ({ job, isOpe
             )}
             onClick={handleBackdropClick}
         >
+            {job && (
+                <Helmet>
+                    <title>{getLocalized(job.title)} | Vision Core Dev</title>
+                    <meta name="description" content={getLocalized(job.description).slice(0, 160)} />
+
+                    {/* Open Graph / Facebook */}
+                    <meta property="og:type" content="article" />
+                    <meta property="og:url" content={`https://hub.vcore.dev/jobs/${job.slug}`} />
+                    <meta property="og:title" content={`${getLocalized(job.title)} | Vision Core Dev`} />
+                    <meta property="og:description" content={getLocalized(job.description).slice(0, 160)} />
+                    <meta property="og:image" content="https://hub.vcore.dev/og-image.jpg" />
+
+                    {/* Twitter */}
+                    <meta property="twitter:card" content="summary_large_image" />
+                    <meta property="twitter:url" content={`https://hub.vcore.dev/jobs/${job.slug}`} />
+                    <meta property="twitter:title" content={`${getLocalized(job.title)} | Vision Core Dev`} />
+                    <meta property="twitter:description" content={getLocalized(job.description).slice(0, 160)} />
+                    <meta property="twitter:image" content="https://hub.vcore.dev/og-image.jpg" />
+                </Helmet>
+            )}
             <div
                 className={cx(
                     "w-full max-w-xl bg-white dark:bg-gray-900 h-full shadow-2xl flex flex-col transform transition-transform duration-300 ease-in-out",
