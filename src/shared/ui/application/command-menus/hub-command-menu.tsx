@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
+import { useNavigate } from "react-router-dom";
 import { api } from "@/shared/utils/api";
 import {
     File02,
@@ -25,6 +26,7 @@ interface SearchResultItem {
     name: string;
     description?: string;
     avatar_url?: string;
+    board_id?: string;
 }
 
 interface SearchResponse {
@@ -38,6 +40,7 @@ interface SearchResponse {
 }
 
 export const HubCommandMenu = ({ isOpen, onOpenChange }: HubCommandMenuProps) => {
+    const navigate = useNavigate();
     const [query, setQuery] = useState("");
     const [results, setResults] = useState<SearchResponse>({
         boards: [],
@@ -85,8 +88,8 @@ export const HubCommandMenu = ({ isOpen, onOpenChange }: HubCommandMenuProps) =>
         debouncedSearch(value);
     };
 
-    const mapToItem = (item: SearchResultItem, icon: any): CommandDropdownMenuItemProps => ({
-        id: item.id,
+    const mapToItem = (item: SearchResultItem, icon: any, type: string): CommandDropdownMenuItemProps => ({
+        id: `${type}:${item.id}`,
         type: "icon",
         label: item.name,
         description: item.description,
@@ -95,14 +98,44 @@ export const HubCommandMenu = ({ isOpen, onOpenChange }: HubCommandMenuProps) =>
     });
 
     const menuGroups = [
-        { id: "boards", title: "Дошки", items: results.boards.map(i => mapToItem(i, LayoutAlt01)) },
-        { id: "tasks", title: "Завдання", items: results.tasks.map(i => mapToItem(i, CheckSquare)) },
-        { id: "docs", title: "База знань", items: results.docs.map(i => mapToItem(i, File04)) },
-        { id: "doc-fragments", title: "Зміст документів", items: results.doc_fragments.map(i => mapToItem(i, File04)) },
-        { id: "users", title: "Користувачі", items: results.users.map(i => mapToItem(i, User01)) },
-        { id: "files", title: "Файли", items: results.files.map(i => mapToItem(i, File02)) },
-        { id: "groups", title: "Групи", items: results.groups.map(i => mapToItem(i, MessageChatCircle)) },
+        { id: "boards", title: "Дошки", items: results.boards.map(i => mapToItem(i, LayoutAlt01, "board")) },
+        { id: "tasks", title: "Завдання", items: results.tasks.map(i => mapToItem(i, CheckSquare, "task")) },
+        { id: "docs", title: "База знань", items: results.docs.map(i => mapToItem(i, File04, "doc")) },
+        { id: "doc-fragments", title: "Зміст документів", items: results.doc_fragments.map(i => mapToItem(i, File04, "doc")) },
+        { id: "users", title: "Користувачі", items: results.users.map(i => mapToItem(i, User01, "user")) },
+        { id: "files", title: "Файли", items: results.files.map(i => mapToItem(i, File02, "file")) },
+        { id: "groups", title: "Групи", items: results.groups.map(i => mapToItem(i, MessageChatCircle, "group")) },
     ].filter(group => group.items.length > 0);
+
+    const handleSelection = (key: string | number) => {
+        const [type, id] = String(key).split(":");
+
+        switch (type) {
+            case "board":
+                navigate(`/boards/b/${id}`);
+                break;
+            case "task":
+                const task = results.tasks.find(t => t.id === id);
+                if (task && task.board_id) {
+                    navigate(`/boards/b/${task.board_id}/t/${id}`);
+                } else {
+                    console.error("Task missing board_id or not found in current results");
+                }
+                break;
+            case "doc":
+                navigate(`/knowledge/d/${id}`);
+                break;
+            case "user":
+                navigate(`/users/u/${id}`);
+                break;
+            case "group":
+                navigate(`/chat/${id}`);
+                break;
+            default:
+                console.warn("Unknown item type:", type);
+        }
+        onOpenChange(false);
+    };
 
     return (
         <CommandMenu
@@ -113,10 +146,7 @@ export const HubCommandMenu = ({ isOpen, onOpenChange }: HubCommandMenuProps) =>
             onInputChange={onInputChange}
             filter={false} // Enable server-side filtering
             items={menuGroups}
-            onSelectionChange={(keys) => {
-                console.log("Selected:", keys);
-                onOpenChange(false);
-            }}
+            onSelectionChange={handleSelection}
             emptyState={
                 !isLoading && query.length > 0 ? (
                     <EmptyState size="sm" className="overflow-hidden p-6 pb-10">

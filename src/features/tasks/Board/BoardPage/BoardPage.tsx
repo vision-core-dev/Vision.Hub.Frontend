@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import styles from "./BoardPage.module.css";
 import ListItem from "../ListItem/ListItem";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import type { UserType } from "@/shared/types/Users.ts";
 import { api } from "@/shared/utils/api.ts";
 import LoaderDots from "@/shared/ui/loader-dots/LoaderDots.tsx";
@@ -65,7 +65,8 @@ interface Props {
 }
 
 const BoardPage = ({ is_public = false }: Props) => {
-    const { id } = useParams();
+    const { id, taskId } = useParams();
+    const navigate = useNavigate();
     const { user } = useAuth();
     const [boardDetails, setBoardDetails] = useState<BoardDetails | null>(null);
     const [boardLists, setBoardLists] = useState<List[]>([]);
@@ -75,8 +76,7 @@ const BoardPage = ({ is_public = false }: Props) => {
 
     const [showSettings, setShowSettings] = useState(false);
 
-    const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
-    const isTaskModalOpen = Boolean(selectedTaskId);
+    const isTaskModalOpen = Boolean(taskId);
 
     const scrollRef = useRef<HTMLDivElement | null>(null);
     useDragScroll(scrollRef, { axis: "x", speed: 1.2 });
@@ -139,6 +139,7 @@ const BoardPage = ({ is_public = false }: Props) => {
         }
     }, [id, fetchBoard]);
 
+    // Handle initial task selection from URL params? No, handled by derived state `taskId`
 
     const handleTaskMove = (taskId: string, toListId: string, newIndex: number): Task | null => {
         if (!boardDetails) return null;
@@ -223,7 +224,7 @@ const BoardPage = ({ is_public = false }: Props) => {
                             users={boardDetails.users}
                             key={list.id}
                             list={list}
-                            onSelectTask={(task) => setSelectedTaskId(task.id)}
+                            onSelectTask={(task) => navigate(is_public ? `/public/boards/b/${id}/t/${task.id}` : `/boards/b/${id}/t/${task.id}`)}
                             onTaskMove={handleTaskMove}
                         />
                     ))}
@@ -246,10 +247,10 @@ const BoardPage = ({ is_public = false }: Props) => {
                 isOpen={isTaskModalOpen}
                 onOpenChange={(open) => {
                     if (!open) {
-                        setSelectedTaskId(null);
+                        navigate(is_public ? `/public/boards/b/${id}` : `/boards/b/${id}`);
                     }
                 }}
-                taskId={selectedTaskId ?? ""}
+                taskId={taskId ?? ""}
                 boardTags={boardDetails.tags}
                 boardLists={boardLists}
             />

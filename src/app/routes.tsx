@@ -119,6 +119,7 @@ export function AppRoutes() {
                         <Route index element={<Navigate to="list" replace />} />
                         <Route path="list" element={<BoardsListPage />} />
                         <Route path="b/:id" element={<BoardPage is_public={false} />} />
+                        <Route path="b/:id/t/:taskId" element={<BoardPage is_public={false} />} />
                     </Route>
 
                     {/* knowledge */}
