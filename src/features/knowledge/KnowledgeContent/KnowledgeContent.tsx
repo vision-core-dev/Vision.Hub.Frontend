@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import styles from "./KnowledgeContent.module.css";
 import { Calendar } from "lucide-react";
 import { api } from "@/shared/utils/api.ts";
 import LoaderDots from "@/shared/ui/loader-dots/LoaderDots.tsx";
 import UserLabel from "@/shared/ui/user/UserLabel.tsx";
-import {safeDatetime} from "@/shared/utils/safeDate.ts";
-import type {UserType} from "@/shared/types/Users.ts";
+import { safeDatetime } from "@/shared/utils/safeDate.ts";
+import type { UserType } from "@/shared/types/Users.ts";
+import { useSearchParams } from "react-router-dom";
 
 interface DocumentData {
     id: string;
@@ -24,6 +25,10 @@ interface Props {
 const KnowledgeContent: React.FC<Props> = ({ documentId, sidebarButton, sidebarClose }) => {
     const [doc, setDoc] = useState<DocumentData | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
+
+    const [searchParams] = useSearchParams();
+    const highlightParam = searchParams.get("highlight");
+    const contentRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (!documentId) {
@@ -54,6 +59,82 @@ const KnowledgeContent: React.FC<Props> = ({ documentId, sidebarButton, sidebarC
         fetchDoc();
     }, [documentId]);
 
+
+    // Highlight logic - DOM Manipulation
+    useEffect(() => {
+        if (!doc || !highlightParam || !contentRef.current) return;
+
+        const rawTerm = highlightParam.trim();
+        if (!rawTerm) return;
+
+        // Use a timeout to ensure DOM is fully rendered
+        const timeoutId = setTimeout(() => {
+            if (!contentRef.current) return;
+
+            let term = rawTerm;
+            try {
+                term = decodeURIComponent(rawTerm);
+            } catch (e) { /* ignore */ }
+
+            const highlightInNode = (node: ChildNode) => {
+                if (node.nodeType === 3) { // Text node
+                    const text = node.nodeValue || "";
+                    if (!text.trim()) return;
+
+                    // Escape regex special chars
+                    const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    const regex = new RegExp(`(${escapedTerm})`, "gi");
+
+                    if (regex.test(text)) {
+                        const fragment = document.createDocumentFragment();
+                        let lastIdx = 0;
+                        let match;
+                        while ((match = regex.exec(text)) !== null) {
+                            const start = match.index;
+                            const end = regex.lastIndex;
+
+                            if (start > lastIdx) {
+                                fragment.appendChild(document.createTextNode(text.slice(lastIdx, start)));
+                            }
+
+                            const mark = document.createElement("mark");
+                            mark.textContent = match[0];
+                            mark.style.backgroundColor = "yellow";
+                            mark.style.color = "black";
+                            mark.className = "highlight-mark";
+                            fragment.appendChild(mark);
+
+                            lastIdx = end;
+                        }
+
+                        if (lastIdx < text.length) {
+                            fragment.appendChild(document.createTextNode(text.slice(lastIdx)));
+                        }
+
+                        node.parentNode?.replaceChild(fragment, node);
+                    }
+                } else if (node.nodeType === 1) { // Element
+                    const el = node as HTMLElement;
+                    if (el.nodeName !== "SCRIPT" && el.nodeName !== "STYLE" && el.nodeName !== "MARK") {
+                        Array.from(el.childNodes).forEach(highlightInNode);
+                    }
+                }
+            };
+
+            // Run highlight
+            Array.from(contentRef.current.childNodes).forEach(highlightInNode);
+
+            // Scroll to first mark
+            const firstMark = contentRef.current.querySelector("mark");
+            if (firstMark) {
+                firstMark.scrollIntoView({ behavior: "smooth", block: "center" });
+            }
+        }, 300);
+
+        return () => clearTimeout(timeoutId);
+
+    }, [doc, highlightParam]);
+
     if (loading)
         return <div className={styles.content}><LoaderDots /></div>;
 
@@ -79,6 +160,7 @@ const KnowledgeContent: React.FC<Props> = ({ documentId, sidebarButton, sidebarC
             </div>
 
             <div
+                ref={contentRef}
                 className={styles.body}
                 dangerouslySetInnerHTML={{ __html: doc.content }}
             />
@@ -87,12 +169,3 @@ const KnowledgeContent: React.FC<Props> = ({ documentId, sidebarButton, sidebarC
 };
 
 export default KnowledgeContent;
-
-
-
-
-
-
-
-
-

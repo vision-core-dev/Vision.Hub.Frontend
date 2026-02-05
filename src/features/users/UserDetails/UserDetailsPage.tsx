@@ -359,7 +359,7 @@ const UserDetailsPage = () => {
                         </div>
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                             <InfoItem icon={Mail} label="Email" value={user.email} />
-                            <InfoItem icon={Phone} label="Телефон" value="+380 (67) 123-45-67" />
+                            {/* <InfoItem icon={Phone} label="Телефон" value="+380 (67) 123-45-67" /> */}
                             {/* <InfoItem icon={MapPin} label="Локація" value="Київ, Україна" />
                             <InfoItem icon={Briefcase} label="Відділ" value="Development Team" /> */}
                         </div>

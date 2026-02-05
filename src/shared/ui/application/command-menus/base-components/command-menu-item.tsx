@@ -41,8 +41,8 @@ export type CommandDropdownMenuItemType =
     | CommandDropdownMenuItemDotType;
 
 const styles = {
-    sm: { wrapper: "py-2 px-2.5", label: "text-sm font-medium", description: "text-sm" },
-    md: { wrapper: "p-2.5", label: "text-md font-medium", description: "text-md font-medium" },
+    sm: { wrapper: "py-2 px-2.5", label: "text-sm font-medium truncate", description: "text-sm truncate" },
+    md: { wrapper: "p-2.5", label: "text-md font-medium truncate", description: "text-md font-medium truncate" },
 };
 
 // Omit keys from an object
@@ -98,7 +98,7 @@ export const CommandDropdownMenuItem = ({
                         </svg>
                     )}
 
-                    <div className={cx("flex flex-1 gap-x-2", stacked && "flex-col")}>
+                    <div className={cx("flex flex-1 gap-x-2 min-w-0", stacked && "flex-col")}>
                         <AriaText slot="label" className={cx("text-primary", styles[size].label)}>
                             {typeof children === "function" ? children(state) : children || label}
                         </AriaText>
