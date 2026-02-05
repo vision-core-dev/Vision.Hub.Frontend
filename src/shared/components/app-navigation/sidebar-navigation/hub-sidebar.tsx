@@ -10,6 +10,10 @@ import { api } from "@/shared/utils/api.ts";
 import { Bell, MessageCircle } from "lucide-react";
 import NotificationsMenu from "@/layouts/Notifications/NotificationsMenu.tsx";
 import { Badge } from "@/shared/ui/badges/badges.tsx";
+import { Input } from "@/shared/components/base/input/input";
+import { SearchLg } from "@untitledui/icons";
+import { HubCommandMenu } from "@/shared/ui/application/command-menus/hub-command-menu";
+import { useHotkeys } from "react-hotkeys-hook";
 
 interface SidebarNavigationProps {
     /** URL of the currently active item. */
@@ -29,7 +33,7 @@ interface SidebarNavigationProps {
 }
 
 
-export const SidebarNavigationSimple = ({
+export const SidebarNavigation = ({
     activeUrl,
     items,
     footerItems = [],
@@ -47,6 +51,12 @@ export const SidebarNavigationSimple = ({
 
     const [showNotifs, setShowNotifs] = useState(false);
     const [unreadCount, setUnreadCount] = useState(0);
+    const [isCommandMenuOpen, setIsCommandMenuOpen] = useState(false);
+
+    useHotkeys("/", (e) => {
+        e.preventDefault();
+        setIsCommandMenuOpen(true);
+    });
 
     const fetchMe = async () => {
         try {
@@ -91,6 +101,11 @@ export const SidebarNavigationSimple = ({
                 className,
             )}
         >
+
+            <div className="cursor-pointer" onClick={() => setIsCommandMenuOpen(true)}>
+                <Input isReadOnly shortcut="/" className="mt-4 px-4 lg:px-5 lg:mt-5 pointer-events-none" size="sm" aria-label="Пошук..." placeholder="Пошук..." icon={SearchLg} />
+            </div>
+
             <NavList activeUrl={activeUrl} items={items} />
 
             <div className="mt-auto flex flex-col gap-4 px-2 py-4 lg:px-4 lg:py-6">
@@ -137,6 +152,7 @@ export const SidebarNavigationSimple = ({
                 style={{ paddingLeft: MAIN_SIDEBAR_WIDTH }}
                 className="invisible hidden lg:sticky lg:top-0 lg:bottom-0 lg:left-0 lg:block"
             />
+            <HubCommandMenu isOpen={isCommandMenuOpen} onOpenChange={setIsCommandMenuOpen} />
         </>
     );
 };

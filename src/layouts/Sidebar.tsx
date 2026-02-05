@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 
 import type { NavItemType } from "@/shared/components/app-navigation/config";
-import { SidebarNavigationSimple } from "@/shared/components/app-navigation/sidebar-navigation/sidebar-simple";
+import { SidebarNavigation } from "@/shared/components/app-navigation/sidebar-navigation/hub-sidebar";
 import { getSidebarText } from "@/shared/types/Messages.ts";
 import { Badge } from "@/shared/ui/badges/badges.tsx";
 import { File02 } from "@untitledui/icons/File02";
@@ -72,7 +72,7 @@ const Sidebar: React.FC = () => {
     })
 
     return (
-        <SidebarNavigationSimple
+        <SidebarNavigation
             className="z-50"
             items={navItems}
         />
