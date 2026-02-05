@@ -146,7 +146,7 @@ export const HubCommandMenu = ({ isOpen, onOpenChange }: HubCommandMenuProps) =>
             onInputChange={onInputChange}
             filter={false} // Enable server-side filtering
             items={menuGroups}
-            onSelectionChange={handleSelection}
+            // onSelectionChange={handleSelection}
             emptyState={
                 !isLoading && query.length > 0 ? (
                     <EmptyState size="sm" className="overflow-hidden p-6 pb-10">
@@ -172,7 +172,7 @@ export const HubCommandMenu = ({ isOpen, onOpenChange }: HubCommandMenuProps) =>
                 <CommandMenu.List>
                     {(group) => (
                         <CommandMenu.Section {...group}>
-                            {(item) => <CommandMenu.Item key={item.id} {...item} />}
+                            {(item) => <CommandMenu.Item key={item.id} {...item} onAction={() => handleSelection(item.id)} />}
                         </CommandMenu.Section>
                     )}
                 </CommandMenu.List>
