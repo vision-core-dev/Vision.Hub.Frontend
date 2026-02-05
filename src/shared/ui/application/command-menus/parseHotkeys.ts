@@ -1,7 +1,8 @@
 // This is a 1:1 copy of the `parseHotkeys.ts` file from `react-hotkeys-hook`.
 // We need this because there's no way to import it from the package directly.
 // Source: https://github.com/JohannesKlauss/react-hotkeys-hook/blob/main/packages/react-hotkeys-hook/src/lib/parseHotkeys.ts
-import type { Hotkey, KeyboardModifiers } from "react-hotkeys-hook/packages/react-hotkeys-hook/dist/types";
+
+import type { Hotkey, KeyboardModifiers } from "react-hotkeys-hook/dist/types";
 
 const reservedModifierKeywords = ["shift", "alt", "meta", "mod", "ctrl", "control"];
 
