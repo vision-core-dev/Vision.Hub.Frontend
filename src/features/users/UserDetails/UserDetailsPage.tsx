@@ -12,7 +12,6 @@ import {
     Clock,
     CheckCircle2,
     Target,
-    Phone,
     Users,
     DollarSign,
     ListTodo,
