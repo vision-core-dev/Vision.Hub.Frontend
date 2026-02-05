@@ -66,6 +66,7 @@ export function parseHotkey(hotkey: string, splitKey = "+", sequenceSplitKey = "
     const singleCharKeys = keys.filter((k) => !reservedModifierKeywords.includes(k));
 
     return {
+        hotkey: hotkey,
         ...modifiers,
         keys: singleCharKeys,
         description,
