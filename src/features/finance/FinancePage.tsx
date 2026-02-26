@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 import { ArrowLeftRight, HandCoins, Plus, RefreshCw } from "lucide-react";
-import { Table } from "@/shared/components/table/table";
+import { Table, TableCard } from "@/shared/components/table/table";
 import DefaultPage from "@/shared/ui/default-page/DefaultPage.tsx";
 import { useNavigate } from "react-router-dom";
 import type { UserType } from "@/shared/types/Users.ts";
@@ -85,7 +85,7 @@ const FinancePage: React.FC = () => {
                     </>
                 )}>
 
-                <div className="min-w-full overflow-hidden rounded-xl border border-secondary bg-primary shadow-sm">
+                <TableCard.Root>
                     <Table aria-label="Історія виплат">
                         <Table.Header>
                             <Table.Head isRowHeader>Дата</Table.Head>
@@ -101,10 +101,10 @@ const FinancePage: React.FC = () => {
                             {(_item: any) => (<Table.Row><Table.Cell /></Table.Row>)}
                         </Table.Body>
                     </Table>
-                </div>
+                </TableCard.Root>
             </DefaultPage>
             <DefaultPage title="Невиплачені кошти">
-                <div className="min-w-full overflow-hidden rounded-xl border border-secondary bg-primary shadow-sm">
+                <TableCard.Root>
                     <Table aria-label="Невиплачені кошти">
                         <Table.Header>
                             <Table.Head isRowHeader>Користувач</Table.Head>
@@ -134,7 +134,7 @@ const FinancePage: React.FC = () => {
                                         />
                                     </Table.Cell>
                                     <Table.Cell>
-                                        <span className="font-semibold text-green-600">
+                                        <span className="font-semibold text-fg-success-primary">
                                             {item.amount.toFixed(2)} ₴
                                         </span>
                                     </Table.Cell>
@@ -146,7 +146,7 @@ const FinancePage: React.FC = () => {
                             )}
                         </Table.Body>
                     </Table>
-                </div>
+                </TableCard.Root>
             </DefaultPage>
         </>
     );

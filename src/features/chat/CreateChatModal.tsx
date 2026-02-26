@@ -108,7 +108,7 @@ export default function CreateChatModal({ isOpen, onClose, onChatCreated }: Crea
             <ModalOverlay isDismissable>
                 <Modal>
                     <Dialog>
-                        <div className="w-full max-w-md rounded-2xl bg-white dark:bg-[#1C1C1E] p-6 shadow-2xl flex flex-col gap-6">
+                        <div className="w-full max-w-md rounded-2xl bg-primary p-6 shadow-2xl flex flex-col gap-6">
                             {/* Header */}
                             <div className="flex items-center justify-between">
                                 <h2 className="text-xl font-semibold">Новий чат</h2>
@@ -166,10 +166,10 @@ export default function CreateChatModal({ isOpen, onClose, onChatCreated }: Crea
                                                     "flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors",
                                                     tab === "direct"
                                                         ? selectedUserId === user.id
-                                                            ? "bg-brand-50 dark:bg-brand-500/10 ring-1 ring-brand-500"
+                                                            ? "bg-secondary ring-1 ring-brand-500"
                                                             : "hover:bg-secondary/50"
                                                         : selectedUserIds.includes(user.id)
-                                                            ? "bg-brand-50 dark:bg-brand-500/10 ring-1 ring-brand-500"
+                                                            ? "bg-secondary ring-1 ring-brand-500"
                                                             : "hover:bg-secondary/50"
                                                 )}
                                                 onClick={() => {

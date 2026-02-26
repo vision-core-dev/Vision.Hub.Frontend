@@ -226,9 +226,9 @@ const DashboardPage: React.FC = () => {
     return (
         <div className="p-6 space-y-6">
             {/* Header */}
-            <h2 className="text-xl font-semibold">
+            <h2 className="text-xl font-semibold text-primary">
                 Привіт,{" "}
-                <span className="text-[#0a9a59] font-extrabold">
+                <span className="text-[#0a9a59] dark:text-fg-success-primary font-extrabold">
                     {user.first_name} {user.last_name || ""}
                 </span>
             </h2>
@@ -238,7 +238,7 @@ const DashboardPage: React.FC = () => {
 
                 {/* My Tasks */}
                 <div className="order-1 lg:order-1 flex flex-col gap-4">
-                    <h3 className="text-lg font-semibold flex items-center gap-2">
+                    <h3 className="text-lg font-semibold flex items-center gap-2 text-primary">
                         ✅ Мої задачі
                     </h3>
                     <MyTasksConnected />
@@ -246,7 +246,7 @@ const DashboardPage: React.FC = () => {
 
                 {/* Updates */}
                 <div className="order-2 lg:order-2 flex flex-col gap-4">
-                    <h3 className="text-lg font-semibold flex items-center gap-2">
+                    <h3 className="text-lg font-semibold flex items-center gap-2 text-primary">
                         📰 Останні оновлення
                     </h3>
                     <ActivityFeedConnected />

@@ -4,6 +4,7 @@
     display: flex;
     flex-direction: column;
 }
+
 .moderate {
     width: 50%;
     gap: 1.5rem;
@@ -24,12 +25,12 @@
 .header h1 {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #111827;
+    color: var(--text-color-primary);
 }
 
 .header p {
     font-size: 1rem;
-    color: #4b5563;
+    color: var(--text-color-secondary);
     line-height: 1.3;
 }
 
@@ -40,10 +41,10 @@
     margin-top: 1rem;
     margin-bottom: 1.5rem;
     padding: 1.5rem 1.8rem;
-    background: #ffffff;
+    background: var(--background-color-primary);
     border-radius: 12px;
-    border: 1px solid #e5e7eb;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border-color-secondary);
+    box-shadow: var(--shadow-sm);
 }
 
 .actions button {
@@ -70,10 +71,10 @@
     flex-direction: column;
     gap: .8rem;
     padding: 1.5rem 1.6rem;
-    background: #ffffff;
+    background: var(--background-color-primary);
     border-radius: 12px;
-    border: 1px solid #e5e7eb;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border-color-secondary);
+    box-shadow: var(--shadow-sm);
 }
 
 .infoRow {
@@ -81,7 +82,7 @@
     align-items: center;
     gap: 1rem;
     padding-bottom: 0.8rem;
-    border-bottom: 1px solid #f3f4f6;
+    border-bottom: 1px solid var(--border-color-secondary);
 }
 
 .infoRow:last-child {
@@ -99,6 +100,7 @@
     display: flex;
     width: 100%;
 }
+
 .locationRow button {
     min-width: 24px;
     margin-left: auto;
@@ -112,14 +114,14 @@
 
 .infoText label {
     font-size: 0.85rem;
-    color: #6b7280;
+    color: var(--text-color-tertiary);
     font-weight: 500;
 }
 
 .infoText span,
 .infoText a {
     font-size: .95rem;
-    color: #1f2937;
+    color: var(--text-color-primary);
     font-weight: 500;
 }
 
@@ -146,50 +148,44 @@
     padding: 1rem 1.2rem;
     border-radius: 12px;
     border: 2px solid transparent;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
     transition: all 0.25s ease;
-    background: #ffffff;
+    background: var(--background-color-primary);
     margin-bottom: 20px;
 }
 
 /* 🟡 PENDING */
 .status.pending {
-    background: #fffbeb;
-    color: #92400e;
-    border-color: #fbbf24;
-    box-shadow: 0 6px 20px rgba(251, 191, 36, 0.3);
+    background: var(--background-color-warning-primary);
+    color: var(--text-color-warning-primary);
+    border-color: var(--border-color-warning-secondary);
 }
 
 /* ✅ ACCEPTED */
 .status.accepted {
-    background: #ecfdf5;
-    color: #065f46;
-    border-color: #34d399;
-    box-shadow: 0 6px 20px rgba(52, 211, 153, 0.3);
+    background: var(--background-color-success-primary);
+    color: var(--text-color-success-primary);
+    border-color: var(--border-color-success-secondary);
 }
 
 /* ❌ DECLINED */
 .status.declined {
-    background: #fff1f2;
-    color: #b91c1c;
-    border-color: #f87171;
-    box-shadow: 0 6px 20px rgba(248, 113, 113, 0.3);
+    background: var(--background-color-error-primary);
+    color: var(--text-color-error-primary);
+    border-color: var(--border-color-error-secondary);
 }
 
 /* 🟢 ATTENDED */
 .status.attended {
-    background: #d1fae5;
-    color: #065f46;
-    border-color: #34d399;
-    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
+    background: var(--background-color-success-primary);
+    color: var(--text-color-success-primary);
+    border-color: var(--border-color-success-secondary);
 }
 
 /* ⚠️ NO SHOW */
 .status.no_show {
-    background: #ffedd5;
-    color: #b45309;
-    border-color: #fb923c;
-    box-shadow: 0 6px 20px rgba(251, 146, 60, 0.3);
+    background: var(--background-color-warning-primary);
+    color: var(--text-color-warning-primary);
+    border-color: var(--border-color-warning-secondary);
 }
 
 .status svg {
@@ -202,4 +198,29 @@
     display: flex;
     gap: 8px;
     justify-content: flex-end;
+}
+
+.statusAccepted {
+    color: var(--text-color-success-primary);
+    font-weight: 600;
+}
+
+.statusDeclined {
+    color: var(--text-color-error-primary);
+    font-weight: 600;
+}
+
+.statusPending {
+    color: var(--text-color-warning-primary);
+    font-weight: 600;
+}
+
+.statusAttended {
+    color: var(--text-color-success-primary);
+    font-weight: 600;
+}
+
+.statusNoShow {
+    color: var(--text-color-warning-primary);
+    font-weight: 600;
 }

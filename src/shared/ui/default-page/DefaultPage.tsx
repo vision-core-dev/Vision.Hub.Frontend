@@ -1,6 +1,7 @@
 import styles from "./DefaultPage.module.css";
 import type { ReactNode } from "react";
 import LoaderDots from "../loader-dots/LoaderDots.tsx";
+import { cx } from "@/shared/utils/cx";
 
 interface DefaultPageProps {
     title?: string;
@@ -21,15 +22,15 @@ const DefaultPage: React.FC<DefaultPageProps> = ({
 }) => {
     return (
         <div className="flex flex-col p-[28px]">
-            { (title || description || action) && (
-                    <div className={styles.pageHeader}>
-                        <div className={styles.pageTitleBlock}>
-                            {title && <span className={styles.title}>{title}</span>}
-                            {description && <p className={styles.description}>{description}</p>}
-                        </div>
-                        {action && <div className={styles.action}>{action}</div>}
+            {(title || description || action) && (
+                <div className={styles.pageHeader}>
+                    <div className={styles.pageTitleBlock}>
+                        {title && <span className={cx(styles.title, "text-primary")}>{title}</span>}
+                        {description && <p className={cx(styles.description, "text-tertiary")}>{description}</p>}
                     </div>
-                )
+                    {action && <div className={styles.action}>{action}</div>}
+                </div>
+            )
             }
 
             <div className={styles.pageContent} style={{ maxWidth }}>

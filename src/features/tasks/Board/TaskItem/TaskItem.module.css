@@ -1,5 +1,5 @@
 .task {
-    background: #ffffff;
+    background: var(--background-color-primary);
     border-radius: 10px;
     overflow: hidden;
     transition: background 0.2s, outline-color 0.1s;
@@ -80,7 +80,7 @@
 .title {
     font-size: 15px;
     font-weight: 600;
-    color: #172b4d;
+    color: var(--text-color-primary);
 }
 
 /* 👥 Асайні */
@@ -95,13 +95,13 @@
     height: 26px;
     border-radius: 50%;
     overflow: hidden;
-    background: #e5e7eb;
+    background: var(--background-color-tertiary);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 13px;
     font-weight: 600;
-    color: #374151;
+    color: var(--text-color-secondary);
 }
 
 .avatar img {
@@ -120,14 +120,14 @@
     font-size: 12px;
 }
 
-.deadline > svg {
-    color: #505258;
+.deadline>svg {
+    color: var(--text-color-quaternary);
     width: 16px;
     height: 16px;
 }
 
-.deadline > span {
-    color: #656565;
+.deadline>span {
+    color: var(--text-color-tertiary);
 }
 
 /* ✅ Готова задача — повноекранний банер */
@@ -148,7 +148,7 @@
     left: 0;
     width: 100%;
     padding: 16px;
-    background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.75) 100%);
+    background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.75) 100%);
     display: flex;
     align-items: center;
     gap: 8px;
@@ -190,7 +190,7 @@
 .doneTitleNoImage {
     font-size: 15px;
     font-weight: 600;
-    color: #000000;
+    color: var(--text-color-primary);
     margin: 0;
     padding: 0;
 }
@@ -205,23 +205,29 @@
 
 /* 🔥 Прострочена задача */
 .overdue {
-    outline-color: #e11d48 !important; /* червона рамка */
-    background: #fff5f5; /* легкий червонуватий фон */
+    outline-color: var(--color-error-600) !important;
+    /* червона рамка */
+    background: var(--color-bg-error-primary);
+    /* легкий червонуватий фон */
 }
 
 .overdue .title {
-    color: #e11d48 !important; /* заголовок червоним */
+    color: #e11d48 !important;
+    /* заголовок червоним */
 }
 
 .overdue .deadline svg,
 .overdue .deadline span {
-    color: #e11d48 !important; /* індикатор часу червоним */
+    color: #e11d48 !important;
+    /* індикатор часу червоним */
 }
 
 /* 🟨 Задача зі строком сьогодні */
 .today {
-    outline-color: #facc15 !important; /* насичений жовтий */
-    background: #fffef4; /* легкий теплий фон */
+    outline-color: var(--color-warning-500) !important;
+    /* жовтий */
+    background: var(--color-bg-warning-primary);
+    /* легкий теплий фон */
     animation: todayPulse 1.4s ease-in-out infinite;
 }
 

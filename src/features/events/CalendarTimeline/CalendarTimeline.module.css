@@ -16,7 +16,7 @@
 .header h2 {
     font-size: 1.3rem;
     font-weight: 700;
-    color: #111827;
+    color: var(--text-color-primary);
     margin: 0;
 }
 
@@ -33,8 +33,8 @@
 }
 
 .dayColumn {
-    background: #fff;
-    border: 1px solid #e4e4e7;
+    background: var(--background-color-primary);
+    border: 1px solid var(--border-color-secondary);
     border-radius: 16px;
     display: flex;
     flex-direction: column;
@@ -43,25 +43,26 @@
 }
 
 .dayHeader {
-    background: #f9fafb;
+    background: var(--background-color-secondary);
     padding: 0.75rem;
     font-weight: 600;
     text-align: center;
-    border-bottom: 1px solid #e4e4e7;
+    border-bottom: 1px solid var(--border-color-secondary);
+    color: var(--text-color-primary);
 }
 
 .dayBody {
     position: relative;
     flex: 1;
-    border-left: 1px solid #eee;
+    border-left: 1px solid var(--border-color-secondary);
 }
 
 .hourMark {
     position: relative;
     height: 60px;
-    border-bottom: 1px dashed #f1f1f3;
+    border-bottom: 1px dashed var(--border-color-secondary);
     font-size: 0.8rem;
-    color: #a1a1aa;
+    color: var(--text-color-tertiary);
     padding-left: 0.5rem;
 }
 
@@ -111,7 +112,7 @@
 
 .empty {
     text-align: center;
-    color: #a1a1aa;
+    color: var(--text-color-tertiary);
     padding: 2rem;
     font-size: 0.95rem;
 }

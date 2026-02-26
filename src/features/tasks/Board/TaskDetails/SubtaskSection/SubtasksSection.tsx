@@ -166,7 +166,7 @@ const SubtasksSection: React.FC<Props> = ({ taskId, initialSubtasks, users: init
 
     return (
         <section className="flex flex-col">
-            <h3>Підзадачі</h3>
+            <h3 className="text-secondary">Підзадачі</h3>
 
             {subtasks.length > 0 && (
                 <ProgressBar labelPosition="right" min={0} max={100} value={progress} />
@@ -179,7 +179,7 @@ const SubtasksSection: React.FC<Props> = ({ taskId, initialSubtasks, users: init
                     const isOverdue = deadline && today(getLocalTimeZone()).compare(deadline) > 0 && s.status !== "completed";
 
                     return (
-                        <div key={s.id} className="group flex items-start gap-3 py-3 border-b border-gray-100 last:border-0 hover:bg-gray-50/50 transition-colors">
+                        <div key={s.id} className="group flex items-start gap-3 py-3 border-b border-secondary last:border-0 hover:bg-secondary_subtle transition-colors">
                             <Checkbox
                                 isSelected={s.status === "completed"}
                                 onChange={() => handleToggle(s)}
@@ -189,7 +189,7 @@ const SubtasksSection: React.FC<Props> = ({ taskId, initialSubtasks, users: init
                             <div className="flex-1 min-w-0 flex flex-col pt-0.5">
                                 {editingId === s.id ? (
                                     <input
-                                        className="flex-1 rounded border border-blue-500 px-1.5 py-0.5 text-sm leading-6 outline-none bg-white font-medium text-gray-700"
+                                        className="flex-1 rounded border border-brand-primary px-1.5 py-0.5 text-sm leading-6 outline-none bg-primary font-medium text-primary"
                                         value={editingValue}
                                         autoFocus
                                         onChange={(e) => setEditingValue(e.target.value)}
@@ -202,8 +202,8 @@ const SubtasksSection: React.FC<Props> = ({ taskId, initialSubtasks, users: init
                                 ) : (
                                     <span
                                         className={cx(
-                                            "text-sm font-medium text-gray-700 dark:text-gray-200 cursor-pointer break-words",
-                                            s.status === "completed" && "text-gray-400 line-through decoration-gray-400"
+                                            "text-sm font-medium text-secondary cursor-pointer break-words",
+                                            s.status === "completed" && "text-quaternary line-through decoration-quaternary"
                                         )}
                                         onClick={() => {
                                             setEditingId(s.id);

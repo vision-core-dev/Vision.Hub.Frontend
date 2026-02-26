@@ -238,7 +238,7 @@ const TaskDetailsModal: React.FC<Props> = ({
             <ModalOverlay isDismissable>
                 <Modal>
                     <Dialog>
-                        <div className="relative w-full max-w-[900px] max-h-[90vh] flex flex-col overflow-hidden rounded-2xl bg-white dark:bg-[#1C1C1E] shadow-2xl">
+                        <div className="relative w-full max-w-[900px] max-h-[90vh] flex flex-col overflow-hidden rounded-2xl bg-primary shadow-2xl">
                             {loading || !task ? (
                                 <div className="flex h-[400px] items-center justify-center">
                                     <LoaderDots />
@@ -264,7 +264,7 @@ const TaskDetailsModal: React.FC<Props> = ({
 
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                                 <section className="flex flex-col gap-2">
-                                                    <Label className="text-xs uppercase tracking-wider text-gray-500 font-semibold mb-1">Учасники</Label>
+                                                    <Label className="text-xs uppercase tracking-wider text-secondary font-semibold mb-1">Учасники</Label>
                                                     <AssigneeSelector
                                                         taskId={task.id}
                                                         assignees={task.assignees}
@@ -275,7 +275,7 @@ const TaskDetailsModal: React.FC<Props> = ({
                                                 </section>
 
                                                 <section className="flex flex-col gap-2">
-                                                    <Label className="text-xs uppercase tracking-wider text-gray-500 font-semibold mb-1">Мітки</Label>
+                                                    <Label className="text-xs uppercase tracking-wider text-secondary font-semibold mb-1">Мітки</Label>
                                                     <TagSelector
                                                         taskId={task.id}
                                                         boardTags={boardTags}
@@ -308,7 +308,7 @@ const TaskDetailsModal: React.FC<Props> = ({
                                             </section>
 
                                             <section className="flex flex-col gap-2">
-                                                <Label className="text-xs uppercase tracking-wider text-gray-500 font-semibold mb-1">Опис</Label>
+                                                <Label className="text-xs uppercase tracking-wider text-secondary font-semibold mb-1">Опис</Label>
                                                 <TextEditor.Root
                                                     placeholder="Додайте опис задачі..."
                                                     inputClassName="w-full min-h-[150px]"
@@ -329,7 +329,7 @@ const TaskDetailsModal: React.FC<Props> = ({
                                                 </TextEditor.Root>
                                             </section>
 
-                                            <hr className="border-gray-100 dark:border-gray-800" />
+                                            <hr className="border-secondary" />
 
                                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                                                 <AttachmentsSection
@@ -348,7 +348,7 @@ const TaskDetailsModal: React.FC<Props> = ({
                                                 />
                                             </div>
 
-                                            <hr className="border-gray-100 dark:border-gray-800" />
+                                            <hr className="border-secondary" />
 
                                             <SubtasksSection
                                                 taskId={task.id}

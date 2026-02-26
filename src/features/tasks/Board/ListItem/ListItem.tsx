@@ -239,7 +239,7 @@ const ListItem = ({
     return (
         <div
             className={styles.list}
-            style={{ backgroundColor: list.color || "#f1f2f4" }}
+            style={{ "--list-bg": list.color || "#f1f2f4" } as React.CSSProperties}
         >
             <div className={styles.header}>
                 <h2
@@ -293,6 +293,7 @@ const ListItem = ({
                 <>
                     {!showCreateTask ? (
                         <Button color="tertiary" iconLeading={Plus}
+                            className={styles.addTask}
                             onClick={() => {
                                 setTaskName("")
                                 setShowCreateTask(true)

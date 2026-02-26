@@ -63,7 +63,7 @@ const TransactionsListSection: React.FC<TransactionsListSectionProps> = ({ trans
                         <div className="flex w-full items-start justify-between gap-4 sm:w-auto sm:justify-start">
                             <FeaturedIcon icon={icon} color={color} theme="modern" size="md" />
                             <div className="block sm:hidden">
-                                <span className={cx("whitespace-nowrap font-semibold", isIncome ? "text-success-primary" : "text-primary")}>
+                                <span className={cx("whitespace-nowrap font-semibold", isIncome ? "text-fg-success-primary" : "text-fg-error-primary")}>
                                     {isIncome ? "+" : ""}
                                     {t.amount.toFixed(2)} ₴
                                 </span>
@@ -79,7 +79,7 @@ const TransactionsListSection: React.FC<TransactionsListSectionProps> = ({ trans
                                     </div>
                                 </div>
                                 <div className="hidden sm:block">
-                                    <span className={cx("whitespace-nowrap font-semibold", isIncome ? "text-success-primary" : "text-primary")}>
+                                    <span className={cx("whitespace-nowrap font-semibold", isIncome ? "text-fg-success-primary" : "text-fg-error-primary")}>
                                         {isIncome ? "+" : ""}
                                         {t.amount.toFixed(2)} ₴
                                     </span>

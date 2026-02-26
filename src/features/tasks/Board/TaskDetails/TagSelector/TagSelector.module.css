@@ -27,10 +27,11 @@
     padding: 8px;
     border-radius: 8px;
     cursor: pointer;
+    color: var(--text-color-primary);
 }
 
 .option:hover {
-    background: var(--color-gray-50);
+    background: var(--background-color-primary_hover);
 }
 
 .color {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styles from "./Finance.module.css";
 import { Plus, Undo2, Search, Trash2 } from "lucide-react";
-import { Table } from "@/shared/components/table/table";
+import { Table, TableCard } from "@/shared/components/table/table";
 import DefaultPage from "@/shared/ui/default-page/DefaultPage.tsx";
 import { useNavigate } from "react-router-dom";
 import { api } from "@/shared/utils/api.ts";
@@ -177,7 +177,7 @@ const TransactionsList: React.FC = () => {
                 />
             </div>
 
-            <div className="min-w-full overflow-hidden rounded-xl border border-secondary bg-primary shadow-sm">
+            <TableCard.Root>
                 <Table aria-label="Транзакції">
                     <Table.Header>
                         <Table.Head isRowHeader>Дата і час</Table.Head>
@@ -190,7 +190,7 @@ const TransactionsList: React.FC = () => {
                         {(item: Transaction) => (
                             <Table.Row
                                 id={item.id}
-                                className="cursor-pointer hover:bg-gray-50 transition-colors"
+                                className="cursor-pointer hover:bg-secondary_hover transition-colors"
                                 onAction={() => openModal(item)}
                             >
                                 <Table.Cell>{safeDatetime(item.transaction_at)}</Table.Cell>
@@ -224,7 +224,9 @@ const TransactionsList: React.FC = () => {
                                             ? "Надходження"
                                             : item.type === "withdrawal"
                                                 ? "Вивід"
-                                                : item.type}
+                                                : item.type === "deduction"
+                                                    ? "Корегування"
+                                                    : "Витрати"}
                                     </span>
                                 </Table.Cell>
                                 <Table.Cell>{item.amount.toFixed(2)} ₴</Table.Cell>
@@ -240,7 +242,7 @@ const TransactionsList: React.FC = () => {
                         onPageChange={setPage}
                     />
                 )}
-            </div>
+            </TableCard.Root>
 
             {/* ========== EDIT MODAL ========== */}
             <ModalOverlay isOpen={!!selectedTx} onOpenChange={(open) => !open && closeModal()}>

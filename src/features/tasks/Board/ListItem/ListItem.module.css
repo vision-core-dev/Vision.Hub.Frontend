@@ -1,5 +1,5 @@
 .list {
-    background: #f1f2f4;
+    background: var(--list-bg, var(--background-color-secondary));
     width: 280px;
     flex-shrink: 0;
     border-radius: 12px;
@@ -10,8 +10,26 @@
     box-sizing: border-box;
     overflow-y: auto;
     overflow-x: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-sm);
     gap: 12px;
+}
+
+:global(.dark-mode) .list {
+    background: color-mix(in srgb, var(--list-bg, #f1f2f4), black 85%) !important;
+    border: 1px solid var(--border-color-secondary);
+}
+
+:global(.dark-mode) .title {
+    color: var(--text-color-primary) !important;
+}
+
+:global(.dark-mode) .addTask {
+    color: var(--text-color-secondary) !important;
+}
+
+:global(.dark-mode) .count {
+    background: var(--background-color-tertiary) !important;
+    color: var(--text-color-tertiary) !important;
 }
 
 .header {
@@ -50,26 +68,26 @@
     cursor: pointer;
     gap: 4px;
     transition: 0.2s;
-    color: #505258;
+    color: var(--text-color-secondary);
 }
 
 .addTask:hover {
-    background: rgba(255, 255, 255, 0.55);
+    background: var(--background-color-tertiary);
 }
 
 .title {
     font-size: 16px;
     font-weight: 600;
-    color: #172b4d;
+    color: var(--text-color-primary);
 }
 
 .count {
-    background: #dfe1e6;
+    background: var(--background-color-tertiary);
     border-radius: 20px;
     padding: 2px 8px;
     font-size: 12px;
     font-weight: 500;
-    color: #5e6c84;
+    color: var(--text-color-tertiary);
 }
 
 .createTask {

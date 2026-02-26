@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { api } from "@/shared/utils/api.ts";
 import { useNavigate } from "react-router-dom";
-import { Table } from "@/shared/components/table/table";
+import { Table, TableCard } from "@/shared/components/table/table";
 import type { EventType } from "@/shared/types/Events.ts";
 import { formatTime, safeDate } from "@/shared/utils/safeDate.ts";
 import DefaultPage from "@/shared/ui/default-page/DefaultPage.tsx";
 import { Plus } from "lucide-react";
 import { Button } from "@/shared/ui/buttons/button.tsx";
 
-const UsersListPage = () => {
+const EventsListPage = () => {
     const [events, setEvents] = useState<EventType[]>([]);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
@@ -51,7 +51,7 @@ const UsersListPage = () => {
                 {events.length === 0 ? (
                     <p>Поки немає жодної події.</p>
                 ) : (
-                    <div className="min-w-full overflow-hidden rounded-xl border border-secondary bg-primary shadow-sm">
+                    <TableCard.Root>
                         <Table aria-label="Заплановані події">
                             <Table.Header>
                                 <Table.Head isRowHeader>Дата</Table.Head>
@@ -60,7 +60,7 @@ const UsersListPage = () => {
                             </Table.Header>
                             <Table.Body items={events.filter(e => !e.date || new Date(e.date) >= new Date())}>
                                 {(item) => (
-                                    <Table.Row id={item.id} onAction={() => navigate(`/events/e/${item.id}`)} className="cursor-pointer">
+                                    <Table.Row id={item.id} onAction={() => navigate(`/events/e/${item.id}`)} className="cursor-pointer hover:bg-secondary_hover transition-colors">
                                         <Table.Cell>{safeDate(item.date)}</Table.Cell>
                                         <Table.Cell>{formatTime(item.time_from)} - {formatTime(item.time_to)}</Table.Cell>
                                         <Table.Cell>{item.name || "—"}</Table.Cell>
@@ -68,11 +68,11 @@ const UsersListPage = () => {
                                 )}
                             </Table.Body>
                         </Table>
-                    </div>
+                    </TableCard.Root>
                 )}
             </DefaultPage>
             <DefaultPage title="Архівні події">
-                <div className="min-w-full overflow-hidden rounded-xl border border-secondary bg-primary shadow-sm">
+                <TableCard.Root>
                     <Table aria-label="Архівні події">
                         <Table.Header>
                             <Table.Head isRowHeader>Дата</Table.Head>
@@ -81,7 +81,7 @@ const UsersListPage = () => {
                         </Table.Header>
                         <Table.Body items={events.filter(e => e.date && new Date(e.date) < new Date())}>
                             {(item) => (
-                                <Table.Row id={item.id} onAction={() => navigate(`/events/e/${item.id}`)} className="cursor-pointer">
+                                <Table.Row id={item.id} onAction={() => navigate(`/events/e/${item.id}`)} className="cursor-pointer hover:bg-secondary_hover transition-colors">
                                     <Table.Cell>{safeDate(item.date)}</Table.Cell>
                                     <Table.Cell>{formatTime(item.time_from)} - {formatTime(item.time_to)}</Table.Cell>
                                     <Table.Cell>{item.name || "—"}</Table.Cell>
@@ -89,14 +89,12 @@ const UsersListPage = () => {
                             )}
                         </Table.Body>
                     </Table>
-                </div>
+                </TableCard.Root>
             </DefaultPage>
         </>
     );
 };
-
-export default UsersListPage;
-
+export default EventsListPage;
 
 
 

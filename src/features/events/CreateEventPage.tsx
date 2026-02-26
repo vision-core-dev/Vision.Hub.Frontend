@@ -48,7 +48,7 @@ const CreateEventPage = () => {
             </Button>
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-4 max-w-md mt-6">
-                <h2 className="text-xl font-semibold">Нова подія</h2>
+                <h2 className="text-xl font-semibold text-primary">Нова подія</h2>
 
                 <Input
                     label="Назва події"
@@ -59,9 +59,9 @@ const CreateEventPage = () => {
                 />
 
                 <div className="flex flex-col gap-1.5">
-                    <label className="text-sm font-medium">Опис</label>
+                    <label className="text-sm font-medium text-secondary">Опис</label>
                     <textarea
-                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-md focus:ring-2 focus:ring-brand outline-none"
+                        className="w-full rounded-lg border border-secondary px-3 py-2 text-md focus:ring-2 focus:ring-brand outline-none bg-primary text-primary"
                         value={formData.description}
                         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                         rows={4}
@@ -108,7 +108,7 @@ const CreateEventPage = () => {
                 />
 
                 <div>
-                    <label className="block text-sm font-medium mb-2">
+                    <label className="block text-sm font-medium mb-2 text-secondary">
                         Учасники ({formData.invitees.length})
                     </label>
                     <UserSelect onChange={(ids) => setFormData({ ...formData, invitees: ids })} />

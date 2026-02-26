@@ -119,18 +119,18 @@ const UserActivitySection = ({ userId }: UserActivitySectionProps) => {
     const getActionColor = (action: string) => {
         switch (action.toLowerCase()) {
             case 'create':
-                return 'text-green-600 bg-green-50';
+                return 'text-fg-success-primary bg-bg-success-primary';
             case 'update':
-                return 'text-blue-600 bg-blue-50';
+                return 'text-fg-brand-primary bg-bg-brand-primary';
             case 'delete':
-                return 'text-red-600 bg-red-50';
+                return 'text-fg-error-primary bg-bg-error-primary';
             case 'archive':
-                return 'text-orange-600 bg-orange-50';
+                return 'text-fg-warning-primary bg-bg-warning-primary';
             case 'assign':
             case 'unassign':
-                return 'text-purple-600 bg-purple-50';
+                return 'text-fg-brand-secondary bg-bg-brand-secondary';
             default:
-                return 'text-gray-600 bg-gray-50';
+                return 'text-tertiary bg-secondary';
         }
     };
 
@@ -164,8 +164,8 @@ const UserActivitySection = ({ userId }: UserActivitySectionProps) => {
         return (
             <section className="rounded-xl border border-secondary bg-primary px-6 py-5 shadow-sm">
                 <div className="mb-4 flex items-center gap-2">
-                    <Activity size={18} className="text-brand-600" />
-                    <h3 className="m-0 text-base font-semibold">Остання активність</h3>
+                    <Activity size={18} className="text-fg-brand-primary" />
+                    <h3 className="m-0 text-base font-semibold text-primary">Остання активність</h3>
                 </div>
                 <p className="text-sm text-tertiary">Завантаження...</p>
             </section>
@@ -177,8 +177,8 @@ const UserActivitySection = ({ userId }: UserActivitySectionProps) => {
             <section className="rounded-xl border border-secondary bg-primary px-6 py-5 shadow-sm">
                 <div className="mb-4 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                        <Activity size={18} className="text-brand-600" />
-                        <h3 className="m-0 text-base font-semibold">Остання активність</h3>
+                        <Activity size={18} className="text-fg-brand-primary" />
+                        <h3 className="m-0 text-base font-semibold text-primary">Остання активність</h3>
                     </div>
                     {totalLogs > PREVIEW_COUNT && (
                         <Button
@@ -207,11 +207,11 @@ const UserActivitySection = ({ userId }: UserActivitySectionProps) => {
                 <ModalOverlay isDismissable>
                     <Modal>
                         <Dialog>
-                            <div className="relative w-full max-w-[800px] max-h-[90vh] flex flex-col overflow-hidden rounded-2xl bg-white dark:bg-[#1C1C1E] shadow-2xl">
+                            <div className="relative w-full max-w-[800px] max-h-[90vh] flex flex-col overflow-hidden rounded-2xl bg-primary shadow-2xl">
                                 <div className="flex items-center justify-between p-6 border-b border-secondary">
                                     <div className="flex items-center gap-2">
-                                        <Activity size={20} className="text-brand-600" />
-                                        <h2 className="text-xl font-semibold">Історія активності</h2>
+                                        <Activity size={20} className="text-fg-brand-primary" />
+                                        <h2 className="text-xl font-semibold text-primary">Історія активності</h2>
                                         <span className="text-sm text-tertiary">({totalLogs})</span>
                                     </div>
                                     <Button color="link-color" onClick={() => setIsModalOpen(false)} iconLeading={X} />

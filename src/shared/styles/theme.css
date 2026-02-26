@@ -95,16 +95,19 @@
         0% {
             transform: translateX(0);
         }
+
         100% {
             transform: translateX(-100%);
         }
     }
 
     @keyframes caret-blink {
+
         0%,
         50% {
             opacity: 1;
         }
+
         51%,
         100% {
             opacity: 0;
@@ -738,6 +741,7 @@
     --color-bg-primary-solid: var(--color-gray-950);
     --color-bg-primary_alt: var(--color-white);
     --color-bg-primary_hover: var(--color-gray-50);
+    --color-primary_hover: var(--color-bg-primary_hover);
     --color-bg-secondary: var(--color-gray-50);
     --color-bg-secondary-solid: var(--color-gray-600);
     --color-bg-secondary_subtle: var(--color-gray-25);
@@ -1161,6 +1165,7 @@
         --color-bg-primary-solid: var(--color-bg-secondary);
         --color-bg-primary_alt: var(--color-bg-secondary);
         --color-bg-primary_hover: var(--color-gray-800);
+        --color-primary_hover: var(--color-bg-primary_hover);
         --color-bg-secondary: var(--color-gray-900);
         --color-bg-secondary-solid: var(--color-gray-600);
         --color-bg-secondary_subtle: var(--color-gray-900);

@@ -67,14 +67,15 @@ const CreateTransaction = () => {
                 />
 
                 <Select
+                    label="Тип транзакції"
                     value={formData.type}
                     onChange={(value: Key | null) => setFormData({ ...formData, type: value as string })}
                     placeholder="Тип транзакції"
                 >
-                    <Select.Item id="income" label="Income">income</Select.Item>
-                    <Select.Item id="expense" label="Expense">expense</Select.Item>
-                    <Select.Item id="withdrawal" label="Withdrawal">withdrawal</Select.Item>
-                    <Select.Item id="deduction" label="Deduction">deduction</Select.Item>
+                    <Select.Item id="income" label="Доходи">income</Select.Item>
+                    <Select.Item id="expense" label="Витрати">expense</Select.Item>
+                    <Select.Item id="withdrawal" label="Виведення">withdrawal</Select.Item>
+                    <Select.Item id="deduction" label="Корегування">deduction</Select.Item>
                 </Select>
 
                 <Input

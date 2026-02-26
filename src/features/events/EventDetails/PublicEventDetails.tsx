@@ -39,37 +39,37 @@ const STATUS_CONFIG: Record<InviteStatus, StatusConfig> = {
     pending: {
         icon: Clock,
         text: "Запрошення очікує вашої відповіді",
-        bgClass: "bg-warning-50",
-        textClass: "text-warning-700",
-        borderClass: "border-warning-300",
+        bgClass: "bg-bg-warning-primary",
+        textClass: "text-fg-warning-primary",
+        borderClass: "border-warning_subtle",
     },
     accepted: {
         icon: Check,
         text: "Ви підтвердили участь",
-        bgClass: "bg-success-50",
-        textClass: "text-success-700",
-        borderClass: "border-success-300",
+        bgClass: "bg-bg-success-primary",
+        textClass: "text-fg-success-primary",
+        borderClass: "border-success_subtle",
     },
     declined: {
         icon: X,
-        text: "Ви відмовились від участі",
-        bgClass: "bg-error-50",
-        textClass: "text-error-700",
-        borderClass: "border-error-300",
+        text: "Ви відмовилась від участі",
+        bgClass: "bg-bg-error-primary",
+        textClass: "text-fg-error-primary",
+        borderClass: "border-error_subtle",
     },
     attended: {
         icon: Check,
         text: "Ви були присутні",
-        bgClass: "bg-success-100",
-        textClass: "text-success-800",
-        borderClass: "border-success-400",
+        bgClass: "bg-bg-success-primary",
+        textClass: "text-fg-success-primary",
+        borderClass: "border-success_subtle",
     },
     no_show: {
         icon: X,
         text: "Ви не з'явились",
-        bgClass: "bg-warning-100",
-        textClass: "text-warning-800",
-        borderClass: "border-warning-400",
+        bgClass: "bg-bg-warning-primary",
+        textClass: "text-fg-warning-primary",
+        borderClass: "border-warning_subtle",
     },
 };
 
@@ -82,8 +82,8 @@ interface InfoRowProps {
 
 const InfoRow = ({ icon: Icon, label, children, action }: InfoRowProps) => (
     <div className="flex items-start gap-4 py-4 border-b border-secondary last:border-b-0 last:pb-0 first:pt-0">
-        <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gray-50">
-            <Icon className="w-5 h-5 text-gray-500" />
+        <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-secondary">
+            <Icon className="w-5 h-5 text-tertiary" />
         </div>
         <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-tertiary">{label}</p>

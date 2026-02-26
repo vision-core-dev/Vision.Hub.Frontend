@@ -1,12 +1,14 @@
-import {Tabs} from "@/shared/components/tabs/tabs.tsx";
-import {NativeSelect} from "@/shared/ui/select/select-native.tsx";
-import type {Key} from "react-aria-components";
-import {useState} from "react";
+import { Tabs } from "@/shared/components/tabs/tabs.tsx";
+import { NativeSelect } from "@/shared/ui/select/select-native.tsx";
+import type { Key } from "react-aria-components";
+import { useState } from "react";
 import ProfileSettings from "@/features/user-settings/tabs/ProfileSettings.tsx";
-import {useAuth} from "@/core/auth/AuthContext.tsx";
+import InterfaceSettings from "@/features/user-settings/tabs/InterfaceSettings.tsx";
+import { useAuth } from "@/core/auth/AuthContext.tsx";
 
 const tabs = [
     { id: "profile", label: "Профіль" },
+    { id: "interface", label: "Інтерфейс" },
     // { id: "password", label: "Password" },
     // { id: "team", label: "Team" },
     // { id: "notifications", label: "Notifications", badge: 2 },
@@ -26,6 +28,8 @@ export default function UserSettingsPage() {
         switch (selectedTabIndex) {
             case "profile":
                 return <ProfileSettings user={user} />;
+            case "interface":
+                return <InterfaceSettings />;
             // case "password":
             //     return <PasswordSettings />;
             default:
@@ -49,7 +53,7 @@ export default function UserSettingsPage() {
                 </Tabs.List>
             </Tabs>
 
-            <div className="flex flex-col gap-4 max-w-[300px]">
+            <div className="flex flex-col gap-6 max-w-[400px]">
                 {renderTab()}
             </div>
 

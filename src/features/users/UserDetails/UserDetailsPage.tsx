@@ -309,8 +309,8 @@ const UserDetailsPage = () => {
                     {/* Статистика активності */}
                     <div className="rounded-xl border border-secondary bg-primary p-5 shadow-sm">
                         <div className="mb-4 flex items-center gap-2">
-                            <Activity size={18} className="text-brand-600" />
-                            <h3 className="m-0 text-base font-semibold">Статистика активності</h3>
+                            <Activity size={18} className="text-fg-brand-primary" />
+                            <h3 className="m-0 text-base font-semibold text-primary">Статистика активності</h3>
                         </div>
                         <div className="flex flex-col gap-3">
                             <StatItem icon={CheckCircle2} label="Завершено задач" value={taskStats.completed.toString()} />
@@ -327,8 +327,8 @@ const UserDetailsPage = () => {
                     <section className="rounded-xl border border-secondary bg-primary px-6 py-5 shadow-sm">
                         <div className="mb-4 flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                                <ListTodo size={18} className="text-brand-600" />
-                                <h3 className="m-0 text-base font-semibold">Активні задачі</h3>
+                                <ListTodo size={18} className="text-fg-brand-primary" />
+                                <h3 className="m-0 text-base font-semibold text-primary">Активні задачі</h3>
                             </div>
                             <Button
                                 color="link-color"
@@ -353,8 +353,8 @@ const UserDetailsPage = () => {
                     {/* Контактна інформація */}
                     <section className="rounded-xl border border-secondary bg-primary px-6 py-5 shadow-sm">
                         <div className="mb-4 flex items-center gap-2">
-                            <Mail size={18} className="text-brand-600" />
-                            <h3 className="m-0 text-base font-semibold">Контактна інформація</h3>
+                            <Mail size={18} className="text-fg-brand-primary" />
+                            <h3 className="m-0 text-base font-semibold text-primary">Контактна інформація</h3>
                         </div>
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                             <InfoItem icon={Mail} label="Email" value={user.email} />
@@ -367,8 +367,8 @@ const UserDetailsPage = () => {
                     {/* Особиста інформація */}
                     <section className="rounded-xl border border-secondary bg-primary px-6 py-5 shadow-sm">
                         <div className="mb-4 flex items-center gap-2">
-                            <Calendar size={18} className="text-brand-600" />
-                            <h3 className="m-0 text-base font-semibold">Особиста інформація</h3>
+                            <Calendar size={18} className="text-fg-brand-primary" />
+                            <h3 className="m-0 text-base font-semibold text-primary">Особиста інформація</h3>
                         </div>
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                             <UserValue
@@ -386,8 +386,8 @@ const UserDetailsPage = () => {
                     {/* Фінансова інформація */}
                     <section className="rounded-xl border border-secondary bg-primary px-6 py-5 shadow-sm">
                         <div className="mb-4 flex items-center gap-2">
-                            <DollarSign size={18} className="text-brand-600" />
-                            <h3 className="m-0 text-base font-semibold">Фінанси</h3>
+                            <DollarSign size={18} className="text-fg-brand-primary" />
+                            <h3 className="m-0 text-base font-semibold text-primary">Фінанси</h3>
                         </div>
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                             <FinanceCard label="Поточний баланс" value={user.balance} />
@@ -399,7 +399,7 @@ const UserDetailsPage = () => {
                     {/* Показники ефективності */}
                     {/* <section className="rounded-xl border border-secondary bg-primary px-6 py-5 shadow-sm">
                         <div className="mb-4 flex items-center gap-2">
-                            <BarChart3 size={18} className="text-brand-600" />
+                            <BarChart3 size={18} className="text-fg-brand-primary" />
                             <h3 className="m-0 text-base font-semibold">Показники ефективності</h3>
                         </div>
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -419,8 +419,8 @@ const UserDetailsPage = () => {
                     {(supervisors.length > 0 || subordinates.length > 0) && (
                         <section className="flex flex-col gap-4 rounded-xl border border-secondary bg-primary px-6 py-5 shadow-sm">
                             <div className="flex items-center gap-2">
-                                <Users size={18} className="text-brand-600" />
-                                <h3 className="m-0 text-base font-semibold">Організаційна структура</h3>
+                                <Users size={18} className="text-fg-brand-primary" />
+                                <h3 className="m-0 text-base font-semibold text-primary">Організаційна структура</h3>
                             </div>
 
                             <UsersGroup
@@ -439,8 +439,8 @@ const UserDetailsPage = () => {
                     {transactions.length > 0 && (
                         <section className="rounded-xl border border-secondary bg-primary px-6 py-5 shadow-sm">
                             <div className="mb-4 flex items-center gap-2">
-                                <DollarSign size={18} className="text-brand-600" />
-                                <h3 className="m-0 text-base font-semibold">Транзакції</h3>
+                                <DollarSign size={18} className="text-fg-brand-primary" />
+                                <h3 className="m-0 text-base font-semibold text-primary">Транзакції</h3>
                             </div>
                             <TransactionsListSection transactions={displayedTransactions} />
                             {transactions.length > TRANSACTIONS_PREVIEW_COUNT && !showAllTransactions && (
@@ -505,8 +505,8 @@ interface StatItemProps {
 const StatItem = ({ icon: Icon, label, value, trend }: StatItemProps) => (
     <div className="flex items-center justify-between rounded-lg border border-secondary bg-secondary/30 px-3 py-2.5 transition-all hover:bg-secondary/50">
         <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-50">
-                <Icon size={16} className="text-brand-600" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-secondary">
+                <Icon size={16} className="text-brand-tertiary" />
             </div>
             <div className="flex flex-col">
                 <span className="text-xs text-tertiary">{label}</span>
@@ -530,8 +530,8 @@ const TaskItem = ({ task }: TaskItemProps) => {
     const isOverdue = !isDone && task.deadline_at && new Date(task.deadline_at) < new Date();
 
     const getStatusColor = () => {
-        if (isOverdue) return 'text-red-600 bg-red-50 border-red-200';
-        if (isDone) return 'text-gray-500 bg-gray-50 border-gray-200 opacity-70';
+        if (isOverdue) return 'text-fg-error-primary bg-bg-error-primary border-error_subtle';
+        if (isDone) return 'text-tertiary bg-secondary border-secondary opacity-70';
         return 'text-primary bg-secondary/30 border-secondary';
     };
 
@@ -577,11 +577,11 @@ interface FinanceCardProps {
 
 const FinanceCard = ({ label, value, highlight }: FinanceCardProps) => (
     <div className={`flex flex-col gap-1.5 rounded-lg border p-4 transition-all ${highlight
-        ? 'border-brand-200 bg-brand-50/50 hover:bg-brand-50'
+        ? 'border-brand-solid bg-secondary'
         : 'border-secondary bg-secondary/30 hover:bg-secondary/50'
         }`}>
         <span className="text-xs font-medium text-tertiary">{label}</span>
-        <span className={`text-xl font-bold ${highlight ? 'text-brand-700' : 'text-primary'}`}>
+        <span className={`text-xl font-bold ${highlight ? 'text-fg-brand-primary' : 'text-primary'}`}>
             {value.toLocaleString()} ₴
         </span>
     </div>
@@ -677,9 +677,9 @@ const RoleChangeModal = ({ isOpen, onOpenChange, roles, selectedRole, onRoleChan
         <ModalOverlay isDismissable>
             <Modal>
                 <Dialog>
-                    <div className="relative w-full max-w-[300px] max-h-[90vh] flex flex-col overflow-hidden rounded-2xl bg-white dark:bg-[#1C1C1E] shadow-2xl p-6 gap-6">
+                    <div className="relative w-full max-w-[300px] max-h-[90vh] flex flex-col overflow-hidden rounded-2xl bg-primary shadow-2xl p-6 gap-6">
                         <div className="flex items-center justify-between">
-                            <h2 className="text-xl font-semibold">Змінити роль</h2>
+                            <h2 className="text-xl font-semibold text-primary">Змінити роль</h2>
                             <CloseButton onClick={() => onOpenChange(false)} />
                         </div>
 
@@ -745,15 +745,15 @@ const StructureEditModal = ({
             <ModalOverlay isDismissable>
                 <Modal>
                     <Dialog>
-                        <div className="relative w-full max-w-[600px] max-h-[90vh] flex flex-col overflow-hidden rounded-2xl bg-white dark:bg-[#1C1C1E] shadow-2xl p-6 gap-6">
+                        <div className="relative w-full max-w-[600px] max-h-[90vh] flex flex-col overflow-hidden rounded-2xl bg-primary shadow-2xl p-6 gap-6">
                             <div className="flex items-center justify-between">
-                                <h2 className="text-xl font-semibold">Редагувати структуру</h2>
+                                <h2 className="text-xl font-semibold text-primary">Редагувати структуру</h2>
                                 <CloseButton onClick={() => onOpenChange(false)} />
                             </div>
 
                             {/* Керівники */}
                             <div className="flex flex-col gap-3">
-                                <h3 className="text-base font-semibold">Керівники</h3>
+                                <h3 className="text-base font-semibold text-primary">Керівники</h3>
                                 {supervisors.map((u) => (
                                     <div key={u.id} className="flex items-center gap-2">
                                         <AvatarLabelGroupWithDropdown
@@ -789,7 +789,7 @@ const StructureEditModal = ({
 
                             {/* Підлеглі */}
                             <div className="flex flex-col gap-3">
-                                <h3 className="text-base font-semibold">Підлеглі</h3>
+                                <h3 className="text-base font-semibold text-primary">Підлеглі</h3>
                                 {subordinates.map((u) => (
                                     <div key={u.id} className="flex items-center gap-2">
                                         <AvatarLabelGroupWithDropdown
@@ -878,10 +878,10 @@ const TasksModal = ({ isOpen, onOpenChange, tasks }: TasksModalProps) => {
             <ModalOverlay isDismissable>
                 <Modal className="max-w-3xl">
                     <Dialog>
-                        <div className="relative w-full max-w-[900px] min-h-[40vh] max-h-[90vh] flex flex-col overflow-hidden rounded-2xl bg-white dark:bg-[#1C1C1E] shadow-2xl p-6 gap-6">
+                        <div className="relative w-full max-w-[900px] min-h-[40vh] max-h-[90vh] flex flex-col overflow-hidden rounded-2xl bg-primary shadow-2xl p-6 gap-6">
 
                             <div className="flex items-center justify-between">
-                                <h2 className="text-xl font-semibold">Задачі користувача</h2>
+                                <h2 className="text-xl font-semibold text-primary">Задачі користувача</h2>
                                 <CloseButton onClick={() => onOpenChange(false)} />
                             </div>
 

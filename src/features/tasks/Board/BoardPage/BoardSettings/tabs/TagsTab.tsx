@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { api } from "@/shared/utils/api";
 import { Trash } from "lucide-react";
-import {Button} from "@/shared/ui/buttons/button.tsx";
-import {Input} from "@/shared/ui/input/input.tsx";
+import { Button } from "@/shared/ui/buttons/button.tsx";
+import { Input } from "@/shared/ui/input/input.tsx";
 
 /* ===================== TYPES ===================== */
 
@@ -21,10 +21,10 @@ interface TagsTabProps {
 /* ===================== COMPONENT ===================== */
 
 export default function TagsTab({
-                                    boardId,
-                                    tags,
-                                    onUpdate,
-                                }: TagsTabProps) {
+    boardId,
+    tags,
+    onUpdate,
+}: TagsTabProps) {
     const [newTag, setNewTag] = useState({
         name: "",
         color: "#5a8dee",
@@ -85,34 +85,42 @@ export default function TagsTab({
                     структурувати задачі.
                 </p>
 
-                <div className="mt-4 grid grid-cols-1 md:grid-cols-[1fr_160px_auto] gap-3">
-                    <Input
-                        type="text"
-                        placeholder="Назва тегу"
-                        value={newTag.name}
-                        onChange={(value) =>
-                            setNewTag({
-                                ...newTag,
-                                name: value,
-                            })
-                        }
-                    />
+                <div className="mt-4 flex flex-col md:flex-row gap-3 items-end">
+                    <div className="flex-1 w-full">
+                        <Input
+                            type="text"
+                            label="Назва тегу"
+                            placeholder="Напр. Дизайн"
+                            value={newTag.name}
+                            onChange={(value) =>
+                                setNewTag({
+                                    ...newTag,
+                                    name: value,
+                                })
+                            }
+                        />
+                    </div>
 
-                    <Input
-                        type="color"
-                        value={newTag.color}
-                        onChange={(value) =>
-                            setNewTag({
-                                ...newTag,
-                                color: value,
-                            })
-                        }
-                    />
+                    <div className="w-full md:w-24">
+                        <Input
+                            type="color"
+                            label="Колір"
+                            value={newTag.color}
+                            onChange={(value) =>
+                                setNewTag({
+                                    ...newTag,
+                                    color: value,
+                                })
+                            }
+                            inputClassName="p-1 h-10"
+                        />
+                    </div>
 
                     <Button
                         size="md"
                         onClick={createTag}
                         isLoading={loading}
+                        className="md:mb-0.5"
                     >
                         Додати
                     </Button>
@@ -135,7 +143,7 @@ export default function TagsTab({
                     {tags.map((tag) => (
                         <div
                             key={tag.id}
-                            className="flex items-center gap-2 rounded-full border border-secondary bg-primary px-3 py-1.5"
+                            className="flex items-center gap-2 rounded-full border border-secondary bg-secondary/30 pl-3 pr-1 py-1"
                         >
                             <span
                                 className="h-2.5 w-2.5 rounded-full"
@@ -143,18 +151,19 @@ export default function TagsTab({
                                     backgroundColor: tag.color,
                                 }}
                             />
-                            <span className="text-sm font-medium">
+                            <span className="text-sm font-medium text-primary">
                                 {tag.name}
                             </span>
 
                             <Button
-                                size="md"
-                                color="primary-destructive"
+                                size="sm"
+                                color="tertiary-destructive"
                                 onClick={() =>
                                     deleteTag(tag.id)
                                 }
                                 isLoading={loading}
                                 iconLeading={Trash}
+                                className="rounded-full"
                             />
                         </div>
                     ))}

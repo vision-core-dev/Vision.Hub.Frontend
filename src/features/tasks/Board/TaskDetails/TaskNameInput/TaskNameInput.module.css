@@ -4,18 +4,18 @@
     box-sizing: border-box;
 }
 
-.taskName > textarea {
+.taskName>textarea {
     width: 100%;
     min-height: 32px;
     font-size: 26px;
     font-weight: 600;
-    color: #111827;
+    color: var(--text-color-primary);
     border: none;
     outline: none;
     background-color: transparent;
     resize: none;
     overflow: hidden;
-    border-bottom: 2px solid #ffffff;
+    border-bottom: 2px solid var(--border-color-secondary);
     transition: border-color 0.1s ease;
 }
 
