@@ -3,6 +3,7 @@ export interface MyRole {
     key: string;
     name: string;
     menu: string[];
+    order: number;
 }
 
 export interface MeUser {

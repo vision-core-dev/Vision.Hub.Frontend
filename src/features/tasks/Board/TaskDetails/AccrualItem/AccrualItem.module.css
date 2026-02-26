@@ -7,20 +7,29 @@
     border-radius: 8px;
     background: #fff;
     margin-bottom: 6px;
+    transition: box-shadow 0.15s ease;
 }
 
-.avatar {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    object-fit: cover;
+.item:hover {
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
 }
 
-.name {
+.item:hover .actions {
+    opacity: 1;
+}
+
+.nameLabel {
     flex: 1;
-    font-size: 14px;
-    font-weight: 500;
-    color: #111827;
+    min-width: 0;
+}
+
+.nameText {
+    font-size: 12px;
+    color: #6b7280;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
 }
 
 .amount {
@@ -30,12 +39,161 @@
     border-radius: 6px;
     font-size: 14px;
     font-weight: 600;
+    flex-shrink: 0;
 }
 
 .plus {
-    color: #1fa971; /* зелений */
+    color: #1fa971;
 }
 
 .minus {
-    color: #d14848; /* червоний */
+    color: #d14848;
+}
+
+.actions {
+    display: flex;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    flex-shrink: 0;
+}
+
+.actionBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: none;
+    background: transparent;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.actionBtn:hover {
+    background: #f3f4f6;
+    color: #111827;
+}
+
+.deleteBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: none;
+    background: transparent;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.deleteBtn:hover {
+    background: #fef2f2;
+    color: #ef4444;
+}
+
+/* EDIT MODE */
+.editItem {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 12px;
+    border: 1px solid #a5b4fc;
+    border-radius: 8px;
+    background: #f8faff;
+    margin-bottom: 6px;
+    animation: fadeIn 0.15s ease;
+}
+
+.editFields {
+    display: flex;
+    gap: 8px;
+}
+
+.editNameInput {
+    flex: 1;
+    padding: 6px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 13px;
+    outline: none;
+    background: #fff;
+    transition: border-color 0.15s;
+}
+
+.editNameInput:focus {
+    border-color: #6366f1;
+}
+
+.editAmountInput {
+    width: 100px;
+    padding: 6px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 13px;
+    outline: none;
+    text-align: right;
+    background: #fff;
+    transition: border-color 0.15s;
+}
+
+.editAmountInput:focus {
+    border-color: #6366f1;
+}
+
+.editActions {
+    display: flex;
+    gap: 4px;
+    justify-content: flex-end;
+}
+
+.saveBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: none;
+    background: #ecfdf5;
+    color: #059669;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.saveBtn:hover {
+    background: #d1fae5;
+}
+
+.cancelBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: none;
+    background: #fef2f2;
+    color: #ef4444;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.cancelBtn:hover {
+    background: #fee2e2;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-2px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

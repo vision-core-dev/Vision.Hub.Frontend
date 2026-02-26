@@ -21,6 +21,11 @@ export interface Transaction {
     amount: number;
     name: string;
     transaction_at: string;
+    task?: {
+        name: string;
+        start_at?: string;
+        deadline_at?: string;
+    };
 }
 
 interface WithdrawRequest {

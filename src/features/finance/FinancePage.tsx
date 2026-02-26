@@ -1,6 +1,6 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
-import { ArrowLeftRight, HandCoins, Plus } from "lucide-react";
+import { ArrowLeftRight, HandCoins, Plus, RefreshCw } from "lucide-react";
 import { Table } from "@/shared/components/table/table";
 import DefaultPage from "@/shared/ui/default-page/DefaultPage.tsx";
 import { useNavigate } from "react-router-dom";
@@ -18,28 +18,61 @@ interface NoWithdrawnDataRes {
     }>;
 }
 
+interface BalanceData {
+    balance: number;
+    income_total: number;
+    expense_total: number;
+}
+
 const FinancePage: React.FC = () => {
     const navigate = useNavigate();
 
-    const [noWithdrawnData, setNoWithdrawnData] = React.useState<Array<any>>([]);
+    const [noWithdrawnData, setNoWithdrawnData] = useState<Array<any>>([]);
+    const [, setBalanceData] = useState<BalanceData | null>(null);
+    const [loadingBalance, setLoadingBalance] = useState(false);
 
+    const fetchBalance = async () => {
+        setLoadingBalance(true);
+        try {
+            const res = await api.get("/v1/Hub/Finance/GetRealTimeBalance");
+            const data = (await res.json()) as BalanceData;
+            setBalanceData(data);
+        } catch (e) {
+            console.error("Failed to fetch balance", e);
+        } finally {
+            setLoadingBalance(false);
+        }
+    };
 
+    const fetchUnwithdrawn = async () => {
+        const res = await api.get("/v1/Hub/Finance/GetUnwithdrawnList");
+        const data = (await res.json()) as NoWithdrawnDataRes;
+        setNoWithdrawnData(data.items);
+    };
 
     useEffect(() => {
-        const fetchData = async () => {
-            const res = await api.get("/v1/Hub/Finance/GetUnwithdrawnList");
-            const data = (await res.json()) as NoWithdrawnDataRes;
-            setNoWithdrawnData(data.items);
-        };
-        fetchData();
-    }, []);
+        fetchBalance();
+        fetchUnwithdrawn();
 
+        // Poll balance every 30 seconds
+        const interval = setInterval(fetchBalance, 30000);
+        return () => clearInterval(interval);
+    }, []);
 
     return (
         <>
-            <DefaultPage title={`0.00 ₴`}
+            <DefaultPage title=""
                 action={(
                     <>
+                        <Button
+                            color="secondary"
+                            onClick={fetchBalance}
+                            iconLeading={RefreshCw}
+                            disabled={loadingBalance}
+                            size="sm"
+                        >
+                            Оновити
+                        </Button>
                         <Button color="primary" onClick={() => navigate('/finance/withdraws/list')} iconLeading={HandCoins}>
                             Запити на вивід
                         </Button>
@@ -51,6 +84,7 @@ const FinancePage: React.FC = () => {
                         </Button>
                     </>
                 )}>
+
                 <div className="min-w-full overflow-hidden rounded-xl border border-secondary bg-primary shadow-sm">
                     <Table aria-label="Історія виплат">
                         <Table.Header>
@@ -64,7 +98,6 @@ const FinancePage: React.FC = () => {
                                 <p>Немає даних</p>
                             </div>
                         )}>
-                            {/* Empty items, this won't be called */}
                             {(_item: any) => (<Table.Row><Table.Cell /></Table.Row>)}
                         </Table.Body>
                     </Table>
@@ -75,7 +108,7 @@ const FinancePage: React.FC = () => {
                     <Table aria-label="Невиплачені кошти">
                         <Table.Header>
                             <Table.Head isRowHeader>Користувач</Table.Head>
-                            <Table.Head>Сума</Table.Head>
+                            <Table.Head>Сума (реальний баланс)</Table.Head>
                             <Table.Head>Остання сума виплати</Table.Head>
                             <Table.Head>Остання виплата</Table.Head>
                         </Table.Header>
@@ -100,7 +133,11 @@ const FinancePage: React.FC = () => {
                                             onViewProfile={() => navigate(`/users/u/${item.user.id}`)}
                                         />
                                     </Table.Cell>
-                                    <Table.Cell>{item.amount.toFixed(2)} ₴</Table.Cell>
+                                    <Table.Cell>
+                                        <span className="font-semibold text-green-600">
+                                            {item.amount.toFixed(2)} ₴
+                                        </span>
+                                    </Table.Cell>
                                     <Table.Cell>{item.last_withdraw_amount.toFixed(2)} ₴</Table.Cell>
                                     <Table.Cell>
                                         {item.last_withdraw_at ? new Date(item.last_withdraw_at).toLocaleDateString("uk-UA") : "—"}
@@ -116,12 +153,3 @@ const FinancePage: React.FC = () => {
 };
 
 export default FinancePage;
-
-
-
-
-
-
-
-
-

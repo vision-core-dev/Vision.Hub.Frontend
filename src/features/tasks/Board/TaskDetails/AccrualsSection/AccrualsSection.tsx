@@ -9,12 +9,14 @@ import AccrualItem from "../AccrualItem/AccrualItem";
 import type { TaskUser } from "../TaskDetailsModal";
 import { Input } from "@/shared/ui/input/input";
 import { Select } from "@/shared/ui/select/select";
+import { useAuth } from "@/core/auth/AuthContext";
 
 /* ===================== TYPES ===================== */
 
 export interface Accrual {
     id: string;
     user: TaskUser;
+    name?: string;
     amount: number;
     created_at: string;
 }
@@ -32,7 +34,11 @@ const AccrualsSection: React.FC<Props> = ({ taskId, accruals = [], users, onUpda
     const [isCreating, setIsCreating] = useState(false);
     const [selectedUserId, setSelectedUserId] = useState<string>("");
     const [amount, setAmount] = useState<string>("");
+    const [accrualName, setAccrualName] = useState<string>("");
     const [loading, setLoading] = useState(false);
+
+    const { role: currentRole } = useAuth();
+    const canManageAccruals = currentRole?.order !== undefined && currentRole.order <= 3;
 
     const handleCreate = async () => {
         if (!selectedUserId || !amount) return;
@@ -42,19 +48,19 @@ const AccrualsSection: React.FC<Props> = ({ taskId, accruals = [], users, onUpda
 
         setLoading(true);
         try {
-            // Pseudo-endpoint based on convention
             const res = await api.post(`/v1/Hub/Tasks/${taskId}/Accruals/Create`, {
                 user_id: selectedUserId,
-                amount: numAmount
+                amount: numAmount,
+                name: accrualName || undefined,
             });
 
             if (res.ok) {
                 const data = await res.json();
-                // Construct new accrual from response or optimistically
                 const user = users.find(u => u.id === selectedUserId)!;
                 const newAccrual: Accrual = {
                     id: data.id || crypto.randomUUID(),
                     user,
+                    name: data.name || accrualName || undefined,
                     amount: numAmount,
                     created_at: new Date().toISOString()
                 };
@@ -62,6 +68,7 @@ const AccrualsSection: React.FC<Props> = ({ taskId, accruals = [], users, onUpda
                 onUpdate?.([...accruals, newAccrual]);
                 setIsCreating(false);
                 setAmount("");
+                setAccrualName("");
                 setSelectedUserId("");
             }
         } catch (e) {
@@ -71,11 +78,52 @@ const AccrualsSection: React.FC<Props> = ({ taskId, accruals = [], users, onUpda
         }
     };
 
+    const handleUpdateAccrual = async (accrualId: string, data: { amount?: number; name?: string }) => {
+        try {
+            const res = await api.post(`/v1/Hub/Tasks/${taskId}/Accruals/${accrualId}/Update`, data);
+            if (res.ok) {
+                const updated = await res.json();
+                const newList = accruals.map(acc =>
+                    acc.id === accrualId
+                        ? {
+                            ...acc,
+                            amount: updated.amount ?? acc.amount,
+                            name: updated.name ?? acc.name,
+                        }
+                        : acc
+                );
+                onUpdate?.(newList);
+            }
+        } catch (e) {
+            console.error("Failed to update accrual", e);
+        }
+    };
+
+    const handleDeleteAccrual = async (accrualId: string) => {
+        try {
+            const res = await api.post(`/v1/Hub/Tasks/${taskId}/Accruals/${accrualId}/Delete`);
+            if (res.ok) {
+                onUpdate?.(accruals.filter(acc => acc.id !== accrualId));
+            }
+        } catch (e) {
+            console.error("Failed to delete accrual", e);
+        }
+    };
+
+    const totalAmount = accruals.reduce((sum, acc) => sum + acc.amount, 0);
+
     return (
         <section className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">Виплати</h3>
-                {!isCreating && (
+                <div className="flex items-center gap-2">
+                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">Виплати</h3>
+                    {accruals.length > 0 && (
+                        <span className="text-xs text-gray-400 font-medium">
+                            ({totalAmount > 0 ? "+" : ""}{totalAmount} ₴)
+                        </span>
+                    )}
+                </div>
+                {!isCreating && canManageAccruals && (
                     <ButtonUtility
                         size="sm"
                         onClick={() => setIsCreating(true)}
@@ -88,7 +136,17 @@ const AccrualsSection: React.FC<Props> = ({ taskId, accruals = [], users, onUpda
             {accruals.length > 0 && (
                 <div className="flex flex-col gap-2">
                     {accruals.map(acc => (
-                        <AccrualItem key={acc.id} user={acc.user} amount={acc.amount} />
+                        <AccrualItem
+                            key={acc.id}
+                            id={acc.id}
+                            taskId={taskId}
+                            user={acc.user}
+                            name={acc.name}
+                            amount={acc.amount}
+                            canEdit={canManageAccruals}
+                            onUpdate={handleUpdateAccrual}
+                            onDelete={handleDeleteAccrual}
+                        />
                     ))}
                 </div>
             )}
@@ -108,14 +166,33 @@ const AccrualsSection: React.FC<Props> = ({ taskId, accruals = [], users, onUpda
                     <Select
                         label="Кому:"
                         placeholder="Оберіть учасника"
-                        value={selectedUserId}
+                        items={users.map(u => ({
+                            id: u.id,
+                            name: `${u.first_name} ${u.last_name || ''}`,
+                            avatarUrl: u.avatar_url
+                        }))}
+                        selectedKey={selectedUserId || null}
+                        onSelectionChange={(key) => setSelectedUserId(String(key))}
                     >
                         {users.map(u => (
-                            <Select.Item key={u.id} id={u.id} textValue={`${u.first_name} ${u.last_name}`} avatarUrl={u.avatar_url}>
-                                {u.first_name} {u.last_name}
+                            <Select.Item
+                                key={u.id}
+                                id={u.id}
+                                label={`${u.first_name} ${u.last_name || ''}`}
+                                textValue={`${u.first_name} ${u.last_name || ''}`}
+                                avatarUrl={u.avatar_url}
+                            >
+                                {`${u.first_name} ${u.last_name || ''}`}
                             </Select.Item>
                         ))}
                     </Select>
+
+                    <Input
+                        label="Назва виплати:"
+                        placeholder="Напр. Бонус за дизайн"
+                        value={accrualName}
+                        onChange={(value) => setAccrualName(value)}
+                    />
 
                     <Input
                         label="Сума (UAH):"
