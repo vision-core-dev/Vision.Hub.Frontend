@@ -1,19 +1,22 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "@/core/auth/AuthContext";
 import LoaderDots from "@/shared/ui/loader-dots/LoaderDots";
 
 import { FeedItem, type FeedItemType } from "@/shared/components/activity-feed/activity-feed";
-import {Badge} from "@/shared/ui/badges/badges.tsx";
-import {api} from "@/shared/utils/api.ts";
-import {Dialog, DialogTrigger, Modal, ModalOverlay} from "@/shared/components/modals/modal.tsx";
-import {CloseButton} from "@/shared/ui/buttons/close-button.tsx";
-import {FeaturedIcon} from "@/shared/assets/icons/featured-icon/featured-icon.tsx";
-import {BackgroundPattern} from "@/shared/assets/background-patterns";
-import {Heading} from "react-aria-components";
-import {Button} from "@/shared/ui/buttons/button.tsx";
-import {Cake} from "lucide-react";
-import {PinInput} from "@/shared/ui/pin-input/pin-input.tsx";
-
+import { Badge } from "@/shared/ui/badges/badges.tsx";
+import { api } from "@/shared/utils/api.ts";
+import { Dialog, DialogTrigger, Modal, ModalOverlay } from "@/shared/components/modals/modal.tsx";
+import { CloseButton } from "@/shared/ui/buttons/close-button.tsx";
+import { FeaturedIcon } from "@/shared/assets/icons/featured-icon/featured-icon.tsx";
+import { BackgroundPattern } from "@/shared/assets/background-patterns";
+import { Heading } from "react-aria-components";
+import { Button } from "@/shared/ui/buttons/button.tsx";
+import { Cake } from "lucide-react";
+import { PinInput } from "@/shared/ui/pin-input/pin-input.tsx";
+import { Link } from "react-router-dom";
+import { CheckCircle2, Clock, SquareCheckBig, Kanban } from "lucide-react";
+import { getTextColor } from "@/shared/utils/colors.ts";
+import { safeDate } from "@/shared/utils/safeDate.ts";
 /* ===================== FEED DATA ===================== */
 
 const feed: FeedItemType[] = [
@@ -95,6 +98,115 @@ const ActivityFeedConnected: React.FC = () => {
     );
 };
 
+/* ===================== MY TASKS COMPONENT ===================== */
+
+interface ActiveTask {
+    id: string;
+    name: string;
+    board_id: string;
+    board_name: string | null;
+    list_id: string;
+    status: string;
+    started_at: string | null;
+    deadline_at: string | null;
+    tags: { id: string; name: string; color: string }[];
+    subtasks_total: number;
+    subtasks_completed: number;
+}
+
+const MyTasksConnected: React.FC = () => {
+    const [tasks, setTasks] = useState<ActiveTask[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchTasks = async () => {
+            try {
+                const res = await api.get("/v1/Hub/UserMe/Tasks/Active");
+                if (res.ok) {
+                    const data = await res.json();
+                    setTasks(data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch tasks", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchTasks();
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="p-4 bg-primary rounded-xl border border-secondary flex justify-center">
+                <LoaderDots />
+            </div>
+        );
+    }
+
+    if (tasks.length === 0) {
+        return (
+            <div className="flex flex-col items-center justify-center p-8 bg-primary rounded-xl border border-secondary text-tertiary">
+                <CheckCircle2 className="w-8 h-8 mb-2" />
+                <p>У вас немає активних задач.</p>
+            </div>
+        );
+    }
+
+    return (
+        <ul className="space-y-3">
+            {tasks.map((task) => (
+                <li key={task.id}>
+                    <Link
+                        to={`/boards/b/${task.board_id}/t/${task.id}`}
+                        className="flex flex-col gap-2 p-4 bg-primary hover:bg-secondary rounded-xl border border-secondary transition-colors"
+                    >
+                        {(task.tags && task.tags.length > 0) && (
+                            <div className="flex flex-wrap gap-1.5 mb-0.5">
+                                {task.tags.map((tag) => (
+                                    <span
+                                        key={tag.id}
+                                        className="px-2 py-0.5 rounded-md text-[11px] font-medium leading-tight"
+                                        style={{ backgroundColor: tag.color, color: getTextColor(tag.color) }}
+                                    >
+                                        {tag.name}
+                                    </span>
+                                ))}
+                            </div>
+                        )}
+                        <span className="font-medium text-primary text-sm sm:text-base leading-snug">{task.name}</span>
+                        {(task.board_name || task.deadline_at || task.started_at || task.subtasks_total > 0) && (
+                            <div className="flex flex-wrap items-center gap-4 mt-1.5 text-xs text-tertiary">
+                                {task.board_name && (
+                                    <div className="flex items-center gap-1.5">
+                                        <Kanban className="w-3.5 h-3.5" />
+                                        <span>{task.board_name}</span>
+                                    </div>
+                                )}
+                                {(task.deadline_at || task.started_at) && (
+                                    <div className="flex items-center gap-1.5">
+                                        <Clock className="w-3.5 h-3.5" />
+                                        <span>
+                                            {task.started_at && safeDate(task.started_at)}
+                                            {task.started_at && task.deadline_at ? " – " : ""}
+                                            {task.deadline_at && safeDate(task.deadline_at)}
+                                        </span>
+                                    </div>
+                                )}
+                                {(task.subtasks_total > 0) && (
+                                    <div className="flex items-center gap-1.5">
+                                        <SquareCheckBig className="w-3.5 h-3.5" />
+                                        <span>{task.subtasks_completed}/{task.subtasks_total}</span>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </Link>
+                </li>
+            ))}
+        </ul>
+    );
+};
+
 /* ===================== DASHBOARD PAGE ===================== */
 
 const DashboardPage: React.FC = () => {
@@ -121,15 +233,25 @@ const DashboardPage: React.FC = () => {
                 </span>
             </h2>
 
-            {/* Updates */}
-            <div className="max-w-3xl">
-                <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold">
-                        📰 Останні оновлення
+            {/* Updates and Tasks */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+
+                {/* My Tasks */}
+                <div className="order-1 lg:order-1 flex flex-col gap-4">
+                    <h3 className="text-lg font-semibold flex items-center gap-2">
+                        ✅ Мої задачі
                     </h3>
+                    <MyTasksConnected />
                 </div>
 
-                <ActivityFeedConnected />
+                {/* Updates */}
+                <div className="order-2 lg:order-2 flex flex-col gap-4">
+                    <h3 className="text-lg font-semibold flex items-center gap-2">
+                        📰 Останні оновлення
+                    </h3>
+                    <ActivityFeedConnected />
+                </div>
+
             </div>
 
             <SubmitBirthdayModal isOpen={birthdayModal} setIsOpen={setBirthdayModal} />
