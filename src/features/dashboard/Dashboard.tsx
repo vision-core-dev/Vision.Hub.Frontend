@@ -21,6 +21,61 @@ import { safeDate } from "@/shared/utils/safeDate.ts";
 
 const feed: FeedItemType[] = [
     {
+        id: "update-deadlines-rewards",
+        unseen: true,
+        date: "27 лютого 2026",
+        user: {
+            avatarUrl: "https://cdn.visioncore.dev/avatars/ca0413d7-6fa1-4bda-99de-d6be805d7ddd_69d5b5fa-63cf-4ca7-a888-f4931efc74f1.jpg",
+            name: "Кирило",
+            href: "",
+            badge: <Badge size="sm" color="brand">Генеральний директор</Badge>,
+        },
+        action: {
+            content: "Оновлення системи",
+            target: "дедлайнів та штрафів 🔔",
+        },
+        labels: [
+            { name: "Процеси", color: "blue" },
+        ],
+        message: (
+            <div className="flex flex-col gap-3">
+                <p>Щоб стабілізувати процеси та прибрати хаос із дедлайнами, вводимо чіткі правила.</p>
+
+                <div className="flex flex-col gap-1.5">
+                    <h4 className="font-semibold text-primary flex items-center gap-1.5">
+                        ⏱ Прострочення задач
+                    </h4>
+                    <p className="text-tertiary">Для задач із встановленим дедлайном:</p>
+                    <ul className="list-disc list-inside ml-2 text-tertiary space-y-1">
+                        <li>Запізнення на 3 дні &rarr; штраф <span className="text-secondary font-medium">15% від оплати</span></li>
+                        <li>Запізнення на 6 днів &rarr; штраф <span className="text-secondary font-medium">50% від оплати</span></li>
+                    </ul>
+                    <blockquote className="mt-1 pl-3 border-l-2 border-secondary italic text-tertiary text-xs">
+                        Якщо задача критично важлива — рішення може бути жорсткішим.
+                    </blockquote>
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                    <h4 className="font-semibold text-primary flex items-center gap-1.5">
+                        📅 Перенесення дедлайну
+                    </h4>
+                    <p className="italic text-tertiary">Перенесення можливе тільки за таких умов:</p>
+                    <ol className="list-decimal list-inside ml-2 space-y-2 text-tertiary">
+                        <li>
+                            Переносити можна не пізніше ніж після <span className="text-secondary font-medium">60% часу</span> виконання задачі
+                            <div className="text-xs opacity-70 ml-5 mt-0.5">Приклад: задача на 10 днів &rarr; перенесення можливе до 6-го дня включно.</div>
+                        </li>
+                        <li>
+                            Перенести можна максимум на <span className="text-secondary font-medium">+30%</span> від початкової тривалості
+                            <div className="text-xs opacity-70 ml-5 mt-0.5">Приклад: задача на 10 днів &rarr; максимум +3 дні.</div>
+                        </li>
+                        <li>Перенесення узгоджується заздалегідь, а не в день дедлайну.</li>
+                    </ol>
+                </div>
+            </div>
+        )
+    },
+    {
         id: "update-communication",
         unseen: false,
         date: "10 січня 2026",
