@@ -51,7 +51,7 @@ export const FeedItem = ({ user, date, action, attachment, comment, labels, mess
                 <Avatar src={user.avatarUrl} alt={user.name} size={size === "sm" ? "sm" : "lg"} status={user.status} />
                 {connector && (
                     <div className="relative my-1 flex h-full w-full justify-center self-center overflow-hidden">
-                        <svg className="absolute" width="2.4">
+                        <svg className="absolute" width="2.4" height="100%">
                             <line
                                 x1="1.2"
                                 y1="1.2"
