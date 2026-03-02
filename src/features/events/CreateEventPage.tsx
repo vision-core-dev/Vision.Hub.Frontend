@@ -33,7 +33,7 @@ const CreateEventPage = () => {
                 const data = await res.json();
                 throw new Error(data.detail || "Не вдалося створити подію");
             }
-            navigate("/events/list");
+            navigate("/calendar");
         } catch (err: any) {
             setError(err.message);
         } finally {
@@ -43,8 +43,8 @@ const CreateEventPage = () => {
 
     return (
         <DefaultPage title="Створити подію">
-            <Button color="link-color" onClick={() => navigate("/events/list")} iconLeading={ArrowLeft}>
-                Назад до списку
+            <Button color="link-color" onClick={() => navigate("/calendar")} iconLeading={ArrowLeft}>
+                Назад до календаря
             </Button>
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-4 max-w-md mt-6">
