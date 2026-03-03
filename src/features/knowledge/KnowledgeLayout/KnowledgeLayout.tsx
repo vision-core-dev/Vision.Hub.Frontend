@@ -45,7 +45,7 @@ const KnowledgeLayout: React.FC = () => {
     return (
         <div className={`${styles.layout} dark:bg-gray-900`}>
             {/* SIDEBAR */}
-            <div className={`dark:bg-gray-900 dark:border-gray-800`}>
+            <div className="dark:bg-gray-900 dark:border-gray-800">
                 <KnowledgeSidebar
                     onSelectDocument={handleSelectDocument}
                     sidebarOpened={sidebarOpened}
