@@ -5,7 +5,7 @@ import KnowledgeSidebar from "../KnowledgeSidebar/KnowledgeSidebar";
 import KnowledgeContent from "../KnowledgeContent/KnowledgeContent";
 import KnowledgeContentEdit from "../KnowledgeContent/KnowledgeContentEdit.tsx"; // 👈 новий компонент
 import { Menu } from "lucide-react";
-import {Button} from "@/shared/ui/buttons/button.tsx";
+import { Button } from "@/shared/ui/buttons/button.tsx";
 
 const KnowledgeLayout: React.FC = () => {
     const navigate = useNavigate();
@@ -43,12 +43,14 @@ const KnowledgeLayout: React.FC = () => {
     };
 
     return (
-        <div className={styles.layout}>
+        <div className={`${styles.layout} dark:bg-gray-900`}>
             {/* SIDEBAR */}
-            <KnowledgeSidebar
-                onSelectDocument={handleSelectDocument}
-                sidebarOpened={sidebarOpened}
-            />
+            <div className={`dark:bg-gray-900 dark:border-gray-800`}>
+                <KnowledgeSidebar
+                    onSelectDocument={handleSelectDocument}
+                    sidebarOpened={sidebarOpened}
+                />
+            </div>
 
             {/* CONTENT */}
             {isEditing ? (
@@ -62,15 +64,17 @@ const KnowledgeLayout: React.FC = () => {
                     sidebarClose={() => sidebarOpened && setSidebarOpened(false)}
                 />
             ) : (
-                <KnowledgeContent
-                    documentId={selectedDoc}
-                    sidebarButton={
-                        windowWidth < 900 && !sidebarOpened && (
-                            <Button color="secondary" onClick={() => setSidebarOpened(true)} iconLeading={Menu} />
-                        )
-                    }
-                    sidebarClose={() => sidebarOpened && setSidebarOpened(false)}
-                />
+                <div className="flex-1 dark:bg-gray-900/90 w-full overflow-hidden">
+                    <KnowledgeContent
+                        documentId={selectedDoc}
+                        sidebarButton={
+                            windowWidth < 900 && !sidebarOpened && (
+                                <Button color="secondary" onClick={() => setSidebarOpened(true)} iconLeading={Menu} />
+                            )
+                        }
+                        sidebarClose={() => sidebarOpened && setSidebarOpened(false)}
+                    />
+                </div>
             )}
         </div>
     );

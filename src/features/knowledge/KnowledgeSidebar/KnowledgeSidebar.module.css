@@ -130,3 +130,39 @@
     cursor: pointer;
     color: #6b7280;
 }
+
+/* DARK MODE */
+:global(.dark) .sidebar {
+    background: #111827;
+    border-color: #374151;
+}
+
+:global(.dark) .folderHeader,
+:global(.dark) .document {
+    background: #1f2937;
+    color: #f3f4f6;
+}
+
+:global(.dark) .folderHeader:hover,
+:global(.dark) .document:hover {
+    background: #022c22;
+    color: #34d399;
+}
+
+:global(.dark) .active {
+    background: #064e3b;
+    color: #34d399;
+}
+
+:global(.dark) .addButton {
+    background: #064e3b;
+    color: #34d399;
+}
+
+:global(.dark) .addButton:hover {
+    background: #065f46;
+}
+
+:global(.dark) .actions svg {
+    color: #9ca3af;
+}

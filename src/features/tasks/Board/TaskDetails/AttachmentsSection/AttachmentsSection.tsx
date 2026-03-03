@@ -177,7 +177,7 @@ const AttachmentsSection: React.FC<Props> = ({
                             >
                                 <div className="p-2 rounded-md bg-gray-50 dark:bg-gray-900 text-primary">
                                     {att.type === "link" ? <LinkIcon size={18} /> :
-                                        att.name.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? <ImageIcon size={18} /> : <FileIcon size={18} />}
+                                        (att.name || "").match(/\.(jpg|jpeg|png|gif|webp)$/i) ? <ImageIcon size={18} /> : <FileIcon size={18} />}
                                 </div>
                                 <div className="flex flex-col min-w-0">
                                     {att.type === "link" ? (

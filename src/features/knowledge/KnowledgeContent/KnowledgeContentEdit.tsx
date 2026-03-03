@@ -99,21 +99,21 @@ const KnowledgeContentEdit: React.FC<Props> = ({ documentId, sidebarButton, side
 
     if (loading)
         return (
-            <div className={styles.content}>
+            <div className={`${styles.content} dark:bg-gray-900/90`}>
                 <LoaderDots />
             </div>
         );
 
     if (!doc)
         return (
-            <div className={styles.content}>
-                <div className={styles.empty}>📄 Виберіть документ у меню</div>
+            <div className={`${styles.content} dark:bg-gray-900/90`}>
+                <div className={`${styles.empty} dark:text-gray-500`}>📄 Виберіть документ у меню</div>
             </div>
         );
 
     return (
         <div
-            className={styles.content}
+            className={`${styles.content} dark:text-gray-200 dark:bg-gray-900/90`}
             onClick={() => {
                 if (sidebarClose && window.innerWidth < 900) sidebarClose();
             }}
@@ -124,13 +124,13 @@ const KnowledgeContentEdit: React.FC<Props> = ({ documentId, sidebarButton, side
 
                 <div>
                     <input
-                        className={styles.titleInput}
+                        className={`${styles.titleInput} dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700`}
                         value={editTitle}
                         onChange={(e) => setEditTitle(e.target.value)}
                         placeholder="Назва документа..."
                     />
 
-                    <div className={styles.meta}>
+                    <div className={`${styles.meta} dark:text-gray-400`}>
                         <span>
                             <User size={16} /> {doc.author}
                         </span>

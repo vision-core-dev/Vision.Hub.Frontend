@@ -20,7 +20,7 @@
     flex-direction: column;
 }
 
-.info > button {
+.info>button {
     width: 38px;
 }
 
@@ -46,7 +46,7 @@
     margin-bottom: 1.5rem;
 }
 
-.meta > div {
+.meta>div {
     display: flex;
     flex-direction: row;
 }
@@ -109,4 +109,22 @@
     padding-left: 14px;
     color: #374151;
     margin: 10px 0;
+}
+
+/* DARK MODE */
+:global(.dark) .content {
+    color: #f3f4f6;
+}
+
+:global(.dark) .title {
+    color: #f9fafb;
+}
+
+:global(.dark) .meta {
+    color: #9ca3af;
+}
+
+:global(.dark) .body blockquote {
+    border-color: #4b5563;
+    color: #d1d5db;
 }

@@ -142,7 +142,7 @@ const KnowledgeContent: React.FC<Props> = ({ documentId, sidebarButton, sidebarC
         return <div className={styles.content}><div className={styles.empty}>📄 Виберіть документ у меню</div></div>;
 
     return (
-        <div className={styles.content}
+        <div className={`${styles.content} dark:text-gray-200 dark:bg-gray-900/90`}
             onClick={() => {
                 if (sidebarClose && window.innerWidth < 900) sidebarClose();
             }}
@@ -150,9 +150,9 @@ const KnowledgeContent: React.FC<Props> = ({ documentId, sidebarButton, sidebarC
             <div className={styles.info}>
                 {sidebarButton}
                 <div>
-                    <h1 className={styles.title}>{doc.title}</h1>
+                    <h1 className={`${styles.title} dark:text-gray-100`}>{doc.title}</h1>
 
-                    <div className={styles.meta}>
+                    <div className={`${styles.meta} dark:text-gray-400`}>
                         <div><UserLabel avatar_url={doc.author.avatar_url} name={`${doc.author.first_name} ${doc.author.last_name || ""}`} user_id={doc.author.id} /></div>
                         <div><Calendar size={20} /><span>{safeDatetime(doc.updated_at)}</span></div>
                     </div>
@@ -161,7 +161,7 @@ const KnowledgeContent: React.FC<Props> = ({ documentId, sidebarButton, sidebarC
 
             <div
                 ref={contentRef}
-                className={styles.body}
+                className={`${styles.body} dark:text-gray-300 [&>blockquote]:dark:border-gray-600 [&>blockquote]:dark:text-gray-400`}
                 dangerouslySetInnerHTML={{ __html: doc.content }}
             />
         </div>

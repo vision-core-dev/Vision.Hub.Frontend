@@ -160,7 +160,7 @@ const AccrualsSection: React.FC<Props> = ({ taskId, accruals = [], users, onUpda
                 <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 flex flex-col gap-3 animate-in fade-in zoom-in-95 duration-200">
                     <div className="flex items-center gap-2">
                         <HandCoins className="text-primary" size={20} />
-                        <span className="text-sm font-medium">Нова виплата</span>
+                        <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Нова виплата</span>
                     </div>
 
                     <Select

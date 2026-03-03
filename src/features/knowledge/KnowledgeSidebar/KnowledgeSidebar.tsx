@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import styles from "./KnowledgeSidebar.module.css";
-import {Folder, ChevronRight, ChevronDown, File, FolderOpen} from "lucide-react";
+import { Folder, ChevronRight, ChevronDown, File, FolderOpen } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
-import {api} from "@/shared/utils/api.ts";
+import { api } from "@/shared/utils/api.ts";
 import LoaderDots from "@/shared/ui/loader-dots/LoaderDots.tsx";
 
 interface FolderType {
@@ -89,11 +89,11 @@ const KnowledgeSidebar: React.FC<Props> = ({ onSelectDocument, sidebarOpened }) 
         return (
             <div key={folder.id} className={styles.folder}>
                 <div
-                    className={styles.folderHeader}
+                    className={`${styles.folderHeader} dark:!bg-gray-800/80 dark:!text-gray-200 hover:dark:!bg-emerald-900/30 hover:dark:!text-emerald-400`}
                     onClick={() => toggleFolder(folder.id)}
                 >
                     {isOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                    {isOpen ? <FolderOpen size={18} /> :  <Folder size={18} /> }
+                    {isOpen ? <FolderOpen size={18} /> : <Folder size={18} />}
                     <span>{folder.name}</span>
                 </div>
 
@@ -102,9 +102,8 @@ const KnowledgeSidebar: React.FC<Props> = ({ onSelectDocument, sidebarOpened }) 
                         {folder.documents?.map((doc) => (
                             <div
                                 key={doc.id}
-                                className={`${styles.document} ${
-                                    activeDocId === doc.id ? styles.active : ""
-                                }`}
+                                className={`${styles.document} dark:!bg-gray-800/80 dark:!text-gray-200 hover:dark:!bg-emerald-900/30 hover:dark:!text-emerald-400 ${activeDocId === doc.id ? `${styles.active} dark:!bg-emerald-900/50 dark:!text-emerald-400` : ""
+                                    }`}
                                 onClick={() => handleSelectDoc(doc.id)}
                             >
                                 <File size={16} />
@@ -119,12 +118,12 @@ const KnowledgeSidebar: React.FC<Props> = ({ onSelectDocument, sidebarOpened }) 
     };
 
     if (loading) return (
-        <div className={`${styles.sidebar} ${!sidebarOpened && styles.collapsed}`}>
+        <div className={`${styles.sidebar} ${!sidebarOpened && styles.collapsed} dark:!bg-gray-900 dark:!border-gray-800`}>
             <LoaderDots />
         </div>
     );
 
-    return <div className={`${styles.sidebar} ${!sidebarOpened && styles.collapsed}`}>{folders.map(renderFolder)}</div>;
+    return <div className={`${styles.sidebar} ${!sidebarOpened && styles.collapsed} dark:!bg-gray-900 dark:!border-gray-800`}>{folders.map(renderFolder)}</div>;
 };
 
 export default KnowledgeSidebar;
