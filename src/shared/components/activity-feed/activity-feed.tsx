@@ -11,7 +11,7 @@ export type FeedItemType = {
     id: string | number;
     unseen?: boolean;
     comment?: string;
-    message?: string;
+    message?: ReactNode;
     date?: string;
     user: {
         avatarUrl: string;
@@ -51,7 +51,7 @@ export const FeedItem = ({ user, date, action, attachment, comment, labels, mess
                 <Avatar src={user.avatarUrl} alt={user.name} size={size === "sm" ? "sm" : "lg"} status={user.status} />
                 {connector && (
                     <div className="relative my-1 flex h-full w-full justify-center self-center overflow-hidden">
-                        <svg className="absolute" width="2.4">
+                        <svg className="absolute" width="2.4" height="100%">
                             <line
                                 x1="1.2"
                                 y1="1.2"
@@ -121,8 +121,8 @@ export const FeedItem = ({ user, date, action, attachment, comment, labels, mess
                 )}
                 {comment && <q className="text-sm text-tertiary">{comment}</q>}
                 {message && (
-                    <section className={cx("gap-2 rounded-lg rounded-tl-none p-3 ring-1 ring-secondary ring-inset", connector && "py-2.5")}>
-                        <p className="text-sm text-secondary">{message}</p>
+                    <section className={cx("flex flex-col gap-2 rounded-lg rounded-tl-none p-3 ring-1 ring-secondary ring-inset", connector && "py-2.5")}>
+                        <div className="text-sm text-secondary">{message}</div>
                     </section>
                 )}
             </div>

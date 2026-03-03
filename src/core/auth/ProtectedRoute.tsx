@@ -20,6 +20,9 @@ const isRouteAllowed = (currentPath: string, menu: string[]): boolean => {
             return currentPath === allowed.slice(1);
         }
 
+        // "events" in menu also grants access to "calendar" routes
+        if (allowed === "events" && currentPath === "calendar") return true;
+
         return false;
     });
 };

@@ -55,7 +55,7 @@ const Sidebar: React.FC = () => {
 
     const navItems: NavItemType[] =
         role?.menu
-            ?.filter((key: string) => !key.startsWith("_"))
+            ?.filter((key: string) => !key.startsWith("_") && key !== "events")
             .map((key: string) => ({
                 label: getSidebarText(key),
                 href: `/${key}`,

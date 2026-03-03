@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useParams } from "react-router-dom";
 
 import ProtectedRoute from "@/core/auth/ProtectedRoute";
 
@@ -16,11 +16,9 @@ import DashboardPage from "@/features/dashboard/Dashboard";
 import UsersListPage from "@/features/users/UsersListPage";
 import UserDetailsPage from "@/features/users/UserDetails/UserDetailsPage";
 
-// Events
-import EventsListPage from "@/features/events/EventsListPage";
-import CalendarTimeline from "@/features/events/CalendarTimeline/CalendarTimeline";
-import PublicEventDetails from "@/features/events/EventDetails/PublicEventDetails";
-import ModerateEventDetails from "@/features/events/EventDetails/ModerateEventDetails";
+// Events / Calendar
+import UnifiedCalendarPage from "@/features/events/UnifiedCalendarPage/UnifiedCalendarPage";
+import EventDetailRouter from "@/features/events/EventDetails/EventDetailRouter";
 
 // Tasks
 import BoardsListPage from "@/features/tasks/BoardsListPage";
@@ -69,6 +67,11 @@ import OrgStructurePage from "@/features/org-structure/OrgStructurePage";
 // Jobs
 import JobsPage from "@/features/jobs/JobsPage";
 
+const EventRedirect = () => {
+    const { id } = useParams();
+    return <Navigate to={`/calendar/e/${id}`} replace />;
+};
+
 export function AppRoutes() {
     return (
         <Routes>
@@ -102,16 +105,19 @@ export function AppRoutes() {
                     {/* org structure */}
                     <Route path="org-structure" element={<OrgStructurePage />} />
 
-                    {/* calendar */}
-                    <Route path="calendar" element={<CalendarTimeline />} />
-                    <Route path="calendar/e/:id" element={<PublicEventDetails />} />
+                    {/* calendar (unified) */}
+                    <Route path="calendar">
+                        <Route index element={<UnifiedCalendarPage />} />
+                        <Route path="e/:id" element={<EventDetailRouter />} />
+                        <Route path="create" element={<CreateEventPage />} />
+                    </Route>
 
-                    {/* events */}
+                    {/* legacy events redirects */}
                     <Route path="events">
-                        <Route index element={<Navigate to="list" replace />} />
-                        <Route path="list" element={<EventsListPage />} />
-                        <Route path="e/:id" element={<ModerateEventDetails />} />
-                        <Route path="create-event" element={<CreateEventPage />} />
+                        <Route index element={<Navigate to="/calendar" replace />} />
+                        <Route path="list" element={<Navigate to="/calendar" replace />} />
+                        <Route path="e/:id" element={<EventRedirect />} />
+                        <Route path="create-event" element={<Navigate to="/calendar/create" replace />} />
                     </Route>
 
                     {/* boards */}

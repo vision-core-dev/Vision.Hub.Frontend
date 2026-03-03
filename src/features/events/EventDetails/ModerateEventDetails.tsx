@@ -232,8 +232,8 @@ const ModerateEventDetails = () => {
                     </Table>
                 </div>
 
-                <Button color="link-color" onClick={() => navigate("/events/list")}>
-                    <ArrowLeft size={20} /> Назад до списку
+                <Button color="link-color" onClick={() => navigate("/calendar")}>
+                    <ArrowLeft size={20} /> Назад до календаря
                 </Button>
             </div>
         </DefaultPage>
