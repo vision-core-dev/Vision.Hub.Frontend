@@ -9,6 +9,7 @@ interface UseBoardWebSocketOptions {
         user_id: string;
         name: string;
         avatar_url?: string;
+        is_guest?: boolean;
     };
 }
 
@@ -27,6 +28,7 @@ export interface ActiveUser {
     user_id: string;
     name: string;
     avatar_url?: string;
+    is_guest?: boolean;
 }
 
 /**
@@ -38,8 +40,17 @@ export const useBoardWebSocket = ({ boardId, onUpdate, onUserPresenceChange, ena
     const reconnectTimeoutRef = useRef<number | undefined>(undefined);
     const reconnectAttemptsRef = useRef(0);
     const maxReconnectAttempts = 5;
-    const reconnectDelay = 3000; // 3 seconds
+    const reconnectDelay = 3000;
     const [activeUsers, setActiveUsers] = useState<ActiveUser[]>([]);
+
+    // Store callbacks in refs to avoid reconnecting when they change
+    const onUpdateRef = useRef(onUpdate);
+    const onUserPresenceChangeRef = useRef(onUserPresenceChange);
+    const currentUserRef = useRef(currentUser);
+
+    useEffect(() => { onUpdateRef.current = onUpdate; }, [onUpdate]);
+    useEffect(() => { onUserPresenceChangeRef.current = onUserPresenceChange; }, [onUserPresenceChange]);
+    useEffect(() => { currentUserRef.current = currentUser; }, [currentUser]);
 
     const connect = useCallback(() => {
         if (!boardId || !enabled) return;
@@ -59,13 +70,12 @@ export const useBoardWebSocket = ({ boardId, onUpdate, onUserPresenceChange, ena
 
             ws.onopen = () => {
                 console.log(`✅ WebSocket connected to board ${boardId}`);
-                reconnectAttemptsRef.current = 0; // Reset reconnect attempts on successful connection
+                reconnectAttemptsRef.current = 0;
 
-                // Send user identification
-                if (currentUser) {
+                if (currentUserRef.current) {
                     ws.send(JSON.stringify({
                         type: 'user_identify',
-                        user: currentUser
+                        user: currentUserRef.current
                     }));
                 }
             };
@@ -74,7 +84,6 @@ export const useBoardWebSocket = ({ boardId, onUpdate, onUserPresenceChange, ena
                 try {
                     const message: WebSocketMessage = JSON.parse(event.data);
 
-                    // Filter out ping/pong to reduce noise
                     if (message.type !== 'pong') {
                         console.log('📨 WebSocket message:', message);
                     }
@@ -82,12 +91,10 @@ export const useBoardWebSocket = ({ boardId, onUpdate, onUserPresenceChange, ena
                     switch (message.type) {
                         case 'connected':
                             console.log('✅ WebSocket connection confirmed. Board:', message.board_id);
-                            // Ensure we identify if we haven't already
-                            if (currentUser && ws.readyState === WebSocket.OPEN) {
-                                console.log('🆔 Sending identification for:', currentUser.name);
+                            if (currentUserRef.current && ws.readyState === WebSocket.OPEN) {
                                 ws.send(JSON.stringify({
                                     type: 'user_identify',
-                                    user: currentUser
+                                    user: currentUserRef.current
                                 }));
                             }
                             break;
@@ -96,25 +103,20 @@ export const useBoardWebSocket = ({ boardId, onUpdate, onUserPresenceChange, ena
                             console.log('✅ User identified successfully');
                             break;
 
-                        case 'user_presence':
-                            // Handle user presence updates
+                        case 'user_presence': {
                             const users = message.users || [];
                             console.log(`👥 Active users update (${users.length}):`, users.map(u => u.name));
                             setActiveUsers(users);
-                            if (onUserPresenceChange) {
-                                onUserPresenceChange(users);
-                            }
+                            onUserPresenceChangeRef.current?.(users);
                             break;
+                        }
 
                         case 'board_update':
                             console.log(`🔄 Board update: ${message.action}`);
-                            if (onUpdate) {
-                                onUpdate();
-                            }
+                            onUpdateRef.current?.();
                             break;
 
                         case 'pong':
-                            // Heartbeat response, ignore
                             break;
 
                         case 'error':
@@ -136,9 +138,8 @@ export const useBoardWebSocket = ({ boardId, onUpdate, onUserPresenceChange, ena
             ws.onclose = (event) => {
                 console.log(`🔌 WebSocket disconnected from board ${boardId}`, event.code, event.reason);
                 wsRef.current = null;
-                setActiveUsers([]); // Clear active users on disconnect
+                setActiveUsers([]);
 
-                // Attempt to reconnect if not manually closed and within retry limit
                 if (event.code !== 1000 && reconnectAttemptsRef.current < maxReconnectAttempts && enabled) {
                     reconnectAttemptsRef.current++;
                     console.log(`🔄 Reconnecting... (Attempt ${reconnectAttemptsRef.current}/${maxReconnectAttempts})`);
@@ -152,7 +153,7 @@ export const useBoardWebSocket = ({ boardId, onUpdate, onUserPresenceChange, ena
         } catch (error) {
             console.error('Error creating WebSocket connection:', error);
         }
-    }, [boardId, onUpdate, onUserPresenceChange, enabled, currentUser]);
+    }, [boardId, enabled]);
 
     const disconnect = useCallback(() => {
         if (reconnectTimeoutRef.current) {
@@ -174,7 +175,6 @@ export const useBoardWebSocket = ({ boardId, onUpdate, onUserPresenceChange, ena
         }
     }, []);
 
-    // Notify server when board changes locally
     const notifyBoardChange = useCallback((action: string) => {
         sendMessage({
             type: 'board_changed',
@@ -183,7 +183,7 @@ export const useBoardWebSocket = ({ boardId, onUpdate, onUserPresenceChange, ena
         });
     }, [sendMessage]);
 
-    // Setup heartbeat to keep connection alive
+    // Setup heartbeat
     useEffect(() => {
         if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return;
 
@@ -191,7 +191,7 @@ export const useBoardWebSocket = ({ boardId, onUpdate, onUserPresenceChange, ena
             if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
                 sendMessage({ type: 'ping' });
             }
-        }, 30000); // Send ping every 30 seconds
+        }, 30000);
 
         return () => clearInterval(heartbeatInterval);
     }, [sendMessage]);

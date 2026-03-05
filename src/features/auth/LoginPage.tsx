@@ -3,9 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { api } from "@/shared/utils/api.ts";
 import { useAuth } from "@/core/auth/AuthContext.tsx";
 import { Lock, Mail } from "lucide-react";
-import {getErrorText} from "@/shared/types/Messages.ts";
-import {Input} from "@/shared/ui/input/input.tsx";
-import {Button} from "@/shared/ui/buttons/button.tsx";
+import { getErrorText } from "@/shared/types/Messages.ts";
+import { Input } from "@/shared/ui/input/input.tsx";
+import { Button } from "@/shared/ui/buttons/button.tsx";
 
 const LoginPage = () => {
     const [email, setEmail] = useState("");
@@ -35,6 +35,7 @@ const LoginPage = () => {
             }
         } catch {
             setError("Помилка підключення до сервера");
+            setIsLoading(false);
         }
     };
 

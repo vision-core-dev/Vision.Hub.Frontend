@@ -277,7 +277,7 @@ const ListItem = ({
                                 }`}
                             onClick={() => onSelectTask(task)}
                         >
-                            <TaskItem isBoardPublic={isBoardPublic} boardTags={boardTags} users={users} task={task} />
+                            <TaskItem boardTags={boardTags} users={users} task={task} />
                         </div>
                     </React.Fragment>
                 ))}

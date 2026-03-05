@@ -62,15 +62,23 @@ export const TagSelector = ({
                 {/* selected tags */}
                 {selectedTags.map((tag) => (
                     isReadOnly ? (
-                        <Badge
+                        <span
                             key={tag.id}
-                            type="pill-color"
-                            color="gray"
-                            size="md"
-                            className="!ring-0 border border-transparent"
+                            style={{
+                                backgroundColor: `${tag.color}35`,
+                                color: tag.color,
+                                borderColor: `${tag.color}60`
+                            }}
                         >
-                            {tag.name}
-                        </Badge>
+                            <Badge
+                                type="pill-color"
+                                color="gray"
+                                size="md"
+                                className="!ring-0 border border-transparent"
+                            >
+                                {tag.name}
+                            </Badge>
+                        </span>
                     ) : (
                         <BadgeWithButton
                             key={tag.id}

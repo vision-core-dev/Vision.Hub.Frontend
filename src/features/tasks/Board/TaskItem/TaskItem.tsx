@@ -6,7 +6,6 @@ import type { UserType } from "@/shared/types/Users.ts";
 import { safeDate } from "@/shared/utils/safeDate.ts";
 
 type TaskProps = {
-    isBoardPublic: boolean;
     task: Task;
     boardTags: TaskTag[];
     users: UserType[];

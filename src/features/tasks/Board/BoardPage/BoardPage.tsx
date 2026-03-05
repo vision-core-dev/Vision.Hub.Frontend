@@ -6,14 +6,15 @@ import type { UserType } from "@/shared/types/Users.ts";
 import { api } from "@/shared/utils/api.ts";
 import LoaderDots from "@/shared/ui/loader-dots/LoaderDots.tsx";
 import { useDragScroll } from "@/shared/utils/useDragScroll.ts";
-import { SlidersVertical } from "lucide-react";
+import { Eye, SlidersVertical } from "lucide-react";
 import BoardSettings from "./BoardSettings/BoardSettings.tsx";
 import TaskDetailsModal from "../TaskDetails/TaskDetailsModal.tsx";
-import { useBoardWebSocket, type ActiveUser } from "@/shared/hooks/useBoardWebSocket.ts";
+import { useBoardWebSocket } from "@/shared/hooks/useBoardWebSocket.ts";
 import { useAuth } from "@/core/auth/AuthContext.tsx";
 import { Avatar } from "@/shared/ui/avatar/avatar.tsx";
 import { Button } from "@/shared/ui/buttons/button.tsx";
 import { Tooltip, TooltipTrigger } from "@/shared/ui/tooltip/tooltip.tsx";
+import { useDebouncedCallback } from "use-debounce";
 
 
 export type Task = {
@@ -70,7 +71,6 @@ const BoardPage = ({ is_public = false }: Props) => {
     const { user } = useAuth();
     const [boardDetails, setBoardDetails] = useState<BoardDetails | null>(null);
     const [boardLists, setBoardLists] = useState<List[]>([]);
-    const [activeUsers, setActiveUsers] = useState<ActiveUser[]>([]);
 
     const [loading, setLoading] = useState(true);
 
@@ -80,6 +80,9 @@ const BoardPage = ({ is_public = false }: Props) => {
 
     const scrollRef = useRef<HTMLDivElement | null>(null);
     useDragScroll(scrollRef, { axis: "x", speed: 1.2 });
+
+    // Timestamp of last local action — skip own echoes from server
+    const lastLocalAction = useRef(0);
 
     const fetchBoard = useCallback(async (silent = false) => {
         try {
@@ -107,29 +110,35 @@ const BoardPage = ({ is_public = false }: Props) => {
         }
     }, [id, is_public]);
 
-    const currentUser = useMemo(() => user ? {
-        user_id: user.id,
-        name: `${user.first_name} ${user.last_name || ''}`.trim(),
-        avatar_url: user.avatar_url ?? undefined
-    } : undefined, [user]);
+    const guestId = useRef(is_public ? crypto.randomUUID() : null);
 
-    const handleBoardUpdate = useCallback(() => {
-        console.log("📡 Received board update via WebSocket, refreshing...");
+    const currentUser = useMemo(() => {
+        if (user) return {
+            user_id: user.id,
+            name: `${user.first_name} ${user.last_name || ''}`.trim(),
+            avatar_url: user.avatar_url ?? undefined
+        };
+        if (is_public && guestId.current) return {
+            user_id: `guest_${guestId.current}`,
+            name: "Гість",
+            is_guest: true
+        };
+        return undefined;
+    }, [user, is_public]);
+
+    // Debounced refetch — collapses rapid WS updates into one call,
+    // skips own echoes (optimistic UI already applied)
+    const handleBoardUpdate = useDebouncedCallback(() => {
+        if (Date.now() - lastLocalAction.current < 3000) return;
         fetchBoard(true);
-    }, [fetchBoard]);
+    }, 2000);
 
-    const handleUserPresenceChange = useCallback((users: ActiveUser[]) => {
-        // console.log("👥 Active users updated:", users);
-        setActiveUsers(users);
-    }, []);
-
-    // 🔌 WebSocket connection for real-time updates
-    const { notifyBoardChange } = useBoardWebSocket({
+    // 🔌 WebSocket — activeUsers come directly from the hook (no duplicate state)
+    const { notifyBoardChange, activeUsers } = useBoardWebSocket({
         boardId: id,
         currentUser,
         onUpdate: handleBoardUpdate,
-        onUserPresenceChange: handleUserPresenceChange,
-        enabled: !is_public // Only enable WebSocket for non-public boards
+        enabled: true
     });
 
     // 🟦 Initial fetch
@@ -174,7 +183,8 @@ const BoardPage = ({ is_public = false }: Props) => {
             setBoardDetails({ ...boardDetails, lists: updatedLists });
             setBoardLists(updatedLists);
 
-            // Notify other clients via WebSocket
+            // Notify other clients via WebSocket (skip own echo)
+            lastLocalAction.current = Date.now();
             notifyBoardChange('task_moved');
         }
 
@@ -187,25 +197,35 @@ const BoardPage = ({ is_public = false }: Props) => {
     return (
         <div className={`${is_public ? styles.publicPage : styles.page}`} style={{ backgroundImage: `url(${boardDetails.board.banner_url || ""})` }}>
             <div className={styles.header}>
-                <h1 className={styles.title}>{boardDetails.board.name}</h1>
+                <h1 className="text-lg font-bold text-fg-primary dark:text-fg-primary_dark">{boardDetails.board.name}</h1>
 
-                <div className="flex items-center gap-2 ml-4">
-                    {activeUsers.length > 0 && (
-                        <div className="flex -space-x-2">
-                            {activeUsers.slice(0, 5).map((user) => (
-                                <Tooltip title={user.name}>
-                                    <TooltipTrigger className="group relative flex cursor-pointer flex-col items-center gap-2 text-fg-quaternary transition duration-100 ease-linear hover:text-fg-quaternary_hover focus:text-fg-quaternary_hover">
-                                        <Avatar
-                                            key={user.user_id}
-                                            size="sm"
-                                            src={user.avatar_url}
-                                            initials={user.name.split(' ').map(n => n[0]).join('')}
-                                        />
-                                    </TooltipTrigger>
-                                </Tooltip>
-                            ))}
-                        </div>
-                    )}
+                <div className="flex items-center gap-3 ml-4">
+
+                    <div className="flex items-center gap-1">
+                        {activeUsers.filter(u => !u.is_guest).length > 0 && (
+                            <div className="flex -space-x-2">
+                                {activeUsers.filter(u => !u.is_guest).slice(0, 5).map((user) => (
+                                    <Tooltip key={user.user_id} title={user.name}>
+                                        <TooltipTrigger className="group relative flex cursor-pointer flex-col items-center gap-2 text-fg-quaternary transition duration-100 ease-linear hover:text-fg-quaternary_hover focus:text-fg-quaternary_hover">
+                                            <Avatar
+                                                size="sm"
+                                                src={user.avatar_url}
+                                                initials={user.name.split(' ').map(n => n[0]).join('')}
+                                            />
+                                        </TooltipTrigger>
+                                    </Tooltip>
+                                ))}
+                            </div>
+                        )}
+
+                        {activeUsers.filter(u => u.is_guest).length > 0 && (
+                            <Tooltip title={`${activeUsers.filter(u => u.is_guest).length} ${activeUsers.filter(u => u.is_guest).length === 1 ? "гість" : "гостей"} онлайн`}>
+                                <TooltipTrigger className="flex items-center gap-1.5 rounded-full bg-secondary px-2.5 py-1 text-xs font-medium text-secondary">
+                                    <Avatar size="sm" className="ring-[1.5px] ring-bg-primary" placeholder={<span className="flex items-center justify-center text-sm font-semibold text-quaternary"><Eye size={14} /></span>} />
+                                </TooltipTrigger>
+                            </Tooltip>
+                        )}
+                    </div>
 
                     {is_public || (
                         <Button color="secondary" onClick={() => setShowSettings(!showSettings)} iconLeading={SlidersVertical} />
