@@ -25,9 +25,10 @@ interface Props {
     taskId: string;
     users: UserType[];
     initialSubtasks?: Subtask[];
+    isReadOnly?: boolean;
 }
 
-const SubtasksSection: React.FC<Props> = ({ taskId, initialSubtasks, users: initialUsers }) => {
+const SubtasksSection: React.FC<Props> = ({ taskId, initialSubtasks, users: initialUsers, isReadOnly = false }) => {
     const [subtasks, setSubtasks] = useState<Subtask[]>(initialSubtasks ?? []);
     const [users, setUsers] = useState<UserType[]>(initialUsers ?? []);
     const [newName, setNewName] = useState("");
@@ -51,13 +52,14 @@ const SubtasksSection: React.FC<Props> = ({ taskId, initialSubtasks, users: init
     /* Fetch users if they weren't passed (and we need them for assignment) */
     useEffect(() => {
         if ((!initialUsers || initialUsers.length === 0) && users.length === 0) {
-            api.get("/v1/Hub/Users/List?only_active=true")
+            const url = isReadOnly ? "/v1/Hub/Users/PublicList" : "/v1/Hub/Users/List?only_active=true";
+            api.get(url)
                 .then((r) => r.json())
                 .then((d) => setUsers(d.list || []));
         } else if (initialUsers && initialUsers.length > 0) {
             setUsers(initialUsers);
         }
-    }, [initialUsers]);
+    }, [initialUsers, isReadOnly]);
 
     const fetchSubtasks = async () => {
         try {
@@ -165,8 +167,12 @@ const SubtasksSection: React.FC<Props> = ({ taskId, initialSubtasks, users: init
     );
 
     return (
-        <section className="flex flex-col">
-            <h3 className="text-secondary">Підзадачі</h3>
+        <section className="flex flex-col gap-2">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">Підзадачі</h3>
+
+            {subtasks.length <= 0 && (
+                <div className="text-sm text-gray-400 italic">Немає підзадач</div>
+            )}
 
             {subtasks.length > 0 && (
                 <ProgressBar labelPosition="right" min={0} max={100} value={progress} />
@@ -182,12 +188,13 @@ const SubtasksSection: React.FC<Props> = ({ taskId, initialSubtasks, users: init
                         <div key={s.id} className="group flex items-start gap-3 py-3 border-b border-secondary last:border-0 hover:bg-secondary_subtle transition-colors">
                             <Checkbox
                                 isSelected={s.status === "completed"}
-                                onChange={() => handleToggle(s)}
+                                onChange={isReadOnly ? undefined : () => handleToggle(s)}
+                                isDisabled={isReadOnly}
                                 className="mt-1"
                             />
 
                             <div className="flex-1 min-w-0 flex flex-col pt-0.5">
-                                {editingId === s.id ? (
+                                {!isReadOnly && editingId === s.id ? (
                                     <input
                                         className="flex-1 rounded border border-brand-primary px-1.5 py-0.5 text-sm leading-6 outline-none bg-primary font-medium text-primary"
                                         value={editingValue}
@@ -202,10 +209,11 @@ const SubtasksSection: React.FC<Props> = ({ taskId, initialSubtasks, users: init
                                 ) : (
                                     <span
                                         className={cx(
-                                            "text-sm font-medium text-secondary cursor-pointer break-words",
+                                            "text-sm font-medium text-secondary break-words",
+                                            !isReadOnly && "cursor-pointer",
                                             s.status === "completed" && "text-quaternary line-through decoration-quaternary"
                                         )}
-                                        onClick={() => {
+                                        onClick={isReadOnly ? undefined : () => {
                                             setEditingId(s.id);
                                             setEditingValue(s.name);
                                         }}
@@ -215,136 +223,150 @@ const SubtasksSection: React.FC<Props> = ({ taskId, initialSubtasks, users: init
                                 )}
                             </div>
 
-                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 has-[[data-state=open]]:opacity-100 transition-opacity">
-                                {/* ASSIGNEE */}
-                                <Dropdown.Root
-                                    isOpen={activeAction?.id === s.id && activeAction.type === "assignee"}
-                                    onOpenChange={(isOpen) => setActiveAction(isOpen ? { id: s.id, type: "assignee" } : null)}
-                                >
-                                    <Button
-                                        color="tertiary"
-                                        size="sm"
-                                        className={cx("!p-1.5", !assignee && !(activeAction?.id === s.id && activeAction?.type === "assignee") && "hidden")}
-                                        title={assignee ? `${assignee.first_name} ${assignee.last_name}` : "Assignee"}
+                            {!isReadOnly && (
+                                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 has-[[data-state=open]]:opacity-100 transition-opacity">
+                                    {/* ASSIGNEE */}
+                                    <Dropdown.Root
+                                        isOpen={activeAction?.id === s.id && activeAction.type === "assignee"}
+                                        onOpenChange={(isOpen) => setActiveAction(isOpen ? { id: s.id, type: "assignee" } : null)}
                                     >
-                                        {assignee ? (
-                                            <Avatar
-                                                size="xs"
-                                                src={assignee.avatar_url}
-                                                initials={(assignee.first_name[0] || "") + (assignee.last_name?.[0] || "")}
-                                            />
-                                        ) : (
-                                            <UserRound size={16} className="text-gray-400" />
-                                        )}
-                                    </Button>
-
-                                    <Dropdown.Popover className="w-72 max-h-[300px] flex flex-col">
-                                        <div className="p-2 border-b border-gray-100 dark:border-gray-700">
-                                            <Input
-                                                size="sm"
-                                                placeholder="Пошук..."
-                                                value={userSearch}
-                                                onChange={(v) => setUserSearch(v as string)}
-                                                autoFocus
-                                            />
-                                        </div>
-                                        <div className="flex-1 overflow-y-auto p-1 flex flex-col gap-0.5">
-                                            {s.assignee_id && (
-                                                <div
-                                                    className="flex items-center gap-2 p-1.5 rounded-md cursor-pointer hover:bg-red-50"
-                                                    onClick={() => handleUnassign(s.id)}
-                                                >
-                                                    <div className="flex items-center justify-center w-6 h-6 rounded-full bg-red-100 text-red-500">
-                                                        <X size={14} />
-                                                    </div>
-                                                    <span className="text-sm text-red-500">Зняти виконавця</span>
-                                                </div>
+                                        <Button
+                                            color="tertiary"
+                                            size="sm"
+                                            className={cx("!p-1.5", !assignee && !(activeAction?.id === s.id && activeAction?.type === "assignee") && "hidden")}
+                                            title={assignee ? `${assignee.first_name} ${assignee.last_name}` : "Assignee"}
+                                        >
+                                            {assignee ? (
+                                                <Avatar
+                                                    size="xs"
+                                                    src={assignee.avatar_url}
+                                                    initials={(assignee.first_name[0] || "") + (assignee.last_name?.[0] || "")}
+                                                />
+                                            ) : (
+                                                <UserRound size={16} className="text-gray-400" />
                                             )}
-                                            {filteredUsers.map(u => (
-                                                <div
-                                                    key={u.id}
-                                                    className="flex items-center gap-2 p-1.5 rounded-md cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
-                                                    onClick={() => handleAssign(s.id, u.id)}
-                                                >
-                                                    <Avatar
-                                                        size="xs"
-                                                        src={u.avatar_url}
-                                                        initials={(u.first_name[0] || "") + (u.last_name?.[0] || "")}
-                                                    />
-                                                    <span className="text-sm truncate">{u.first_name} {u.last_name}</span>
-                                                    {s.assignee_id === u.id && <Check size={14} className="ml-auto text-primary" />}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </Dropdown.Popover>
-                                </Dropdown.Root>
+                                        </Button>
 
-                                {/* DEADLINE */}
-                                <DatePicker
-                                    isOpen={activeAction?.id === s.id && activeAction.type === "date"}
-                                    onOpenChange={(isOpen) => setActiveAction(isOpen ? { id: s.id, type: "date" } : null)}
-                                    value={deadline}
-                                    onChange={() => { }}
-                                    onApply={(date) => handleSetDeadline(s.id, dateValueToLocalString(date))}
-                                >
-                                    <Button
-                                        color={isOverdue ? "primary-destructive" : "tertiary"}
-                                        size="sm"
-                                        className={cx("!p-1.5", isOverdue && "bg-red-50 text-red-600 ring-red-100 hover:bg-red-100", !deadline && !(activeAction?.id === s.id && activeAction?.type === "date") && "hidden")}
-                                        title="Deadline"
+                                        <Dropdown.Popover className="w-72 max-h-[300px] flex flex-col">
+                                            <div className="p-2 border-b border-gray-100 dark:border-gray-700">
+                                                <Input
+                                                    size="sm"
+                                                    placeholder="Пошук..."
+                                                    value={userSearch}
+                                                    onChange={(v) => setUserSearch(v as string)}
+                                                    autoFocus
+                                                />
+                                            </div>
+                                            <div className="flex-1 overflow-y-auto p-1 flex flex-col gap-0.5">
+                                                {s.assignee_id && (
+                                                    <div
+                                                        className="flex items-center gap-2 p-1.5 rounded-md cursor-pointer hover:bg-red-50"
+                                                        onClick={() => handleUnassign(s.id)}
+                                                    >
+                                                        <div className="flex items-center justify-center w-6 h-6 rounded-full bg-red-100 text-red-500">
+                                                            <X size={14} />
+                                                        </div>
+                                                        <span className="text-sm text-red-500">Зняти виконавця</span>
+                                                    </div>
+                                                )}
+                                                {filteredUsers.map(u => (
+                                                    <div
+                                                        key={u.id}
+                                                        className="flex items-center gap-2 p-1.5 rounded-md cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                                                        onClick={() => handleAssign(s.id, u.id)}
+                                                    >
+                                                        <Avatar
+                                                            size="xs"
+                                                            src={u.avatar_url}
+                                                            initials={(u.first_name[0] || "") + (u.last_name?.[0] || "")}
+                                                        />
+                                                        <span className="text-sm truncate">{u.first_name} {u.last_name}</span>
+                                                        {s.assignee_id === u.id && <Check size={14} className="ml-auto text-primary" />}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </Dropdown.Popover>
+                                    </Dropdown.Root>
+
+                                    {/* DEADLINE */}
+                                    <DatePicker
+                                        isOpen={activeAction?.id === s.id && activeAction.type === "date"}
+                                        onOpenChange={(isOpen) => setActiveAction(isOpen ? { id: s.id, type: "date" } : null)}
+                                        value={deadline}
+                                        onChange={() => { }}
+                                        onApply={(date) => handleSetDeadline(s.id, dateValueToLocalString(date))}
                                     >
-                                        <CalendarIcon size={16} className={cx(isOverdue ? "text-red-600" : "text-gray-400")} />
-                                        {deadline && <span className="text-xs ml-1">{dateValueToLocalString(deadline)?.slice(0, 5)}</span>}
-                                    </Button>
-                                </DatePicker>
+                                        <Button
+                                            color={isOverdue ? "primary-destructive" : "tertiary"}
+                                            size="sm"
+                                            className={cx("!p-1.5", isOverdue && "bg-red-50 text-red-600 ring-red-100 hover:bg-red-100", !deadline && !(activeAction?.id === s.id && activeAction?.type === "date") && "hidden")}
+                                            title="Deadline"
+                                        >
+                                            <CalendarIcon size={16} className={cx(isOverdue ? "text-red-600" : "text-gray-400")} />
+                                            {deadline && <span className="text-xs ml-1">{dateValueToLocalString(deadline)?.slice(0, 5)}</span>}
+                                        </Button>
+                                    </DatePicker>
 
-                                {/* MENU */}
-                                <Dropdown.Root>
-                                    <Button color="tertiary" size="sm" className="!p-1.5">
-                                        <Ellipsis size={16} className="text-gray-400" />
-                                    </Button>
-                                    <Dropdown.Popover>
-                                        <Dropdown.Menu onAction={(key) => {
-                                            if (key === "assign") setActiveAction({ id: s.id, type: "assignee" });
-                                            if (key === "deadline") setActiveAction({ id: s.id, type: "date" });
-                                            if (key === "delete") handleDelete(s.id);
-                                        }}>
-                                            <Dropdown.Item id="assign" icon={UserRound}>
-                                                Поставити відповідального
-                                            </Dropdown.Item>
+                                    {/* MENU */}
+                                    <Dropdown.Root>
+                                        <Button color="tertiary" size="sm" className="!p-1.5">
+                                            <Ellipsis size={16} className="text-gray-400" />
+                                        </Button>
+                                        <Dropdown.Popover>
+                                            <Dropdown.Menu onAction={(key) => {
+                                                if (key === "assign") setActiveAction({ id: s.id, type: "assignee" });
+                                                if (key === "deadline") setActiveAction({ id: s.id, type: "date" });
+                                                if (key === "delete") handleDelete(s.id);
+                                            }}>
+                                                <Dropdown.Item id="assign" icon={UserRound}>
+                                                    Поставити відповідального
+                                                </Dropdown.Item>
 
-                                            <Dropdown.Item id="deadline" icon={CalendarIcon}>
-                                                Поставити дедлайн
-                                            </Dropdown.Item>
+                                                <Dropdown.Item id="deadline" icon={CalendarIcon}>
+                                                    Поставити дедлайн
+                                                </Dropdown.Item>
 
-                                            <Dropdown.Separator />
+                                                <Dropdown.Separator />
 
-                                            <Dropdown.Item addon="Del" key="delete" id="delete" className="text-red-500">
-                                                <div className="flex items-center gap-2">
-                                                    <Trash2 size={16} />
-                                                    <span>Видалити</span>
-                                                </div>
-                                            </Dropdown.Item>
-                                        </Dropdown.Menu>
-                                    </Dropdown.Popover>
-                                </Dropdown.Root>
-                            </div>
+                                                <Dropdown.Item addon="Del" key="delete" id="delete" className="text-red-500">
+                                                    <div className="flex items-center gap-2">
+                                                        <Trash2 size={16} />
+                                                        <span>Видалити</span>
+                                                    </div>
+                                                </Dropdown.Item>
+                                            </Dropdown.Menu>
+                                        </Dropdown.Popover>
+                                    </Dropdown.Root>
+                                </div>
+                            )}
+
+                            {isReadOnly && assignee && (
+                                <div className="flex items-center gap-1">
+                                    <Avatar
+                                        size="xs"
+                                        src={assignee.avatar_url}
+                                        initials={(assignee.first_name[0] || "") + (assignee.last_name?.[0] || "")}
+                                    />
+                                </div>
+                            )}
                         </div>
                     );
                 })}
 
-                <div className="flex items-center gap-2 mt-2">
-                    <Input
-                        size="sm"
-                        type="text"
-                        value={newName}
-                        placeholder="Нова підзадача..."
-                        onChange={(value) => setNewName(value)}
-                        onKeyDown={(e) => e.key === "Enter" && handleAdd()}
-                        isDisabled={isAdding}
-                    />
-                    <Button onClick={handleAdd} disabled={isAdding} iconLeading={Plus} />
-                </div>
+                {!isReadOnly && (
+                    <div className="flex items-center gap-2 mt-2">
+                        <Input
+                            size="sm"
+                            type="text"
+                            value={newName}
+                            placeholder="Нова підзадача..."
+                            onChange={(value) => setNewName(value)}
+                            onKeyDown={(e) => e.key === "Enter" && handleAdd()}
+                            isDisabled={isAdding}
+                        />
+                        <Button onClick={handleAdd} disabled={isAdding} iconLeading={Plus} />
+                    </div>
+                )}
             </div>
         </section>
     );

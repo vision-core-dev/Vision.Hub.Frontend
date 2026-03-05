@@ -370,7 +370,7 @@ export const TextEditorLink = ({ className }: { className?: string }) => {
  */
 export const TextEditorImage = ({ className }: { className?: string }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const { editor, isDisabled, onUploadImage } = useEditorContext();
+    const { editor, isDisabled } = useEditorContext();
 
     const { isImage } = useEditorState({
         editor,
@@ -386,33 +386,19 @@ export const TextEditorImage = ({ className }: { className?: string }) => {
     };
 
     const handleFileChange = useCallback(
-        async (event: React.ChangeEvent<HTMLInputElement>) => {
+        (event: React.ChangeEvent<HTMLInputElement>) => {
             const file = event.target.files?.[0];
             if (!file) return;
 
-            // Reset input so same file can be re-selected
-            event.target.value = "";
-
-            if (onUploadImage) {
-                // 🌐 Upload to server (Bunny CDN)
-                try {
-                    const url = await onUploadImage(file);
-                    editor.chain().focus().setImage({ src: url }).run();
-                } catch (err) {
-                    console.error("❌ Image upload failed:", err);
-                }
-            } else {
-                // Fallback: local blob URL
-                const blobUrl = URL.createObjectURL(file);
-                editor.chain().focus().setImage({ src: blobUrl }).run();
-            }
+            const blobUrl = URL.createObjectURL(file);
+            editor.chain().focus().setImage({ src: blobUrl }).run();
         },
-        [editor, onUploadImage],
+        [editor],
     );
 
     return (
         <>
-            <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
+            <input type="file" ref={fileInputRef} className="hidden" onChange={handleFileChange} />
             <EditorButton aria-label="Insert image" isDisabled={isDisabled} isActive={isImage} onClick={triggerFileUpload} className={className}>
                 <Image01 className="size-5" />
             </EditorButton>

@@ -66,6 +66,7 @@ interface Props {
     boardLists: List[];
     isOpen: boolean;
     onOpenChange: (open: boolean) => void;
+    isReadOnly?: boolean;
 }
 
 /* ===================== COMPONENT ===================== */
@@ -76,6 +77,7 @@ const TaskDetailsModal: React.FC<Props> = ({
     boardTags,
     isOpen,
     onOpenChange,
+    isReadOnly = false,
 }) => {
     const [loading, setLoading] = useState(false);
     const [task, setTask] = useState<TaskDetails | null>(null);
@@ -98,7 +100,7 @@ const TaskDetailsModal: React.FC<Props> = ({
     const fetchTaskDetails = async () => {
         try {
             setLoading(true);
-            const res = await api.get(`/v1/Hub/Tasks/${taskId}/GetDetails`);
+            const res = await api.get(`/v1/Hub/Tasks/${taskId}` + (isReadOnly ? "/GetPublicDetails" : "/GetDetails"));
             const data = await res.json();
 
             const taskData = data.task ?? data;
@@ -255,81 +257,108 @@ const TaskDetailsModal: React.FC<Props> = ({
                                             onSetBannerByUrl={handleBannerByUrl}
                                             onArchive={handleArchive}
                                             onClose={() => onOpenChange(false)}
+                                            isReadOnly={isReadOnly}
                                         />
                                     </div>
 
                                     <div className="flex-1 overflow-y-auto px-8 py-6 custom-scrollbar">
                                         <div className="flex flex-col gap-8">
-                                            <TaskNameInput value={task.name} onChange={handleNameChange} />
+                                            {isReadOnly ? (
+                                                <h2 className="text-2xl font-bold text-primary">{task.name}</h2>
+                                            ) : (
+                                                <TaskNameInput value={task.name} onChange={handleNameChange} />
+                                            )}
 
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                                 <section className="flex flex-col gap-2">
-                                                    <Label className="text-xs uppercase tracking-wider text-secondary font-semibold mb-1">Учасники</Label>
+                                                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">Учасники</h3>
                                                     <AssigneeSelector
                                                         taskId={task.id}
                                                         assignees={task.assignees}
                                                         onUpdate={(assignees) =>
                                                             setTask({ ...task, assignees })
                                                         }
+                                                        isReadOnly={isReadOnly}
                                                     />
                                                 </section>
 
                                                 <section className="flex flex-col gap-2">
-                                                    <Label className="text-xs uppercase tracking-wider text-secondary font-semibold mb-1">Мітки</Label>
+                                                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">Мітки</h3>
                                                     <TagSelector
                                                         taskId={task.id}
                                                         boardTags={boardTags}
                                                         selectedTags={task.tags}
                                                         onUpdate={(tags) => setTask({ ...task, tags })}
+                                                        isReadOnly={isReadOnly}
                                                     />
                                                 </section>
                                             </div>
 
                                             <section className="flex flex-row gap-6">
-                                                <DatePicker
-                                                    label="Початок"
-                                                    value={startedAt}
-                                                    onChange={(v) => setStartedAt(v)}
-                                                    onApply={(v) => {
-                                                        setStartedAt(v);
-                                                        saveDates(v, deadlineAt);
-                                                    }}
-                                                />
+                                                {isReadOnly ? (
+                                                    <>
+                                                        <div className="flex flex-col gap-1">
+                                                            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">Початок</h3>
+                                                            <span className="text-sm text-primary">{startedAt ? dateValueToLocalString(startedAt) : "—"}</span>
+                                                        </div>
+                                                        <div className="flex flex-col gap-1">
+                                                            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">Крайдата</h3>
+                                                            <span className="text-sm text-primary">{deadlineAt ? dateValueToLocalString(deadlineAt) : "—"}</span>
+                                                        </div>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <div className="flex flex-col gap-1">
+                                                            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">Початок</h3>
+                                                            <DatePicker
+                                                                value={startedAt}
+                                                                onChange={(v) => setStartedAt(v)}
+                                                                onApply={(v) => {
+                                                                    setStartedAt(v);
+                                                                    saveDates(v, deadlineAt);
+                                                                }}
+                                                            />
+                                                        </div>
 
-                                                <DatePicker
-                                                    label="Крайдата"
-                                                    value={deadlineAt}
-                                                    onChange={(v) => setDeadlineAt(v)}
-                                                    onApply={(v) => {
-                                                        setDeadlineAt(v);
-                                                        saveDates(startedAt, v);
-                                                    }}
-                                                />
+                                                        <div className="flex flex-col gap-1">
+                                                            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">Крайдата</h3>
+                                                            <DatePicker
+                                                                value={deadlineAt}
+                                                                onChange={(v) => setDeadlineAt(v)}
+                                                                onApply={(v) => {
+                                                                    setDeadlineAt(v);
+                                                                    saveDates(startedAt, v);
+                                                                }}
+                                                            />
+                                                        </div>
+
+
+                                                    </>
+                                                )}
                                             </section>
 
                                             <section className="flex flex-col gap-2">
-                                                <Label className="text-xs uppercase tracking-wider text-secondary font-semibold mb-1">Опис</Label>
+                                                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">Опис</h3>
                                                 <TextEditor.Root
-                                                    placeholder="Додайте опис задачі..."
-                                                    inputClassName="w-full min-h-[150px]"
+                                                    placeholder={isReadOnly ? "" : "Додайте опис задачі..."}
+                                                    inputClassName="w-full min-h-[150px] resize-y"
                                                     content={description}
-                                                    onUpdate={({ editor }) => {
+                                                    isDisabled={isReadOnly}
+                                                    onUpdate={isReadOnly ? undefined : ({ editor }) => {
                                                         const html = editor.getHTML();
                                                         setDescription(html);
                                                         saveDescription(html);
                                                     }}
                                                 >
-                                                    <TextEditor.Tooltip />
+                                                    {!isReadOnly && <TextEditor.Tooltip />}
                                                     <div className="flex flex-col gap-2">
-                                                        <TextEditor.Toolbar type="advanced" />
-                                                        <div className="px-3 py-2">
-                                                            <TextEditor.Content />
-                                                        </div>
+                                                        {!isReadOnly && <TextEditor.Toolbar type="advanced" />}
+                                                        {/* <div className="px-3 py-2"> */}
+                                                        <TextEditor.Content />
+                                                        {/* </div> */}
                                                     </div>
                                                 </TextEditor.Root>
                                             </section>
-
-                                            <hr className="border-secondary" />
 
                                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                                                 <AttachmentsSection
@@ -338,6 +367,7 @@ const TaskDetailsModal: React.FC<Props> = ({
                                                     onChange={(attachments) =>
                                                         setTask({ ...task, attachments })
                                                     }
+                                                    isReadOnly={isReadOnly}
                                                 />
 
                                                 <AccrualsSection
@@ -345,15 +375,15 @@ const TaskDetailsModal: React.FC<Props> = ({
                                                     accruals={task.accruals || []}
                                                     users={task.assignees}
                                                     onUpdate={(accruals) => setTask({ ...task, accruals })}
+                                                    isReadOnly={isReadOnly}
                                                 />
                                             </div>
-
-                                            <hr className="border-secondary" />
 
                                             <SubtasksSection
                                                 taskId={task.id}
                                                 initialSubtasks={task.subtasks}
                                                 users={[]}
+                                                isReadOnly={isReadOnly}
                                             />
                                         </div>
                                     </div>

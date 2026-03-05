@@ -84,7 +84,7 @@ const BoardPage = ({ is_public = false }: Props) => {
     const fetchBoard = useCallback(async (silent = false) => {
         try {
             if (!silent) setLoading(true);
-            const res = await api.get(`/v1/Hub/Boards/${id}/GetDetails` + (is_public ? "?only-public" : ""));
+            const res = await api.get(`/v1/Hub/Boards/${id}` + (is_public ? "/GetPublicDetails" : "/GetDetails"));
             const data: BoardDetails = await res.json();
 
             setBoardLists(data.lists)
@@ -253,6 +253,7 @@ const BoardPage = ({ is_public = false }: Props) => {
                 taskId={taskId ?? ""}
                 boardTags={boardDetails.tags}
                 boardLists={boardLists}
+                isReadOnly={is_public}
             />
 
         </div >

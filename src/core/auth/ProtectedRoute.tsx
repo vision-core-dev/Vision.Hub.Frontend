@@ -42,7 +42,14 @@ const ProtectedRoute = () => {
 
     // Redirect to login if not authenticated
     if (!isAuthenticated) {
-        return <Navigate to="/login" state={{ from: location }} replace />;
+        // If they are trying to access a board without auth, redirect them to the public view
+        if (location.pathname.startsWith("/boards/b/")) {
+            return <Navigate to={`/public${location.pathname}`} replace />;
+        }
+
+        if (!location.pathname.startsWith("/public")) {
+            return <Navigate to="/login" state={{ from: location }} replace />;
+        }
     }
 
     // Check if role has menu permissions

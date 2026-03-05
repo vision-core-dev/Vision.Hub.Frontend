@@ -1,22 +1,16 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./KnowledgeContent.module.css";
 import { Calendar, User, Save } from "lucide-react";
 import { api } from "@/shared/utils/api.ts";
 import LoaderDots from "@/shared/ui/loader-dots/LoaderDots.tsx";
 import { safeDatetime } from "@/shared/utils/safeDate.ts";
-import { TextEditor } from "@/shared/ui/text-editor/text-editor";
-import { Button } from "@/shared/ui/buttons/button";
+import TextEditor from "@/shared/ui/text-editor-basic/TextEditor.tsx";
 
 interface DocumentData {
     id: string;
     title: string;
     content: string;
-    author: {
-        id: string;
-        avatar_url?: string;
-        first_name: string;
-        last_name?: string;
-    };
+    author: string;
     updated_at: string;
 }
 
@@ -33,7 +27,6 @@ const KnowledgeContentEdit: React.FC<Props> = ({ documentId, sidebarButton, side
     const [editTitle, setEditTitle] = useState("");
     const [editContent, setEditContent] = useState("");
     const [saving, setSaving] = useState(false);
-    const [, setSaved] = useState(false);
 
     // -------------------------------
     //   LOAD DOCUMENT
@@ -71,17 +64,14 @@ const KnowledgeContentEdit: React.FC<Props> = ({ documentId, sidebarButton, side
     // -------------------------------
     //   SAVE DOCUMENT
     // -------------------------------
-    const handleSave = useCallback(async (contentOverride?: string) => {
+    const handleSave = async () => {
         if (!doc) return;
         setSaving(true);
-        setSaved(false);
-
-        const contentToSave = contentOverride ?? editContent;
 
         try {
             const res = await api.post(`/v1/Hub/Knowledge/${doc.id}/UpdateDocument`, {
                 title: editTitle,
-                content: contentToSave,
+                content: editContent,
             });
 
             const data = await res.json();
@@ -90,11 +80,9 @@ const KnowledgeContentEdit: React.FC<Props> = ({ documentId, sidebarButton, side
                 setDoc({
                     ...doc,
                     title: editTitle,
-                    content: contentToSave,
+                    content: editContent,
                     updated_at: new Date().toISOString(),
                 });
-                setSaved(true);
-                setTimeout(() => setSaved(false), 2500);
             } else {
                 console.warn("⚠️ Save error:", data.detail);
             }
@@ -103,19 +91,7 @@ const KnowledgeContentEdit: React.FC<Props> = ({ documentId, sidebarButton, side
         } finally {
             setSaving(false);
         }
-    }, [doc, editTitle, editContent]);
-
-    // Ctrl+S shortcut
-    useEffect(() => {
-        const handler = (e: KeyboardEvent) => {
-            if ((e.ctrlKey || e.metaKey) && e.key === "s") {
-                e.preventDefault();
-                handleSave();
-            }
-        };
-        document.addEventListener("keydown", handler);
-        return () => document.removeEventListener("keydown", handler);
-    }, [handleSave]);
+    };
 
     // -------------------------------
     //          RENDER
@@ -123,82 +99,85 @@ const KnowledgeContentEdit: React.FC<Props> = ({ documentId, sidebarButton, side
 
     if (loading)
         return (
-            <div className={`${styles.content} dark:bg-gray-900/90`}>
+            <div className={styles.content}>
                 <LoaderDots />
             </div>
         );
 
     if (!doc)
         return (
-            <div className={`${styles.content} dark:bg-gray-900/90`}>
-                <div className="text-gray-500 dark:text-gray-500">📄 Виберіть документ у меню</div>
+            <div className={styles.content}>
+                <div className={styles.empty}>📄 Виберіть документ у меню</div>
             </div>
         );
 
     return (
         <div
-            className={`${styles.content} dark:text-gray-200 dark:bg-gray-900/90`}
+            className={styles.content}
             onClick={() => {
                 if (sidebarClose && window.innerWidth < 900) sidebarClose();
             }}
         >
             {/* HEADER */}
-            <div className="flex flex-col items-start gap-2">
+            <div className={styles.info}>
                 {sidebarButton}
 
-                <div className="flex-1 min-w-0">
+                <div>
                     <input
-                        className={`${styles.titleInput} dark:bg-transparent dark:text-gray-100 dark:border-gray-700`}
+                        className={styles.titleInput}
                         value={editTitle}
                         onChange={(e) => setEditTitle(e.target.value)}
                         placeholder="Назва документа..."
                     />
 
-                    <div className={`${styles.meta} dark:text-gray-400`}>
-                        <span className="flex items-center gap-1">
-                            <User size={16} /> {doc.author?.first_name} {doc.author?.last_name || ""}
+                    <div className={styles.meta}>
+                        <span>
+                            <User size={16} /> {doc.author}
                         </span>
-                        <span className="flex items-center gap-1">
+                        <span>
                             <Calendar size={16} /> {safeDatetime(doc.updated_at)}
                         </span>
                     </div>
                 </div>
 
                 {/* SAVE BUTTON */}
-                <Button
-                    color="primary"
-                    iconLeading={Save}
-                    onClick={() => handleSave()}
-                    showTextWhileLoading
-                    isLoading={saving}
+                <button
+                    className={styles.saveButton}
+                    disabled={saving}
+                    onClick={handleSave}
                 >
-                    Зберегти
-                </Button>
+                    <Save size={18} />
+                    {saving ? "Збереження..." : "Зберегти"}
+                </button>
             </div>
 
-            {/* BODY EDITOR — Untitled UI TipTap editor */}
-            <div className={`${styles.editorContainer} flex flex-col gap-3`}>
-                <TextEditor.Root
-                    content={editContent}
-                    onUpdate={({ editor }) => {
-                        setEditContent(editor.getHTML());
-                    }}
-                    placeholder="Почніть писати документ..."
-                    onUploadImage={async (file: File) => {
+            {/* BODY EDITOR */}
+            <div className={styles.editorContainer}>
+                <TextEditor
+                    mode="edit"
+                    value={editContent}
+                    onChange={(html) => setEditContent(html)}
+                    onUploadImage={async (file) => {
                         const form = new FormData();
                         form.append("file", file);
-                        const res = await api.post("/v1/Hub/Uploads/Image", form);
+
+                        const res = await api.post(`/v1/Hub/UploadImage`, form);
                         const data = await res.json();
-                        if (!res.ok) throw new Error(data.detail || "Upload failed");
-                        return data.file_url as string;
+                        return data.file_url;
                     }}
-                >
-                    <TextEditor.Toolbar type="advanced" className="sticky top-0 z-10 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 py-2" />
-                    <TextEditor.Content className="min-h-[400px]" />
-                </TextEditor.Root>
+                />
             </div>
         </div>
     );
 };
 
 export default KnowledgeContentEdit;
+
+
+
+
+
+
+
+
+

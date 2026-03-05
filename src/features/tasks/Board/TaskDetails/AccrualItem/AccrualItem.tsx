@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { AvatarLabelGroup } from "@/shared/ui/avatar/avatar-label-group";
 import { Pencil, Trash2, Check, X } from "lucide-react";
-import { Input } from "@/shared/ui/input/input";
-import { ButtonUtility } from "@/shared/ui/buttons/button-utility";
+import styles from "./AccrualItem.module.css";
 
 interface Props {
     id: string;
@@ -46,42 +45,42 @@ export default function AccrualItem({ id, user, name, amount, canEdit, onUpdate,
 
     if (isEditing) {
         return (
-            <div className="flex flex-col gap-3 py-3 px-3 border border-indigo-200 dark:border-indigo-800/50 rounded-lg bg-indigo-50/30 dark:bg-gray-800/80 mb-1.5 animate-in fade-in slide-in-from-top-1">
-                <div className="flex flex-col sm:flex-row gap-2">
-                    <div className="flex items-center sm:w-1/4 shrink-0">
-                        <AvatarLabelGroup
-                            title={`${user.first_name} ${user.last_name || ""}`}
-                            size="sm"
-                            src={user.avatar_url}
-                            initials={initials}
-                        />
-                    </div>
-                    <div className="flex-1">
-                        <Input
-                            value={editName}
-                            onChange={(value) => setEditName(value)}
-                            placeholder="Назва виплати"
-                        />
-                    </div>
-                    <div className="sm:w-[120px] shrink-0">
-                        <Input
-                            type="number"
-                            value={editAmount}
-                            onChange={(value) => setEditAmount(value)}
-                            placeholder="Сума"
-                        />
-                    </div>
+            <div className={styles.editItem}>
+                <AvatarLabelGroup
+                    title={`${user.first_name} ${user.last_name || ""}`}
+                    size="sm"
+                    src={user.avatar_url}
+                    initials={initials}
+                />
+                <div className={styles.editFields}>
+                    <input
+                        className={styles.editNameInput}
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                        placeholder="Назва виплати"
+                    />
+                    <input
+                        className={styles.editAmountInput}
+                        type="number"
+                        value={editAmount}
+                        onChange={(e) => setEditAmount(e.target.value)}
+                        placeholder="Сума"
+                    />
                 </div>
-                <div className="flex gap-2 justify-end">
-                    <ButtonUtility icon={Check} onClick={handleSave} tooltip="Зберегти" color="secondary" />
-                    <ButtonUtility icon={X} onClick={handleCancel} tooltip="Скасувати" color="tertiary" />
+                <div className={styles.editActions}>
+                    <button className={styles.saveBtn} onClick={handleSave} title="Зберегти">
+                        <Check size={14} />
+                    </button>
+                    <button className={styles.cancelBtn} onClick={handleCancel} title="Скасувати">
+                        <X size={14} />
+                    </button>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="group flex items-center gap-3 py-2 px-3 border border-gray-200 dark:border-gray-700/80 rounded-lg bg-white dark:bg-gray-800/80 mb-1.5 transition-all hover:shadow-sm">
+        <div className={styles.item}>
             <AvatarLabelGroup
                 title={`${user.first_name} ${user.last_name || ""}`}
                 size="sm"
@@ -89,20 +88,24 @@ export default function AccrualItem({ id, user, name, amount, canEdit, onUpdate,
                 initials={initials}
             />
 
-            <div className="flex-1 min-w-0">
-                {name && <span className="text-[13px] text-gray-500 dark:text-gray-400 block truncate">{name}</span>}
+            <div className={styles.nameLabel}>
+                {name && <span className={styles.nameText}>{name}</span>}
             </div>
 
             <div
-                className={`w-[90px] text-right py-1.5 px-2 rounded-md text-[14px] font-medium shrink-0 ${amount > 0 ? "text-emerald-600 dark:text-emerald-400" : amount < 0 ? "text-red-600 dark:text-red-400" : "text-gray-800 dark:text-gray-200"}`}
+                className={`${styles.amount} ${amount > 0 ? styles.plus : amount < 0 ? styles.minus : ""}`}
             >
                 {amount > 0 ? `+${amount}` : amount} ₴
             </div>
 
             {canEdit && (
-                <div className="flex gap-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-                    <ButtonUtility icon={<Pencil size={14} />} onClick={() => setIsEditing(true)} tooltip="Редагувати" size="xs" color="tertiary" />
-                    <ButtonUtility icon={<Trash2 size={14} className="text-red-500 dark:text-red-400" />} onClick={() => onDelete?.(id)} tooltip="Видалити" size="xs" color="tertiary" />
+                <div className={styles.actions}>
+                    <button className={styles.actionBtn} onClick={() => setIsEditing(true)} title="Редагувати">
+                        <Pencil size={14} />
+                    </button>
+                    <button className={styles.deleteBtn} onClick={() => onDelete?.(id)} title="Видалити">
+                        <Trash2 size={14} />
+                    </button>
                 </div>
             )}
         </div>

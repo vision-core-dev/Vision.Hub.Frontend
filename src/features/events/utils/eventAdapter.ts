@@ -1,4 +1,5 @@
 import type { CalendarEvent } from "@/shared/ui/application/calendar/calendar";
+import type { EventType } from "@/shared/types/Events";
 
 interface EventLike {
     id: string;

@@ -3,14 +3,10 @@ import styles from "./KnowledgeContent.module.css";
 import { Calendar } from "lucide-react";
 import { api } from "@/shared/utils/api.ts";
 import LoaderDots from "@/shared/ui/loader-dots/LoaderDots.tsx";
+import UserLabel from "@/shared/ui/user/UserLabel.tsx";
 import { safeDatetime } from "@/shared/utils/safeDate.ts";
 import type { UserType } from "@/shared/types/Users.ts";
-import { useSearchParams, useNavigate } from "react-router-dom";
-import { useAuth } from "@/core/auth/AuthContext.tsx";
-import { Copy, History, Edit3, Trash2 } from "lucide-react";
-import { Button } from "@/shared/ui/buttons/button";
-import { CloseButton } from "@/shared/ui/buttons/close-button";
-import { AvatarLabelGroup } from "@/shared/components/base/avatar/avatar-label-group";
+import { useSearchParams } from "react-router-dom";
 
 interface DocumentData {
     id: string;
@@ -29,12 +25,6 @@ interface Props {
 const KnowledgeContent: React.FC<Props> = ({ documentId, sidebarButton, sidebarClose }) => {
     const [doc, setDoc] = useState<DocumentData | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
-    const [versions, setVersions] = useState<any[]>([]);
-    const [showVersions, setShowVersions] = useState(false);
-
-    const { role } = useAuth();
-    const isAdmin = role && role.order <= 1;
-    const navigate = useNavigate();
 
     const [searchParams] = useSearchParams();
     const highlightParam = searchParams.get("highlight");
@@ -68,31 +58,6 @@ const KnowledgeContent: React.FC<Props> = ({ documentId, sidebarButton, sidebarC
 
         fetchDoc();
     }, [documentId]);
-
-    const fetchVersions = async () => {
-        try {
-            const res = await api.get(`/v1/Hub/Knowledge/${documentId}/Versions`);
-            const data = await res.json();
-            if (res.ok) {
-                setVersions(data.versions);
-                setShowVersions(true);
-            }
-        } catch (e) {
-            console.error(e);
-        }
-    };
-
-    const deleteVersion = async (versionId: string) => {
-        if (!confirm("Ви впевнені, що хочете видалити цю версію?")) return;
-        try {
-            const res = await api.post(`/v1/Hub/Knowledge/Admin/Version/${versionId}/Delete`);
-            if (res.ok) {
-                setVersions(prev => prev.filter((v: any) => v.id !== versionId));
-            }
-        } catch (e) {
-            console.error(e);
-        }
-    };
 
 
     // Highlight logic - DOM Manipulation
@@ -174,117 +139,31 @@ const KnowledgeContent: React.FC<Props> = ({ documentId, sidebarButton, sidebarC
         return <div className={styles.content}><LoaderDots /></div>;
 
     if (!doc)
-        return <div className={styles.content}><div className="text-gray-500 dark:text-gray-500">📄 Виберіть документ у меню</div></div>;
+        return <div className={styles.content}><div className={styles.empty}>📄 Виберіть документ у меню</div></div>;
 
     return (
-        <div className={`${styles.content} dark:text-gray-200 dark:bg-gray-900/90`}
+        <div className={styles.content}
             onClick={() => {
                 if (sidebarClose && window.innerWidth < 900) sidebarClose();
             }}
         >
-            <div className="flex flex-col items-start gap-2">
+            <div className={styles.info}>
                 {sidebarButton}
                 <div>
-                    <h1 className="text-xl font-semibold dark:text-gray-100">{doc.title}</h1>
+                    <h1 className={styles.title}>{doc.title}</h1>
 
-                    <div className={`${styles.meta} dark:text-gray-400 flex items-center gap-4 mt-2`}>
-                        <div className="flex items-center gap-2"><AvatarLabelGroup
-                            size="sm"
-                            src={doc.author?.avatar_url?.toString()}
-                            title={`${doc.author?.first_name || ""} ${doc.author?.last_name || ""}`}
-                            subtitle={undefined}
-                        /></div>
-                        <div className="flex items-center gap-2 text-sm"><Calendar size={16} /><span>{safeDatetime(doc.updated_at)}</span></div>
-
-                        {isAdmin && (
-                            <div className="flex gap-2 ml-auto">
-                                <Button
-                                    onClick={fetchVersions}
-                                    color="secondary"
-                                    iconLeading={History}
-                                >
-                                    Історія версій
-                                </Button>
-                                <Button
-                                    onClick={() => navigate(`/knowledge/d/${doc.id}/edit`)}
-                                    color="primary"
-                                    iconLeading={Edit3}
-                                >
-                                    Редагувати
-                                </Button>
-                            </div>
-                        )}
+                    <div className={styles.meta}>
+                        <div><UserLabel avatar_url={doc.author.avatar_url} name={`${doc.author.first_name} ${doc.author.last_name || ""}`} user_id={doc.author.id} /></div>
+                        <div><Calendar size={20} /><span>{safeDatetime(doc.updated_at)}</span></div>
                     </div>
                 </div>
             </div>
 
             <div
                 ref={contentRef}
-                className={`${styles.body} dark:text-gray-300 [&>blockquote]:dark:border-gray-600 [&>blockquote]:dark:text-gray-400`}
+                className={styles.body}
                 dangerouslySetInnerHTML={{ __html: doc.content }}
             />
-
-            {/* Versions Modal */}
-            {showVersions && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 overflow-y-auto w-full h-full p-6">
-                    <div className="relative w-full max-w-2xl rounded-xl bg-white dark:bg-gray-900 shadow-2xl flex flex-col max-h-[90vh]">
-                        <div className="flex items-center justify-between border-b dark:border-gray-800 px-6 py-4">
-                            <h3 className="text-lg font-semibold dark:text-white">Історія версій</h3>
-                            <CloseButton onClick={() => setShowVersions(false)} />
-                        </div>
-                        <div className="overflow-y-auto px-6 py-4 space-y-4">
-                            {versions.length === 0 ? <p className="text-gray-500">Немає збережених версій.</p> : null}
-                            {versions.map((ver: any, index: number) => (
-                                <div key={ver.id} className="flex flex-col gap-4 border border-gray-200 dark:border-gray-800 rounded-lg p-4 bg-gray-50 dark:bg-gray-800/50">
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex flex-col">
-                                            <div className="text-sm font-semibold dark:text-gray-200">
-                                                Версія від {safeDatetime(ver.created_at)}
-                                            </div>
-                                            {(ver.author_first_name || ver.author_last_name) && (
-                                                <div className="flex items-center gap-2 mt-1">
-                                                    <span className="text-xs text-gray-500">Автор:</span>
-                                                    <AvatarLabelGroup
-                                                        size="sm"
-                                                        src={ver.author_avatar_url?.toString()}
-                                                        title={`${ver.author_first_name || ""} ${ver.author_last_name || ""}`}
-                                                        subtitle={undefined}
-                                                    />
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            {index === 0 && (
-                                                <span className="px-2 py-1 bg-emerald-100 text-emerald-800 text-xs font-semibold rounded dark:bg-emerald-900/30 dark:text-emerald-400">Поточна</span>
-                                            )}
-                                            {isAdmin && index !== 0 && (
-                                                <Button
-                                                    size="sm"
-                                                    color="tertiary-destructive"
-                                                    iconLeading={Trash2}
-                                                    onClick={() => deleteVersion(ver.id)}
-                                                />
-                                            )}
-                                        </div>
-                                    </div>
-                                    <div className="text-sm text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-900 p-3 rounded border dark:border-gray-800 h-32 overflow-y-auto" dangerouslySetInnerHTML={{ __html: ver.content }} />
-                                    <Button
-                                        size="sm"
-                                        onClick={() => {
-                                            navigator.clipboard.writeText(ver.content);
-                                            alert("HTML вміст версії скопійовано");
-                                        }}
-                                        color="link-gray"
-                                        iconLeading={Copy}
-                                    >
-                                        Скопіювати HTML код
-                                    </Button>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 };

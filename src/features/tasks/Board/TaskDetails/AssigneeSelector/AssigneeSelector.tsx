@@ -15,18 +15,20 @@ interface Props {
     taskId: string;
     assignees: TaskUser[];
     onUpdate: (list: TaskUser[]) => void;
+    isReadOnly?: boolean;
 }
 
-export const AssigneeSelector = ({ taskId, assignees, onUpdate }: Props) => {
+export const AssigneeSelector = ({ taskId, assignees, onUpdate, isReadOnly = false }: Props) => {
     const [users, setUsers] = useState<UserType[]>([]);
     const [search, setSearch] = useState("");
 
     /* load users */
     useEffect(() => {
+        if (isReadOnly) return;
         api.get("/v1/Hub/Users/List?only_active=true")
             .then((r) => r.json())
             .then((d) => setUsers(d.list || []));
-    }, []);
+    }, [isReadOnly]);
 
     const availableUsers = useMemo(() => {
         const lower = String(search).toLowerCase();
@@ -61,7 +63,7 @@ export const AssigneeSelector = ({ taskId, assignees, onUpdate }: Props) => {
 
                     <div
                         key={u.id}
-                        className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white pl-1 pr-2 py-0.5 shadow-sm dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors"
+                        className={`inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white pl-1 ${isReadOnly ? "pr-2" : "pr-2"} py-0.5 shadow-sm dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors`}
                     >
                         <Avatar
                             size="xs"
@@ -71,12 +73,14 @@ export const AssigneeSelector = ({ taskId, assignees, onUpdate }: Props) => {
                         <span className="text-xs font-medium text-gray-700 dark:text-gray-200">
                             {u.first_name}
                         </span>
-                        <button
-                            className="ml-1 text-gray-400 hover:text-red-500 transition-colors"
-                            onClick={() => unassign(u.id)}
-                        >
-                            <X size={14} />
-                        </button>
+                        {!isReadOnly && (
+                            <button
+                                className="ml-1 text-gray-400 hover:text-red-500 transition-colors"
+                                onClick={() => unassign(u.id)}
+                            >
+                                <X size={14} />
+                            </button>
+                        )}
                     </div>
 
                     // <div key={u.id} className={styles.chip}>
@@ -90,45 +94,47 @@ export const AssigneeSelector = ({ taskId, assignees, onUpdate }: Props) => {
                 ))}
 
                 {/* add */}
-                <Dropdown.Root>
-                    <ButtonUtility icon={Plus} />
+                {!isReadOnly && (
+                    <Dropdown.Root>
+                        <ButtonUtility icon={Plus} />
 
-                    <Dropdown.Popover className={styles.dropdown}>
-                        {/* search */}
-                        <Input
-                            placeholder="Пошук користувача…"
-                            value={search}
-                            onChange={(value) => setSearch(value as string)}
-                            icon={Search}
-                        />
+                        <Dropdown.Popover className={styles.dropdown}>
+                            {/* search */}
+                            <Input
+                                placeholder="Пошук користувача…"
+                                value={search}
+                                onChange={(value) => setSearch(value as string)}
+                                icon={Search}
+                            />
 
-                        {/* list */}
-                        <div className={styles.list}>
-                            {availableUsers.map((u) => (
-                                <div
-                                    key={u.id}
-                                    className={styles.option}
-                                    onClick={() => assign(u)}
-                                >
-                                    <AvatarLabelGroupWithDropdown
-                                        size="md"
-                                        src={u.avatar_url}
-                                        title={`${u.first_name} ${u.last_name ?? ""}`}
-                                        subtitle={u.role.name}
-                                        userId={u.id}
-                                        disableDropdown
-                                    />
-                                </div>
-                            ))}
+                            {/* list */}
+                            <div className={styles.list}>
+                                {availableUsers.map((u) => (
+                                    <div
+                                        key={u.id}
+                                        className={styles.option}
+                                        onClick={() => assign(u)}
+                                    >
+                                        <AvatarLabelGroupWithDropdown
+                                            size="md"
+                                            src={u.avatar_url}
+                                            title={`${u.first_name} ${u.last_name ?? ""}`}
+                                            subtitle={u.role.name}
+                                            userId={u.id}
+                                            disableDropdown
+                                        />
+                                    </div>
+                                ))}
 
-                            {availableUsers.length === 0 && (
-                                <div className={styles.empty}>
-                                    Нічого не знайдено
-                                </div>
-                            )}
-                        </div>
-                    </Dropdown.Popover>
-                </Dropdown.Root>
+                                {availableUsers.length === 0 && (
+                                    <div className={styles.empty}>
+                                        Нічого не знайдено
+                                    </div>
+                                )}
+                            </div>
+                        </Dropdown.Popover>
+                    </Dropdown.Root>
+                )}
             </div>
         </div>
     );

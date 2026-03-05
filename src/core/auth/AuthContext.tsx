@@ -74,7 +74,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
                     if (data.detail === "user_is_deactivated") {
                         navigate("/deactivated");
                     } else {
-                        navigate("/login");
+                        if (!currentPath.startsWith("/public")) {
+                            navigate("/login");
+                        }
                     }
                 }
             } catch {

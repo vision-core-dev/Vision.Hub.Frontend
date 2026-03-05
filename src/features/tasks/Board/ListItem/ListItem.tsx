@@ -275,7 +275,7 @@ const ListItem = ({
                             onDragEnd={handleDragEnd}
                             className={`${styles.taskWrapper} ${(draggingTaskId === task.id) ? styles.dragging : ""
                                 }`}
-                            onClick={() => !isBoardPublic && onSelectTask(task)}
+                            onClick={() => onSelectTask(task)}
                         >
                             <TaskItem isBoardPublic={isBoardPublic} boardTags={boardTags} users={users} task={task} />
                         </div>

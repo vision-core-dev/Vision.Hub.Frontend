@@ -3,7 +3,7 @@ import { Plus, Search } from "lucide-react";
 import { Dropdown } from "@/shared/ui/dropdown/dropdown";
 import { ButtonUtility } from "@/shared/ui/buttons/button-utility";
 import { Input } from "@/shared/ui/input/input";
-import { BadgeWithButton } from "@/shared/ui/badges/badges";
+import { Badge, BadgeWithButton } from "@/shared/ui/badges/badges";
 import { api } from "@/shared/utils/api";
 import styles from "./TagSelector.module.css";
 
@@ -18,6 +18,7 @@ interface Props {
     boardTags: Tag[];
     selectedTags: Tag[];
     onUpdate: (tags: Tag[]) => void;
+    isReadOnly?: boolean;
 }
 
 export const TagSelector = ({
@@ -25,6 +26,7 @@ export const TagSelector = ({
     boardTags,
     selectedTags,
     onUpdate,
+    isReadOnly = false,
 }: Props) => {
     const [search, setSearch] = useState("");
 
@@ -59,59 +61,78 @@ export const TagSelector = ({
             <div className={styles.chips}>
                 {/* selected tags */}
                 {selectedTags.map((tag) => (
-                    <BadgeWithButton
-                        key={tag.id}
-                        type="pill-color" // Use pill style
-                        color="gray" // Fallback/Base
-                        size="md"
-                        style={{
-                            backgroundColor: `${tag.color}35`, // Increased opacity from 20 to 35
-                            color: tag.color,
-                            borderColor: `${tag.color}60` // Increased opacity from 40 to 60
-                        }}
-                        className="!ring-0 border border-transparent" // Remove default ring if needed
-                        buttonLabel="Remove"
-                        onButtonClick={() => unassign(tag.id)}
-                    >
-                        {tag.name}
-                    </BadgeWithButton >
+                    isReadOnly ? (
+                        <Badge
+                            key={tag.id}
+                            type="pill-color"
+                            color="gray"
+                            size="md"
+                            style={{
+                                backgroundColor: `${tag.color}35`,
+                                color: tag.color,
+                                borderColor: `${tag.color}60`
+                            }}
+                            className="!ring-0 border border-transparent"
+                        >
+                            {tag.name}
+                        </Badge>
+                    ) : (
+                        <BadgeWithButton
+                            key={tag.id}
+                            type="pill-color"
+                            color="gray"
+                            size="md"
+                            style={{
+                                backgroundColor: `${tag.color}35`,
+                                color: tag.color,
+                                borderColor: `${tag.color}60`
+                            }}
+                            className="!ring-0 border border-transparent"
+                            buttonLabel="Remove"
+                            onButtonClick={() => unassign(tag.id)}
+                        >
+                            {tag.name}
+                        </BadgeWithButton>
+                    )
                 ))}
 
                 {/* add */}
-                <Dropdown.Root>
-                    <ButtonUtility icon={Plus} />
+                {!isReadOnly && (
+                    <Dropdown.Root>
+                        <ButtonUtility icon={Plus} />
 
-                    <Dropdown.Popover className={styles.dropdown}>
-                        <Input
-                            placeholder="Пошук мітки…"
-                            value={search}
-                            onChange={(v) => setSearch(v as string)}
-                            icon={Search}
-                        />
+                        <Dropdown.Popover className={styles.dropdown}>
+                            <Input
+                                placeholder="Пошук мітки…"
+                                value={search}
+                                onChange={(v) => setSearch(v as string)}
+                                icon={Search}
+                            />
 
-                        <div className={styles.list}>
-                            {availableTags.map((tag) => (
-                                <div
-                                    key={tag.id}
-                                    className={styles.option}
-                                    onClick={() => assign(tag)}
-                                >
-                                    <span
-                                        className={styles.color}
-                                        style={{ backgroundColor: tag.color }}
-                                    />
-                                    {tag.name}
-                                </div>
-                            ))}
+                            <div className={styles.list}>
+                                {availableTags.map((tag) => (
+                                    <div
+                                        key={tag.id}
+                                        className={styles.option}
+                                        onClick={() => assign(tag)}
+                                    >
+                                        <span
+                                            className={styles.color}
+                                            style={{ backgroundColor: tag.color }}
+                                        />
+                                        {tag.name}
+                                    </div>
+                                ))}
 
-                            {availableTags.length === 0 && (
-                                <div className={styles.empty}>
-                                    Нічого не знайдено
-                                </div>
-                            )}
-                        </div>
-                    </Dropdown.Popover>
-                </Dropdown.Root>
+                                {availableTags.length === 0 && (
+                                    <div className={styles.empty}>
+                                        Нічого не знайдено
+                                    </div>
+                                )}
+                            </div>
+                        </Dropdown.Popover>
+                    </Dropdown.Root>
+                )}
             </div>
         </div>
     );

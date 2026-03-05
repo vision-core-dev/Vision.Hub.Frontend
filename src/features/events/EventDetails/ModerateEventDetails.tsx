@@ -15,13 +15,18 @@ import {
     ArrowLeft,
     Link,
     UserCheck,
-    UserX
+    UserX,
+    Pencil,
+    UserPlus,
+    Trash2
 } from "lucide-react";
 import { Table } from "@/shared/components/table/table";
 import UserLabel from "@/shared/ui/user/UserLabel.tsx";
 import { safeDatetime } from "@/shared/utils/safeDate.ts";
 import LoaderSpinner from "@/shared/ui/loader-spinner/LoaderSpinner.tsx";
 import { Button } from "@/shared/ui/buttons/button.tsx";
+import EditEventModal from "./EditEventModal";
+import AddParticipantsModal from "./AddParticipantsModal";
 
 interface UserShort {
     id: string;
@@ -48,8 +53,9 @@ const ModerateEventDetails = () => {
     const [actions, setActions] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
 
-    // 👇 додаємо локальний стейт для конкретного користувача, що зараз оновлюється
     const [userLoading, setUserLoading] = useState<string | null>(null);
+    const [editOpen, setEditOpen] = useState(false);
+    const [addParticipantsOpen, setAddParticipantsOpen] = useState(false);
 
     const fetchEvent = async (withLoading = true) => {
         if (withLoading) setLoading(true);
@@ -83,6 +89,34 @@ const ModerateEventDetails = () => {
             console.error("Error:", err);
         } finally {
             setUserLoading(null); // ✅ ховаємо лоадер після запиту
+        }
+    };
+
+    const handleRemoveInvitee = async (userId: string) => {
+        if (!confirm("Видалити цього учасника?")) return;
+        try {
+            setUserLoading(userId);
+            const res = await api.post(`/v1/Hub/Events/${event?.id}/Invitees/${userId}/Remove`);
+            if (!res.ok) console.error("Failed to remove invitee");
+            fetchEvent(false);
+        } catch (err) {
+            console.error("Error:", err);
+        } finally {
+            setUserLoading(null);
+        }
+    };
+
+    const handleDeleteEvent = async () => {
+        if (!confirm("Ви впевнені, що хочете видалити цю подію?")) return;
+        try {
+            const res = await api.post(`/v1/Hub/Events/${event?.id}/Delete`);
+            if (res.ok) {
+                navigate("/calendar");
+            } else {
+                console.error("Failed to delete event");
+            }
+        } catch (err) {
+            console.error("Error:", err);
         }
     };
 
@@ -151,6 +185,22 @@ const ModerateEventDetails = () => {
                             <span>{event.location_url || "—"}</span>
                         </div>
                     </div>
+                </div>
+
+                <div className="flex gap-2 flex-wrap">
+                    {actions.includes("edit") && (
+                        <Button color="secondary" onClick={() => setEditOpen(true)} iconLeading={Pencil}>
+                            Редагувати
+                        </Button>
+                    )}
+                    <Button color="secondary" onClick={() => setAddParticipantsOpen(true)} iconLeading={UserPlus}>
+                        Додати учасників
+                    </Button>
+                    {actions.includes("cancel") && (
+                        <Button color="primary-destructive" onClick={handleDeleteEvent} iconLeading={Trash2}>
+                            Видалити подію
+                        </Button>
+                    )}
                 </div>
 
                 <div className="overflow-hidden rounded-xl border border-secondary bg-primary shadow-sm">
@@ -224,6 +274,19 @@ const ModerateEventDetails = () => {
                                                             : <UserX size={18} />}
                                                     </Button>
                                                 )}
+
+                                            {actions.includes("remove") && (
+                                                <Button
+                                                    color="primary-destructive"
+                                                    onClick={() => handleRemoveInvitee(item.user.id)}
+                                                    title="Видалити учасника"
+                                                    disabled={!!userLoading}
+                                                >
+                                                    {userLoading === item.user.id
+                                                        ? <LoaderSpinner size={18} />
+                                                        : <Trash2 size={18} />}
+                                                </Button>
+                                            )}
                                         </div>
                                     </Table.Cell>
                                 </Table.Row>
@@ -232,10 +295,26 @@ const ModerateEventDetails = () => {
                     </Table>
                 </div>
 
-                <Button color="link-color" onClick={() => navigate("/calendar")}>
-                    <ArrowLeft size={20} /> Назад до календаря
+                <Button color="link-color" onClick={() => navigate("/calendar")} iconLeading={ArrowLeft}>
+                    Назад до календаря
                 </Button>
             </div>
+
+            {event && (
+                <EditEventModal
+                    event={event}
+                    isOpen={editOpen}
+                    onClose={() => setEditOpen(false)}
+                    onSaved={() => fetchEvent(false)}
+                />
+            )}
+
+            <AddParticipantsModal
+                eventId={id!}
+                isOpen={addParticipantsOpen}
+                onClose={() => setAddParticipantsOpen(false)}
+                onAdded={() => fetchEvent(false)}
+            />
         </DefaultPage>
     );
 };

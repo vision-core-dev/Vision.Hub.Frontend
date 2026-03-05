@@ -26,11 +26,12 @@ interface Props {
     accruals: Accrual[];
     users: TaskUser[]; // Available users to pay
     onUpdate?: (list: Accrual[]) => void;
+    isReadOnly?: boolean;
 }
 
 /* ===================== COMPONENT ===================== */
 
-const AccrualsSection: React.FC<Props> = ({ taskId, accruals = [], users, onUpdate }) => {
+const AccrualsSection: React.FC<Props> = ({ taskId, accruals = [], users, onUpdate, isReadOnly = false }) => {
     const [isCreating, setIsCreating] = useState(false);
     const [selectedUserId, setSelectedUserId] = useState<string>("");
     const [amount, setAmount] = useState<string>("");
@@ -123,7 +124,7 @@ const AccrualsSection: React.FC<Props> = ({ taskId, accruals = [], users, onUpda
                         </span>
                     )}
                 </div>
-                {!isCreating && canManageAccruals && (
+                {!isCreating && canManageAccruals && !isReadOnly && (
                     <ButtonUtility
                         size="sm"
                         onClick={() => setIsCreating(true)}
@@ -143,7 +144,7 @@ const AccrualsSection: React.FC<Props> = ({ taskId, accruals = [], users, onUpda
                             user={acc.user}
                             name={acc.name}
                             amount={acc.amount}
-                            canEdit={canManageAccruals}
+                            canEdit={canManageAccruals && !isReadOnly}
                             onUpdate={handleUpdateAccrual}
                             onDelete={handleDeleteAccrual}
                         />
@@ -156,11 +157,11 @@ const AccrualsSection: React.FC<Props> = ({ taskId, accruals = [], users, onUpda
             )}
 
             {/* CREATE FORM */}
-            {isCreating && (
+            {isCreating && !isReadOnly && (
                 <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 flex flex-col gap-3 animate-in fade-in zoom-in-95 duration-200">
                     <div className="flex items-center gap-2">
                         <HandCoins className="text-primary" size={20} />
-                        <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Нова виплата</span>
+                        <span className="text-sm font-medium">Нова виплата</span>
                     </div>
 
                     <Select

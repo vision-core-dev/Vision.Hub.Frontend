@@ -4,10 +4,12 @@ export const api = {
     async post(url: string, body?: any, customHeaders: Record<string, string> = {}) {
         const isFormData = body instanceof FormData;
 
+        const token = localStorage.getItem("token");
+
         return fetch(BASE_URL + url, {
             method: "POST",
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
                 ...(isFormData ? {} : { "Content-Type": "application/json" }),
                 ...customHeaders,
             },
@@ -17,19 +19,21 @@ export const api = {
     },
 
     async get(url: string) {
+        const token = localStorage.getItem("token");
         return fetch(BASE_URL + url, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
             },
             credentials: "include",
         });
     },
 
     async patch(url: string, body?: any, customHeaders: Record<string, string> = {}) {
+        const token = localStorage.getItem("token");
         return fetch(BASE_URL + url, {
             method: "PATCH",
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
                 "Content-Type": "application/json",
                 ...customHeaders,
             },
@@ -39,10 +43,11 @@ export const api = {
     },
 
     async delete(url: string) {
+        const token = localStorage.getItem("token");
         return fetch(BASE_URL + url, {
             method: "DELETE",
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
             },
             credentials: "include",
         });

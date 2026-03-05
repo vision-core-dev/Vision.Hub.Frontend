@@ -32,9 +32,9 @@ const TaskItem = ({ isBoardPublic = false, task, boardTags, users }: TaskProps) 
     return (
         <div className={`${styles.task} 
             ${(isDone && task.banner_url) ? styles.doneTask : ""}
-            ${(isOverdue && !isBoardPublic) ? styles.overdue : ""}
+            ${isOverdue ? styles.overdue : ""}
             ${isToday ? styles.today : ""}
-            ${!isBoardPublic && styles.point}
+            ${styles.point}
         `}>
             {task.banner_url ? (
                 <div className={`${styles.banner} ${isDone ? styles.bannerDone : ""}`}>
@@ -61,7 +61,7 @@ const TaskItem = ({ isBoardPublic = false, task, boardTags, users }: TaskProps) 
 
             {!isDone && (
                 <div className={styles.content}>
-                    {(taskTags.length > 0 && !isBoardPublic) && (
+                    {taskTags.length > 0 && (
                         <div className={styles.tags}>
                             {taskTags.map((tag) => (
                                 <span
@@ -82,7 +82,7 @@ const TaskItem = ({ isBoardPublic = false, task, boardTags, users }: TaskProps) 
                         <h3 className={styles.title}>{task.name}</h3>
                     </div>
 
-                    {(task.deadline_at || task.started_at || (task.subtasks_total && task.subtasks_total > 0)) && !isBoardPublic ? (
+                    {(task.deadline_at || task.started_at || (task.subtasks_total && task.subtasks_total > 0)) ? (
                         <div className={styles.miniDetails}>
                             {(task.deadline_at || task.started_at) && (
                                 <div className={styles.deadline}>
@@ -103,7 +103,7 @@ const TaskItem = ({ isBoardPublic = false, task, boardTags, users }: TaskProps) 
                         </div>
                     ) : null}
 
-                    {(taskAssignees.length > 0 && !isBoardPublic) && (
+                    {taskAssignees.length > 0 && (
                         <div className={styles.assignees}>
                             {taskAssignees.map((a) => (
                                 <div key={a.id} className={styles.avatar}>

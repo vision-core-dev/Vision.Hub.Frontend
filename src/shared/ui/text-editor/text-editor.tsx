@@ -25,7 +25,6 @@ type EditorContextType = {
     isDisabled?: boolean;
     limit?: number;
     isInvalid?: boolean;
-    onUploadImage?: (file: File) => Promise<string>;
 };
 
 const EditorContext = createContext<EditorContextType | null>(null);
@@ -47,8 +46,6 @@ interface TextEditorRootProps extends Partial<EditorOptions> {
     children?: ReactNode;
     inputClassName?: string;
     ref?: Ref<HTMLDivElement>;
-    /** Custom image upload handler. Must return public URL. */
-    onUploadImage?: (file: File) => Promise<string>;
 }
 
 const TextEditorRoot = ({
@@ -59,7 +56,6 @@ const TextEditorRoot = ({
     isDisabled,
     limit,
     placeholder = "Write something...",
-    onUploadImage,
     ...editorOptions
 }: TextEditorRootProps) => {
     const id = useId();
@@ -180,7 +176,7 @@ const TextEditorRoot = ({
     }
 
     return (
-        <EditorContext.Provider value={{ editor, isDisabled, limit, isInvalid, editorId, onUploadImage }}>
+        <EditorContext.Provider value={{ editor, isDisabled, limit, isInvalid, editorId }}>
             <div className={cx("flex w-full flex-col gap-3", className)}>{children}</div>
         </EditorContext.Provider>
     );
@@ -196,7 +192,7 @@ const TextEditorContent = ({ ...props }: TextEditorContentProps) => {
     return <EditorContent disabled={isDisabled} {...props} editor={editor} />;
 };
 
-interface TextEditorLabelProps extends ComponentProps<typeof Label> { }
+interface TextEditorLabelProps extends ComponentProps<typeof Label> {}
 
 const TextEditorLabel = ({ children, ...props }: TextEditorLabelProps) => {
     const { editor, editorId } = useEditorContext();
@@ -214,7 +210,7 @@ const TextEditorLabel = ({ children, ...props }: TextEditorLabelProps) => {
     );
 };
 
-interface TextEditorHintTextProps extends HTMLAttributes<HTMLElement> { }
+interface TextEditorHintTextProps extends HTMLAttributes<HTMLElement> {}
 
 const TextEditorHintText = ({ children, ...props }: TextEditorHintTextProps) => {
     const { editor, editorId, limit, isInvalid } = useEditorContext();

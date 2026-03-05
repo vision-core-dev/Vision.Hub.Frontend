@@ -192,76 +192,8 @@
         opacity: 0;
         transform: translateY(-2px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
     }
-}
-
-/* DARK MODE */
-:global(.dark) .item {
-    background: #1f2937;
-    border-color: #374151;
-}
-
-:global(.dark) .item:hover {
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-}
-
-:global(.dark) .nameText {
-    color: #9ca3af;
-}
-
-:global(.dark) .actionBtn {
-    color: #9ca3af;
-}
-
-:global(.dark) .actionBtn:hover {
-    background: #374151;
-    color: #f3f4f6;
-}
-
-:global(.dark) .deleteBtn {
-    color: #9ca3af;
-}
-
-:global(.dark) .deleteBtn:hover {
-    background: #7f1d1d;
-    color: #f87171;
-}
-
-:global(.dark) .editItem {
-    background: #111827;
-    border-color: #374151;
-}
-
-:global(.dark) .editNameInput,
-:global(.dark) .editAmountInput {
-    background: #1f2937;
-    border-color: #374151;
-    color: #f3f4f6;
-}
-
-:global(.dark) .editNameInput:focus,
-:global(.dark) .editAmountInput:focus {
-    border-color: #818cf8;
-}
-
-:global(.dark) .saveBtn {
-    background: #064e3b;
-    color: #34d399;
-}
-
-:global(.dark) .saveBtn:hover {
-    background: #065f46;
-}
-
-:global(.dark) .cancelBtn {
-    background: #7f1d1d;
-    color: #f87171;
-}
-
-:global(.dark) .cancelBtn:hover {
-    background: #991b1b;
 }

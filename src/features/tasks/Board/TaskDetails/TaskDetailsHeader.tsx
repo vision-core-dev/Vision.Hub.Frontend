@@ -10,6 +10,7 @@ export interface TaskDetailsHeaderProps {
     onSetBannerByUrl: () => void;
     onArchive: () => void;
     onClose: () => void;
+    isReadOnly?: boolean;
 }
 
 import { Select } from "@/shared/ui/select/select";
@@ -26,7 +27,10 @@ export const TaskDetailsHeader: React.FC<TaskDetailsHeaderProps> = ({
     onSetBannerByUrl,
     onArchive,
     onClose,
+    isReadOnly = false,
 }) => {
+    const currentListName = listItems.find((l) => l.id === currentListId)?.label;
+
     return (
         <div
             className={`flex items-start justify-between gap-3 border-b border-secondary px-5 py-4 ${task.banner_url
@@ -40,46 +44,54 @@ export const TaskDetailsHeader: React.FC<TaskDetailsHeaderProps> = ({
             }
         >
             {/* LEFT */}
-            <Select
-                size="sm"
-                aria-label="Список задачі"
-                placeholder="Обери список"
-                items={listItems}
-                selectedKey={currentListId}
-                onSelectionChange={onMoveToList}
-            >
-                {(item) => <Select.Item id={item.id}>{item.label}</Select.Item>}
-            </Select>
+            {isReadOnly ? (
+                <span className="inline-flex items-center rounded-md bg-secondary px-2.5 py-1 text-xs font-medium text-secondary">
+                    {currentListName || "—"}
+                </span>
+            ) : (
+                <Select
+                    size="sm"
+                    aria-label="Список задачі"
+                    placeholder="Обери список"
+                    items={listItems}
+                    selectedKey={currentListId}
+                    onSelectionChange={onMoveToList}
+                >
+                    {(item) => <Select.Item id={item.id}>{item.label}</Select.Item>}
+                </Select>
+            )}
 
             {/* RIGHT */}
             <div className="flex items-center gap-2">
-                <Dropdown.Root>
-                    <ButtonUtility size="sm" icon={MoreHorizontal} />
+                {!isReadOnly && (
+                    <Dropdown.Root>
+                        <ButtonUtility size="sm" icon={MoreHorizontal} />
 
-                    <Dropdown.Popover>
-                        <Dropdown.Menu>
-                            <Dropdown.Section>
-                                <Dropdown.Item icon={ImageIcon} onAction={onUploadBanner}>
-                                    Завантажити банер
-                                </Dropdown.Item>
-                                <Dropdown.Item icon={LinkIcon} onAction={onSetBannerByUrl}>
-                                    Встановити банер по URL
-                                </Dropdown.Item>
-                            </Dropdown.Section>
+                        <Dropdown.Popover>
+                            <Dropdown.Menu>
+                                <Dropdown.Section>
+                                    <Dropdown.Item icon={ImageIcon} onAction={onUploadBanner}>
+                                        Завантажити банер
+                                    </Dropdown.Item>
+                                    <Dropdown.Item icon={LinkIcon} onAction={onSetBannerByUrl}>
+                                        Встановити банер по URL
+                                    </Dropdown.Item>
+                                </Dropdown.Section>
 
-                            <Dropdown.Separator />
+                                <Dropdown.Separator />
 
-                            <Dropdown.Section>
-                                <Dropdown.Item
-                                    icon={ArchiveIcon}
-                                    onAction={onArchive}
-                                >
-                                    Архівувати задачу
-                                </Dropdown.Item>
-                            </Dropdown.Section>
-                        </Dropdown.Menu>
-                    </Dropdown.Popover>
-                </Dropdown.Root>
+                                <Dropdown.Section>
+                                    <Dropdown.Item
+                                        icon={ArchiveIcon}
+                                        onAction={onArchive}
+                                    >
+                                        Архівувати задачу
+                                    </Dropdown.Item>
+                                </Dropdown.Section>
+                            </Dropdown.Menu>
+                        </Dropdown.Popover>
+                    </Dropdown.Root>
+                )}
 
                 <ButtonUtility onClick={onClose} icon={X} />
             </div>

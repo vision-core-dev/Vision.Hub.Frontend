@@ -26,6 +26,7 @@ interface Props {
     taskId: string;
     attachments: Attachment[];
     onChange?: (list: Attachment[]) => void;
+    isReadOnly?: boolean;
 }
 
 /* ===================== COMPONENT ===================== */
@@ -34,6 +35,7 @@ const AttachmentsSection: React.FC<Props> = ({
     taskId,
     attachments,
     onChange,
+    isReadOnly = false,
 }) => {
     const [localAttachments, setLocalAttachments] = useState<Attachment[]>(attachments);
     const [isLinkPopoverOpen, setIsLinkPopoverOpen] = useState(false);
@@ -146,18 +148,20 @@ const AttachmentsSection: React.FC<Props> = ({
             </div>
 
             {/* DROP ZONE */}
-            <FileUpload.Root>
-                <FileUpload.DropZone
-                    hint="Будь-який файл"
-                    accept="*"
-                    maxSize={1024 * 1024 * 1000}
-                    allowsMultiple={true}
-                    onDropFiles={handleUploadFiles}
-                />
-            </FileUpload.Root>
+            {!isReadOnly && (
+                <FileUpload.Root>
+                    <FileUpload.DropZone
+                        hint="Будь-який файл"
+                        accept="*"
+                        maxSize={1024 * 1024 * 1000}
+                        allowsMultiple={true}
+                        onDropFiles={handleUploadFiles}
+                    />
+                </FileUpload.Root>
+            )}
 
             {/* LIST */}
-            {localAttachments.length > 0 && (
+            {localAttachments.length > 0 ? (
                 <div className="grid grid-cols-1 gap-2 mt-2">
                     {localAttachments.map((att) => (
                         <div
@@ -177,7 +181,7 @@ const AttachmentsSection: React.FC<Props> = ({
                             >
                                 <div className="p-2 rounded-md bg-gray-50 dark:bg-gray-900 text-primary">
                                     {att.type === "link" ? <LinkIcon size={18} /> :
-                                        (att.name || "").match(/\.(jpg|jpeg|png|gif|webp)$/i) ? <ImageIcon size={18} /> : <FileIcon size={18} />}
+                                        att.name.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? <ImageIcon size={18} /> : <FileIcon size={18} />}
                                 </div>
                                 <div className="flex flex-col min-w-0">
                                     {att.type === "link" ? (
@@ -200,46 +204,54 @@ const AttachmentsSection: React.FC<Props> = ({
                                 </div>
                             </div>
 
-                            <Dropdown.Root>
-                                <Button size="sm" color="secondary" iconLeading={MoreVertical} />
-                                <Dropdown.Popover className="w-40">
-                                    <Dropdown.Menu onAction={(key) => {
-                                        if (key === "open") window.open(att.url, "_blank");
-                                        if (key === "rename") handleRename(att);
-                                        if (key === "delete") handleRemove(att);
-                                    }}>
-                                        <Dropdown.Item key="open" id="open" icon={ExternalLink} label="Відкрити" />
-                                        <Dropdown.Item key="rename" id="rename" icon={Pencil} label="Перейменувати" />
-                                        <Dropdown.Item key="delete" id="delete" icon={Trash} label="Видалити" />
-                                    </Dropdown.Menu>
-                                </Dropdown.Popover>
-                            </Dropdown.Root>
+                            {isReadOnly ? (
+                                <Button size="sm" color="secondary" iconLeading={ExternalLink} onClick={() => window.open(att.url, "_blank")} />
+                            ) : (
+                                <Dropdown.Root>
+                                    <Button size="sm" color="secondary" iconLeading={MoreVertical} />
+                                    <Dropdown.Popover className="w-40">
+                                        <Dropdown.Menu onAction={(key) => {
+                                            if (key === "open") window.open(att.url, "_blank");
+                                            if (key === "rename") handleRename(att);
+                                            if (key === "delete") handleRemove(att);
+                                        }}>
+                                            <Dropdown.Item key="open" id="open" icon={ExternalLink} label="Відкрити" />
+                                            <Dropdown.Item key="rename" id="rename" icon={Pencil} label="Перейменувати" />
+                                            <Dropdown.Item key="delete" id="delete" icon={Trash} label="Видалити" />
+                                        </Dropdown.Menu>
+                                    </Dropdown.Popover>
+                                </Dropdown.Root>
+                            )}
                         </div>
                     ))}
                 </div>
+            ) : (
+                <div className="text-sm text-gray-400 italic">Немає вкладень</div>
             )}
 
             {/* ADD LINK BUTTON with POPOVER */}
-            <Dropdown.Root onOpenChange={setIsLinkPopoverOpen} isOpen={isLinkPopoverOpen}>
-                <ButtonUtility
-                    className="w-full text-xs text-center justify-center opacity-70 hover:opacity-100"
-                    icon={<LinkIcon size={14} />}
-                >
-                    Додати посилання
-                </ButtonUtility>
-                <Dropdown.Popover className="p-3 w-[320px]">
-                    <Input
-                        placeholder="google.com"
-                        value={linkUrl}
-                        onChange={(v) => setLinkUrl(v as string)}
-                        autoFocus
-                    />
-                    <div className="flex justify-end gap-2">
-                        <Button size="sm" color="tertiary" onClick={() => setIsLinkPopoverOpen(false)}>Скасувати</Button>
-                        <Button size="sm" color="primary" onClick={handleAddLink} disabled={!linkUrl}>Додати</Button>
-                    </div>
-                </Dropdown.Popover>
-            </Dropdown.Root>
+            {!isReadOnly && (
+                <Dropdown.Root onOpenChange={setIsLinkPopoverOpen} isOpen={isLinkPopoverOpen}>
+                    <ButtonUtility
+                        className="w-full text-xs text-center justify-center opacity-70 hover:opacity-100"
+                        icon={<LinkIcon size={14} />}
+                    >
+                        Додати посилання
+                    </ButtonUtility>
+                    <Dropdown.Popover className="p-3 w-[320px]">
+                        <Input
+                            placeholder="google.com"
+                            value={linkUrl}
+                            onChange={(v) => setLinkUrl(v as string)}
+                            autoFocus
+                        />
+                        <div className="flex justify-end gap-2">
+                            <Button size="sm" color="tertiary" onClick={() => setIsLinkPopoverOpen(false)}>Скасувати</Button>
+                            <Button size="sm" color="primary" onClick={handleAddLink} disabled={!linkUrl}>Додати</Button>
+                        </div>
+                    </Dropdown.Popover>
+                </Dropdown.Root>
+            )}
 
             {/* File Preview Modal */}
             {previewFile && (

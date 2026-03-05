@@ -90,20 +90,3 @@
         width: 100%;
     }
 }
-
-/* DARK MODE */
-:global(.dark) .sidebarWrapper {
-    background: #111827;
-    border-color: #374151;
-}
-
-:global(.dark) .contentWrapper {
-    background: #1f2937;
-}
-
-@media (max-width: 900px) {
-    :global(.dark) .sidebarWrapper {
-        background: #111827;
-        border-color: #374151;
-    }
-}
