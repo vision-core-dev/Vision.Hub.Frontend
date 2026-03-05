@@ -67,11 +67,6 @@ export const TagSelector = ({
                             type="pill-color"
                             color="gray"
                             size="md"
-                            style={{
-                                backgroundColor: `${tag.color}35`,
-                                color: tag.color,
-                                borderColor: `${tag.color}60`
-                            }}
                             className="!ring-0 border border-transparent"
                         >
                             {tag.name}

@@ -18,7 +18,6 @@ import type { DateValue } from "react-aria-components";
 
 import { Dialog, DialogTrigger, Modal, ModalOverlay } from "@/shared/components/modals/modal";
 import { TaskDetailsHeader } from "./TaskDetailsHeader";
-import { Label } from "@/shared/ui/input/label.tsx";
 
 /* ===================== TYPES ===================== */
 

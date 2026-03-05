@@ -12,7 +12,7 @@ type TaskProps = {
     users: UserType[];
 };
 
-const TaskItem = ({ isBoardPublic = false, task, boardTags, users }: TaskProps) => {
+const TaskItem = ({ task, boardTags, users }: TaskProps) => {
     const taskTags =
         task.tags && task.tags.length > 0
             ? boardTags.filter((t) => task.tags.includes(t.id))
