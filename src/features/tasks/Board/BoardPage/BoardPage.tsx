@@ -28,8 +28,11 @@ export type Task = {
     deadline_at?: string;
     assignees: string[];
     tags: string[];
-    subtasks_total?: number,
-    subtasks_completed?: number
+    subtasks_total?: number;
+    subtasks_completed?: number;
+    has_description?: boolean;
+    accruals_count?: number;
+    accruals_sum?: number;
 };
 
 export type List = {

@@ -1,5 +1,5 @@
 import styles from "./TaskItem.module.css";
-import { Check, Clock, SquareCheckBig } from "lucide-react";
+import { AlignLeft, Check, Clock, HandCoins, SquareCheckBig } from "lucide-react";
 import type { Task, TaskTag } from "../BoardPage/BoardPage.tsx";
 import { getTextColor } from "@/shared/utils/colors.ts";
 import type { UserType } from "@/shared/types/Users.ts";
@@ -81,8 +81,14 @@ const TaskItem = ({ task, boardTags, users }: TaskProps) => {
                         <h3 className={styles.title}>{task.name}</h3>
                     </div>
 
-                    {(task.deadline_at || task.started_at || (task.subtasks_total && task.subtasks_total > 0)) ? (
+                    {(task.deadline_at || task.started_at || (task.subtasks_total && task.subtasks_total > 0) || task.has_description || (task.accruals_count && task.accruals_count > 0)) ? (
                         <div className={styles.miniDetails}>
+                            {task.has_description && (
+                                <div className={styles.deadline}>
+                                    <AlignLeft />
+                                </div>
+                            )}
+
                             {(task.deadline_at || task.started_at) && (
                                 <div className={styles.deadline}>
                                     <Clock />
@@ -97,6 +103,12 @@ const TaskItem = ({ task, boardTags, users }: TaskProps) => {
                             {(task.subtasks_total && task.subtasks_total > 0) ? (
                                 <div className={styles.deadline}>
                                     <SquareCheckBig /><span>{task.subtasks_completed || 0}/{task.subtasks_total || 0}</span>
+                                </div>
+                            ) : null}
+
+                            {(task.accruals_count && task.accruals_count > 0) ? (
+                                <div className={styles.deadline}>
+                                    <HandCoins /><span>{task.accruals_count} / {task.accruals_sum || 0} ₴</span>
                                 </div>
                             ) : null}
                         </div>

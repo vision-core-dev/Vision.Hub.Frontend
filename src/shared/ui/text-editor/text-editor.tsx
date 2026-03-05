@@ -61,9 +61,11 @@ const TextEditorRoot = ({
     const id = useId();
     const editorId = `editor-${id}`;
 
+    const resolvedEditable = isDisabled !== undefined ? !isDisabled : (editorOptions.editable ?? true);
+
     const editor = useEditor({
         ...editorOptions,
-        editable: !isDisabled,
+        editable: resolvedEditable,
         immediatelyRender: false,
         extensions: [
             StarterKit.configure({
@@ -135,6 +137,12 @@ const TextEditorRoot = ({
     });
 
     useEffect(() => {
+        if (editor) {
+            editor.setEditable(resolvedEditable);
+        }
+    }, [editor, resolvedEditable]);
+
+    useEffect(() => {
         const setLink = () => {
             if (!editor) return;
 
@@ -192,7 +200,7 @@ const TextEditorContent = ({ ...props }: TextEditorContentProps) => {
     return <EditorContent disabled={isDisabled} {...props} editor={editor} />;
 };
 
-interface TextEditorLabelProps extends ComponentProps<typeof Label> {}
+interface TextEditorLabelProps extends ComponentProps<typeof Label> { }
 
 const TextEditorLabel = ({ children, ...props }: TextEditorLabelProps) => {
     const { editor, editorId } = useEditorContext();
@@ -210,7 +218,7 @@ const TextEditorLabel = ({ children, ...props }: TextEditorLabelProps) => {
     );
 };
 
-interface TextEditorHintTextProps extends HTMLAttributes<HTMLElement> {}
+interface TextEditorHintTextProps extends HTMLAttributes<HTMLElement> { }
 
 const TextEditorHintText = ({ children, ...props }: TextEditorHintTextProps) => {
     const { editor, editorId, limit, isInvalid } = useEditorContext();

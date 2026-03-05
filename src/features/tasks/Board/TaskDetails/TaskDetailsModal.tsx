@@ -339,11 +339,11 @@ const TaskDetailsModal: React.FC<Props> = ({
                                             <section className="flex flex-col gap-2">
                                                 <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">Опис</h3>
                                                 <TextEditor.Root
-                                                    placeholder={isReadOnly ? "" : "Додайте опис задачі..."}
+                                                    placeholder={isReadOnly ? "Немає опису" : "Додайте опис задачі..."}
                                                     inputClassName="w-full min-h-[150px] resize-y"
                                                     content={description}
-                                                    isDisabled={isReadOnly}
-                                                    onUpdate={isReadOnly ? undefined : ({ editor }) => {
+                                                    editable={!isReadOnly}
+                                                    onUpdate={({ editor }) => {
                                                         const html = editor.getHTML();
                                                         setDescription(html);
                                                         saveDescription(html);
@@ -352,9 +352,7 @@ const TaskDetailsModal: React.FC<Props> = ({
                                                     {!isReadOnly && <TextEditor.Tooltip />}
                                                     <div className="flex flex-col gap-2">
                                                         {!isReadOnly && <TextEditor.Toolbar type="advanced" />}
-                                                        {/* <div className="px-3 py-2"> */}
                                                         <TextEditor.Content />
-                                                        {/* </div> */}
                                                     </div>
                                                 </TextEditor.Root>
                                             </section>
