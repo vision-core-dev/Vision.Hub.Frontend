@@ -83,7 +83,7 @@ export const FileUploadDropZone = ({
     const [isDraggingOver, setIsDraggingOver] = useState(false);
 
     const isFileTypeAccepted = (file: File): boolean => {
-        if (!accept) return true;
+        if (!accept || accept === "*" || accept === "*/*") return true;
 
         // Split the accept string into individual types
         const acceptedTypes = accept.split(",").map((type) => type.trim());

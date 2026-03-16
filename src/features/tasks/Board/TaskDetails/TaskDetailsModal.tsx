@@ -345,8 +345,10 @@ const TaskDetailsModal: React.FC<Props> = ({
                                                     editable={!isReadOnly}
                                                     onUpdate={({ editor }) => {
                                                         const html = editor.getHTML();
-                                                        setDescription(html);
-                                                        saveDescription(html);
+                                                        const isEmpty = editor.isEmpty;
+                                                        const value = isEmpty ? "" : html;
+                                                        setDescription(value);
+                                                        saveDescription(value);
                                                     }}
                                                 >
                                                     {!isReadOnly && <TextEditor.Tooltip />}

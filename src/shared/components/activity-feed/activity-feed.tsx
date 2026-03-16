@@ -41,9 +41,10 @@ export type FeedItemType = {
 interface FeedItemProps extends FeedItemType {
     connector?: boolean;
     size?: "sm" | "md";
+    extraActions?: ReactNode;
 }
 
-export const FeedItem = ({ user, date, action, attachment, comment, labels, message, unseen, connector, size = "md" }: FeedItemProps) => {
+export const FeedItem = ({ user, date, action, attachment, comment, labels, message, unseen, connector, size = "md", extraActions }: FeedItemProps) => {
     return (
         <article className="relative flex gap-3">
             {unseen && <Dot size="md" className="absolute top-0 right-0 text-fg-success-secondary" />}
@@ -83,6 +84,11 @@ export const FeedItem = ({ user, date, action, attachment, comment, labels, mess
                             <time className="text-xs text-tertiary" dateTime={date}>
                                 {date}
                             </time>
+                        )}
+                        {extraActions && (
+                            <div className="ml-auto flex items-center gap-1">
+                                {extraActions}
+                            </div>
                         )}
                     </div>
                     {action && (

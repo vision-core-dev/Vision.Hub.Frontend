@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "@/core/auth/AuthContext";
 import LoaderDots from "@/shared/ui/loader-dots/LoaderDots";
 
-import { FeedItem, type FeedItemType } from "@/shared/components/activity-feed/activity-feed";
-import { Badge } from "@/shared/ui/badges/badges.tsx";
+import { FeedItem } from "@/shared/components/activity-feed/activity-feed";
 import { api } from "@/shared/utils/api.ts";
 import { Dialog, DialogTrigger, Modal, ModalOverlay } from "@/shared/components/modals/modal.tsx";
 import { CloseButton } from "@/shared/ui/buttons/close-button.tsx";
@@ -17,139 +16,156 @@ import { Link } from "react-router-dom";
 import { CheckCircle2, Clock, SquareCheckBig, Kanban } from "lucide-react";
 import { getTextColor } from "@/shared/utils/colors.ts";
 import { safeDate } from "@/shared/utils/safeDate.ts";
-/* ===================== FEED DATA ===================== */
-
-const feed: FeedItemType[] = [
-    {
-        id: "update-deadlines-rewards",
-        unseen: true,
-        date: "27 лютого 2026",
-        user: {
-            avatarUrl: "https://cdn.visioncore.dev/avatars/ca0413d7-6fa1-4bda-99de-d6be805d7ddd_69d5b5fa-63cf-4ca7-a888-f4931efc74f1.jpg",
-            name: "Кирило",
-            href: "",
-            badge: <Badge size="sm" color="brand">Генеральний директор</Badge>,
-        },
-        action: {
-            content: "Оновлення системи",
-            target: "дедлайнів та штрафів 🔔",
-        },
-        labels: [
-            { name: "Процеси", color: "blue" },
-        ],
-        message: (
-            <div className="flex flex-col gap-3">
-                <p>Щоб стабілізувати процеси та прибрати хаос із дедлайнами, вводимо чіткі правила.</p>
-
-                <div className="flex flex-col gap-1.5">
-                    <h4 className="font-semibold text-primary flex items-center gap-1.5">
-                        ⏱ Прострочення задач
-                    </h4>
-                    <p className="text-tertiary">Для задач із встановленим дедлайном:</p>
-                    <ul className="list-disc list-inside ml-2 text-tertiary space-y-1">
-                        <li>Запізнення на 3 дні &rarr; штраф <span className="text-secondary font-medium">15% від оплати</span></li>
-                        <li>Запізнення на 6 днів &rarr; штраф <span className="text-secondary font-medium">50% від оплати</span></li>
-                    </ul>
-                    <blockquote className="mt-1 pl-3 border-l-2 border-secondary italic text-tertiary text-xs">
-                        Якщо задача критично важлива — рішення може бути жорсткішим.
-                    </blockquote>
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                    <h4 className="font-semibold text-primary flex items-center gap-1.5">
-                        📅 Перенесення дедлайну
-                    </h4>
-                    <p className="italic text-tertiary">Перенесення можливе тільки за таких умов:</p>
-                    <ol className="list-decimal list-inside ml-2 space-y-2 text-tertiary">
-                        <li>
-                            Переносити можна не пізніше ніж після <span className="text-secondary font-medium">60% часу</span> виконання задачі
-                            <div className="text-xs opacity-70 ml-5 mt-0.5">Приклад: задача на 10 днів &rarr; перенесення можливе до 6-го дня включно.</div>
-                        </li>
-                        <li>
-                            Перенести можна максимум на <span className="text-secondary font-medium">+30%</span> від початкової тривалості
-                            <div className="text-xs opacity-70 ml-5 mt-0.5">Приклад: задача на 10 днів &rarr; максимум +3 дні.</div>
-                        </li>
-                        <li>Перенесення узгоджується заздалегідь, а не в день дедлайну.</li>
-                    </ol>
-                </div>
-            </div>
-        )
-    },
-    {
-        id: "update-communication",
-        unseen: false,
-        date: "10 січня 2026",
-        user: {
-            avatarUrl: "https://cdn.visioncore.dev/avatars/ca0413d7-6fa1-4bda-99de-d6be805d7ddd_69d5b5fa-63cf-4ca7-a888-f4931efc74f1.jpg",
-            name: "Кирило",
-            href: "",
-            badge: <Badge size="sm" color="brand">Генеральний директор</Badge>,
-        },
-        action: {
-            content: "Тепер кожне питання має свій шлях: задачі, оплата, блокери, ідеї та стратегія. Визначено",
-            target: "порядок звернень",
-            href: "https://vcore.b-cdn.net/updates/communications-schema.png",
-        },
-        labels: [
-            { name: "Процеси", color: "blue" },
-            { name: "Комунікація", color: "indigo" },
-        ],
-    },
-    {
-        id: "update-structure",
-        unseen: false,
-        date: "07 січня 2026",
-        user: {
-            avatarUrl: "https://cdn.visioncore.dev/avatars/ca0413d7-6fa1-4bda-99de-d6be805d7ddd_69d5b5fa-63cf-4ca7-a888-f4931efc74f1.jpg",
-            name: "Кирило",
-            href: "",
-            badge: <Badge size="sm" color="brand">Генеральний директор</Badge>,
-        },
-        action: {
-            content: "Ми впровадили нову організаційну структуру з поділом на студії, ролі та зони відповідальності. Оновлено",
-            target: "структуру компанії",
-            href: "https://vcore.b-cdn.net/updates/company-structure.png",
-        },
-        labels: [
-            { name: "Організація", color: "purple" },
-            { name: "Процеси", color: "blue" },
-        ]
-    },
-    {
-        id: "update-projects",
-        date: "18 грудня 2025",
-        user: {
-            avatarUrl: "https://cdn.visioncore.dev/avatars/ca0413d7-6fa1-4bda-99de-d6be805d7ddd_69d5b5fa-63cf-4ca7-a888-f4931efc74f1.jpg",
-            name: "Кирило",
-            href: "",
-            badge: <Badge size="sm" color="brand">Генеральний директор</Badge>,
-        },
-        action: {
-            content: "Актуалізовано список активних проєктів RoVision та Vision Web. Оновлено",
-            target: "структуру проєктів",
-            href: "https://vcore.b-cdn.net/updates/projects-structure.png",
-        },
-        labels: [
-            { name: "RoVision", color: "brand" },
-            { name: "Vision Web", color: "success" },
-        ],
-    },
-];
-
+import Leaderboard from "./components/Leaderboard.tsx";
+import { Edit01, Trash01, Plus } from "@untitledui/icons";
+import { TextEditor } from "@/shared/ui/text-editor/text-editor.tsx";
+import { toast } from "sonner";
+import { format } from "date-fns";
+import { uk } from "date-fns/locale";
 /* ===================== FEED COMPONENT ===================== */
 
+interface NewsItem {
+    id: string;
+    title: string | null;
+    content: string;
+    labels: string[];
+    target_text: string | null;
+    target_url: string | null;
+    created_at: string;
+    author: {
+        id: string;
+        first_name: string;
+        last_name: string | null;
+        avatar_url: string | null;
+    };
+}
+
 const ActivityFeedConnected: React.FC = () => {
+    const { role } = useAuth();
+    const [news, setNews] = useState<NewsItem[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [editingNews, setEditingNews] = useState<NewsItem | null>(null);
+
+    const canManageNews = role && role.order <= 1;
+
+    const fetchNews = async () => {
+        try {
+            const res = await api.get("/v1/Hub/News/List");
+            if (res.ok) {
+                const data = await res.json();
+                setNews(data.items);
+            }
+        } catch (error) {
+            console.error("Failed to fetch news", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchNews();
+    }, []);
+
+    const handleDelete = async (id: string) => {
+        if (!window.confirm("Ви впевнені, що хочете видалити цю новину?")) return;
+        try {
+            const res = await api.delete(`/v1/Hub/News/${id}/Delete`);
+            if (res.ok) {
+                toast.success("Новину видалено");
+                fetchNews();
+            }
+        } catch (error) {
+            toast.error("Помилка при видаленні");
+            console.error(error);
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="flex justify-center p-8">
+                <LoaderDots />
+            </div>
+        );
+    }
+
     return (
-        <ul className="space-y-0">
-            {feed.map((item, index) => (
-                <li key={item.id}>
-                    <FeedItem
-                        {...item}
-                        connector={index !== feed.length - 1}
-                    />
-                </li>
-            ))}
-        </ul>
+        <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold flex items-center gap-2 text-primary">
+                    📰 Останні оновлення
+                </h3>
+                {canManageNews && (
+                    <Button 
+                        size="sm" 
+                        color="secondary" 
+                        onClick={() => setIsCreateModalOpen(true)}
+                        iconLeading={<Plus className="w-4 h-4" />}
+                    >
+                        Додати
+                    </Button>
+                )}
+            </div>
+
+            <ul className="space-y-0">
+                {news.map((item, index) => (
+                    <li key={item.id}>
+                        <FeedItem
+                            id={item.id}
+                            date={format(new Date(item.created_at), "d MMMM yyyy", { locale: uk })}
+                            user={{
+                                name: `${item.author.first_name} ${item.author.last_name || ""}`,
+                                avatarUrl: item.author.avatar_url || "",
+                                href: "#",
+                            }}
+                            labels={item.labels.map(l => ({ name: l, color: "blue" }))}
+                            action={item.target_text ? {
+                                content: item.title || "",
+                                target: item.target_text,
+                                href: item.target_url || "#"
+                            } : undefined}
+                            message={
+                                <div 
+                                    className="prose prose-sm dark:prose-invert max-w-none text-secondary" 
+                                    dangerouslySetInnerHTML={{ __html: item.content }} 
+                                />
+                            }
+                            connector={index !== news.length - 1}
+                            extraActions={canManageNews ? (
+                                <>
+                                    <button 
+                                        onClick={() => setEditingNews(item)}
+                                        className="p-1 hover:bg-secondary rounded-md text-tertiary transition-colors"
+                                    >
+                                        <Edit01 className="w-4 h-4" />
+                                    </button>
+                                    <button 
+                                        onClick={() => handleDelete(item.id)}
+                                        className="p-1 hover:bg-error-secondary rounded-md text-tertiary hover:text-error transition-colors"
+                                    >
+                                        <Trash01 className="w-4 h-4" />
+                                    </button>
+                                </>
+                            ) : undefined}
+                        />
+                    </li>
+                ))}
+            </ul>
+
+            <NewsModal 
+                isOpen={isCreateModalOpen || !!editingNews} 
+                setIsOpen={(open) => {
+                    setIsCreateModalOpen(open);
+                    if (!open) setEditingNews(null);
+                }}
+                news={editingNews}
+                onSuccess={() => {
+                    fetchNews();
+                    setIsCreateModalOpen(false);
+                    setEditingNews(null);
+                }}
+            />
+        </div>
     );
 };
 
@@ -288,22 +304,24 @@ const DashboardPage: React.FC = () => {
                 </span>
             </h2>
 
-            {/* Updates and Tasks */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+            {/* Updates, Tasks, Leaderboard */}
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 items-start">
 
                 {/* My Tasks */}
-                <div className="order-1 lg:order-1 flex flex-col gap-4">
+                <div className="flex flex-col gap-4">
                     <h3 className="text-lg font-semibold flex items-center gap-2 text-primary">
                         ✅ Мої задачі
                     </h3>
                     <MyTasksConnected />
                 </div>
 
+                {/* Leaderboard */}
+                <div className="flex flex-col gap-4">
+                    <Leaderboard />
+                </div>
+
                 {/* Updates */}
-                <div className="order-2 lg:order-2 flex flex-col gap-4">
-                    <h3 className="text-lg font-semibold flex items-center gap-2 text-primary">
-                        📰 Останні оновлення
-                    </h3>
+                <div className="flex flex-col gap-4">
                     <ActivityFeedConnected />
                 </div>
 
@@ -490,6 +508,161 @@ const SubmitBirthdayModal = ({ isOpen, setIsOpen }: CreateUserModalProps) => {
 };
 
 export default DashboardPage;
+
+
+interface NewsModalProps {
+    isOpen: boolean;
+    setIsOpen: (open: boolean) => void;
+    news: NewsItem | null;
+    onSuccess: () => void;
+}
+
+const NewsModal = ({ isOpen, setIsOpen, news, onSuccess }: NewsModalProps) => {
+    const [loading, setLoading] = useState(false);
+    const [content, setContent] = useState("");
+    const [title, setTitle] = useState("");
+    const [labels, setLabels] = useState("");
+    const [targetText, setTargetText] = useState("");
+    const [targetUrl, setTargetUrl] = useState("");
+
+    useEffect(() => {
+        if (news) {
+            setContent(news.content);
+            setTitle(news.title || "");
+            setLabels(news.labels.join(", "));
+            setTargetText(news.target_text || "");
+            setTargetUrl(news.target_url || "");
+        } else {
+            setContent("");
+            setTitle("");
+            setLabels("");
+            setTargetText("");
+            setTargetUrl("");
+        }
+    }, [news, isOpen]);
+
+    const handleSubmit = async () => {
+        if (!content) {
+            toast.error("Вміст новини не може бути порожнім");
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const data = {
+                title,
+                content,
+                labels: labels.split(",").map(l => l.trim()).filter(l => l),
+                target_text: targetText,
+                target_url: targetUrl
+            };
+
+            const url = news ? `/v1/Hub/News/${news.id}/Update` : "/v1/Hub/News/Create";
+            const res = news 
+                ? await api.patch(url, data)
+                : await api.post(url, data);
+
+            if (res.ok) {
+                toast.success(news ? "Новину оновлено" : "Новину створено");
+                onSuccess();
+            } else {
+                toast.error("Помилка при збереженні");
+            }
+        } catch (error) {
+            toast.error("Сталася помилка");
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <DialogTrigger isOpen={isOpen} onOpenChange={setIsOpen}>
+            <ModalOverlay isDismissable>
+                <Modal>
+                    <Dialog className="overflow-hidden">
+                        <div className="relative w-full max-w-2xl overflow-hidden rounded-2xl bg-primary shadow-xl">
+                            <CloseButton onClick={() => setIsOpen(false)} theme="light" size="lg" className="absolute top-3 right-3" />
+                            
+                            <div className="p-6">
+                                <Heading slot="title" className="text-xl font-semibold text-primary mb-6">
+                                    {news ? "Редагувати новину" : "Створити новину"}
+                                </Heading>
+
+                                <div className="space-y-4">
+                                    <div className="flex flex-col gap-1.5">
+                                        <label className="text-sm font-medium text-secondary">Заголовок</label>
+                                        <input 
+                                            value={title}
+                                            onChange={(e) => setTitle(e.target.value)}
+                                            placeholder="Напр. Оновлення системи"
+                                            className="w-full px-3 py-2 bg-primary border border-secondary rounded-lg text-primary focus:ring-2 focus:ring-brand outline-none"
+                                        />
+                                    </div>
+
+                                    <div className="flex flex-col gap-1.5">
+                                        <label className="text-sm font-medium text-secondary">Теги (через кому)</label>
+                                        <input 
+                                            value={labels}
+                                            onChange={(e) => setLabels(e.target.value)}
+                                            placeholder="Процеси, Комунікація"
+                                            className="w-full px-3 py-2 bg-primary border border-secondary rounded-lg text-primary focus:ring-2 focus:ring-brand outline-none"
+                                        />
+                                    </div>
+
+                                    <div className="flex flex-col gap-1.5">
+                                        <label className="text-sm font-medium text-secondary">Зміст новини</label>
+                                        <div className="min-h-[200px] border border-secondary rounded-lg overflow-hidden">
+                                            <TextEditor.Root 
+                                                content={content}
+                                                onUpdate={({ editor }) => setContent(editor.getHTML())}
+                                            >
+                                                <div className="border-b border-secondary p-1">
+                                                    <TextEditor.Toolbar type="simple" />
+                                                </div>
+                                                <TextEditor.Content className="min-h-[150px] p-4 focus:outline-none" />
+                                            </TextEditor.Root>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="flex flex-col gap-1.5">
+                                            <label className="text-sm font-medium text-secondary">Текст посилання</label>
+                                            <input 
+                                                value={targetText}
+                                                onChange={(e) => setTargetText(e.target.value)}
+                                                placeholder="Детальніше"
+                                                className="w-full px-3 py-2 bg-primary border border-secondary rounded-lg text-primary focus:ring-2 focus:ring-brand outline-none"
+                                            />
+                                        </div>
+                                        <div className="flex flex-col gap-1.5">
+                                            <label className="text-sm font-medium text-secondary">URL посилання</label>
+                                            <input 
+                                                value={targetUrl}
+                                                onChange={(e) => setTargetUrl(e.target.value)}
+                                                placeholder="https://..."
+                                                className="w-full px-3 py-2 bg-primary border border-secondary rounded-lg text-primary focus:ring-2 focus:ring-brand outline-none"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex justify-end gap-3 p-6 bg-secondary/30 border-t border-secondary">
+                                <Button color="secondary" onClick={() => setIsOpen(false)}>
+                                    Скасувати
+                                </Button>
+                                <Button color="primary" onClick={handleSubmit} isLoading={loading} showTextWhileLoading>
+                                    Зберегти
+                                </Button>
+                            </div>
+                        </div>
+                    </Dialog>
+                </Modal>
+            </ModalOverlay>
+        </DialogTrigger>
+    );
+};
 
 
 
