@@ -114,54 +114,56 @@ export default function DrivePage() {
         newUploads.forEach(async (upload) => {
             updateUploadProgress(upload.id, 0, "uploading");
             
-            let pollInterval: any = null;
             let pollingActive = true;
             const streamingId = upload.serverStreamingId!;
 
             try {
-                const uploadPromise = driveApi.uploadFile(upload.file, {
+                // Phase 1: Upload to Server (Green)
+                const res = await driveApi.uploadFile(upload.file, {
                     folderId: currentFolderId,
                     accessType,
                     allowedRoleIds,
                     uploadId: streamingId,
                     onProgress: (percent) => {
                         if (!pollingActive) return;
-                        updateUploadProgress(upload.id, percent);
-                        
-                        if (percent === 100 && !pollInterval) {
-                            updateUploadProgress(upload.id, 0, "streaming");
-                            pollInterval = setInterval(async () => {
-                                if (!pollingActive) {
-                                    clearInterval(pollInterval);
-                                    return;
-                                }
-                                try {
-                                    const statusData = await driveApi.getUploadStatus(streamingId);
-                                    if (!pollingActive) return;
-                                    
-                                    if (statusData.status === "streaming") {
-                                        updateUploadProgress(upload.id, statusData.progress, "streaming");
-                                    } else if (statusData.status === "completed_or_not_found") {
-                                        // Wait for the main promise to finish
-                                        clearInterval(pollInterval);
-                                    }
-                                } catch {
-                                    clearInterval(pollInterval);
-                                }
-                            }, 1000);
-                        }
+                        updateUploadProgress(upload.id, percent, "uploading");
                     },
                 });
 
-                await uploadPromise;
+                // Phase 2: Stream from Server to Bunny (Blue)
+                if (res && res.status === "processing") {
+                    updateUploadProgress(upload.id, 0, "streaming");
+                    await new Promise<void>((resolve, reject) => {
+                        const poll = setInterval(async () => {
+                            if (!pollingActive) {
+                                clearInterval(poll);
+                                reject(new Error("Upload cancelled"));
+                                return;
+                            }
+                            try {
+                                const statusData = await driveApi.getUploadStatus(streamingId);
+                                if (!pollingActive) return;
+                                
+                                if (statusData.status === "streaming") {
+                                    updateUploadProgress(upload.id, statusData.progress, "streaming");
+                                } else {
+                                    clearInterval(poll);
+                                    resolve();
+                                }
+                            } catch (e) {
+                                clearInterval(poll);
+                                reject(e);
+                            }
+                        }, 1000);
+                    });
+                }
+
+                // Phase 3: Finished
                 pollingActive = false;
-                if (pollInterval) clearInterval(pollInterval);
-                
                 updateUploadProgress(upload.id, 100, "completed");
-                setTimeout(() => loadDrive(currentFolderId), 500); // Small delay to let DB settle
+                setTimeout(() => loadDrive(currentFolderId), 500); 
             } catch (err: any) {
                 pollingActive = false;
-                if (pollInterval) clearInterval(pollInterval);
                 updateUploadProgress(upload.id, 0, "error", err.message || "Upload failed");
             }
         });
