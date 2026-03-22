@@ -1,8 +1,6 @@
 import { api } from "@/shared/utils/api";
 import type { DriveListResponse, TaskDiskFile, AccessType } from "./types";
 
-const BASE_URL = import.meta.env.VITE_API_URL;
-
 export const driveApi = {
     async list(folderId?: string | null): Promise<DriveListResponse> {
         const params = folderId ? `?folder_id=${folderId}` : "";
