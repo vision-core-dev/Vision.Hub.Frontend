@@ -191,7 +191,7 @@
     display: flex;
     gap: 8px;
     flex-direction: row;
-    align-items: center;
+    align-items: start;
 }
 
 .doneContentText {
@@ -215,11 +215,11 @@
     align-items: center;
 }
 
-.miniDetailsDark .deadline > svg {
+.miniDetailsDark .deadline>svg {
     color: rgba(255, 255, 255, 0.8) !important;
 }
 
-.miniDetailsDark .deadline > span {
+.miniDetailsDark .deadline>span {
     color: rgba(255, 255, 255, 0.9) !important;
 }
 
