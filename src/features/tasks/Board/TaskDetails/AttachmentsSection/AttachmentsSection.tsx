@@ -171,10 +171,10 @@ const AttachmentsSection: React.FC<Props> = ({
                             <div
                                 className={cx(
                                     "flex items-center gap-3 overflow-hidden flex-1 min-w-0",
-                                    att.type === "file" && "cursor-pointer hover:opacity-80 transition-opacity"
+                                    (att.type === "file" || att.type === "link") && "cursor-pointer hover:opacity-80 transition-opacity"
                                 )}
                                 onClick={() => {
-                                    if (att.type === "file") {
+                                    if (att.type === "file" || att.type === "link") {
                                         setPreviewFile(att);
                                     }
                                 }}
@@ -185,14 +185,11 @@ const AttachmentsSection: React.FC<Props> = ({
                                 </div>
                                 <div className="flex flex-col min-w-0">
                                     {att.type === "link" ? (
-                                        <a
-                                            href={att.url}
-                                            target="_blank"
-                                            rel="noreferrer"
-                                            className="text-sm font-medium hover:text-primary truncate"
+                                        <span
+                                            className="text-sm font-medium hover:text-primary truncate text-primary transition-colors block"
                                         >
                                             {att.name}
-                                        </a>
+                                        </span>
                                     ) : (
                                         <span className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
                                             {att.name}

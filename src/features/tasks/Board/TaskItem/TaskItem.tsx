@@ -28,6 +28,45 @@ const TaskItem = ({ task, boardTags, users }: TaskProps) => {
         new Date(task.deadline_at).toDateString() === new Date().toDateString();
 
 
+    const renderMiniDetails = (isDark = false) => {
+        if (!task.deadline_at && !task.started_at && !(task.subtasks_total && task.subtasks_total > 0) && !task.has_description && !(task.accruals_count && task.accruals_count > 0)) {
+            return null;
+        }
+
+        return (
+            <div className={`${styles.miniDetails} ${isDark ? styles.miniDetailsDark : ""}`}>
+                {task.has_description && (
+                    <div className={styles.deadline}>
+                        <AlignLeft />
+                    </div>
+                )}
+
+                {(task.deadline_at || task.started_at) && (
+                    <div className={styles.deadline}>
+                        <Clock />
+                        <span>
+                            {task.started_at && safeDate(task.started_at)}
+                            {task.started_at && task.deadline_at ? " – " : ""}
+                            {task.deadline_at && safeDate(task.deadline_at)}
+                        </span>
+                    </div>
+                )}
+
+                {(task.subtasks_total && task.subtasks_total > 0) ? (
+                    <div className={styles.deadline}>
+                        <SquareCheckBig /><span>{task.subtasks_completed || 0}/{task.subtasks_total || 0}</span>
+                    </div>
+                ) : null}
+
+                {(task.accruals_count && task.accruals_count > 0) ? (
+                    <div className={styles.deadline}>
+                        <HandCoins /><span>{task.accruals_count} / {task.accruals_sum || 0} ₴</span>
+                    </div>
+                ) : null}
+            </div>
+        );
+    };
+
     return (
         <div className={`${styles.task} 
             ${(isDone && task.banner_url) ? styles.doneTask : ""}
@@ -40,10 +79,13 @@ const TaskItem = ({ task, boardTags, users }: TaskProps) => {
                     <img src={task.banner_url} alt="Banner" draggable={false} />
                     {isDone && (
                         <div className={styles.doneOverlay}>
-                            <div className={styles.doneIcon}>
-                                <Check strokeWidth={3} />
+                            <div className={styles.doneOverlayTitleRow}>
+                                <div className={styles.doneIcon}>
+                                    <Check strokeWidth={3} />
+                                </div>
+                                <h3 className={styles.doneTitle}>{task.name}</h3>
                             </div>
-                            <h3 className={styles.doneTitle}>{task.name}</h3>
+                            {renderMiniDetails(true)}
                         </div>
                     )}
                 </div>
@@ -53,7 +95,10 @@ const TaskItem = ({ task, boardTags, users }: TaskProps) => {
                         <div className={styles.doneIcon}>
                             <Check strokeWidth={3} />
                         </div>
-                        <h3 className={styles.doneTitleNoImage}>{task.name}</h3>
+                        <div className={styles.doneContentText}>
+                            <h3 className={styles.doneTitleNoImage}>{task.name}</h3>
+                            {renderMiniDetails()}
+                        </div>
                     </div>
                 ) : null
             )}
@@ -81,38 +126,7 @@ const TaskItem = ({ task, boardTags, users }: TaskProps) => {
                         <h3 className={styles.title}>{task.name}</h3>
                     </div>
 
-                    {(task.deadline_at || task.started_at || (task.subtasks_total && task.subtasks_total > 0) || task.has_description || (task.accruals_count && task.accruals_count > 0)) ? (
-                        <div className={styles.miniDetails}>
-                            {task.has_description && (
-                                <div className={styles.deadline}>
-                                    <AlignLeft />
-                                </div>
-                            )}
-
-                            {(task.deadline_at || task.started_at) && (
-                                <div className={styles.deadline}>
-                                    <Clock />
-                                    <span>
-                                        {task.started_at && safeDate(task.started_at)}
-                                        {task.started_at && task.deadline_at ? " – " : ""}
-                                        {task.deadline_at && safeDate(task.deadline_at)}
-                                    </span>
-                                </div>
-                            )}
-
-                            {(task.subtasks_total && task.subtasks_total > 0) ? (
-                                <div className={styles.deadline}>
-                                    <SquareCheckBig /><span>{task.subtasks_completed || 0}/{task.subtasks_total || 0}</span>
-                                </div>
-                            ) : null}
-
-                            {(task.accruals_count && task.accruals_count > 0) ? (
-                                <div className={styles.deadline}>
-                                    <HandCoins /><span>{task.accruals_count} / {task.accruals_sum || 0} ₴</span>
-                                </div>
-                            ) : null}
-                        </div>
-                    ) : null}
+                    {renderMiniDetails()}
 
                     {taskAssignees.length > 0 && (
                         <div className={styles.assignees}>

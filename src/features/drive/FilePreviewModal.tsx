@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { X, Download, FileText, AlertCircle } from "lucide-react";
+import { X, Download, FileText, AlertCircle, ExternalLink } from "lucide-react";
 import { Button } from "@/shared/ui/buttons/button";
 import { VideoPlayer } from "@/shared/ui/base/video-player/video-player";
 import { Dialog, DialogTrigger, Modal, ModalOverlay } from "@/shared/components/modals/modal";
@@ -20,15 +20,27 @@ interface FilePreviewModalProps {
 /**
  * Determines the preview type based on file extension
  */
-const getPreviewType = (fileName: string): "image" | "document" | "video" | "unsupported" => {
-    const ext = fileName.split(".").pop()?.toLowerCase() || "";
+const getPreviewType = (fileName: string, typeProp?: string): "image" | "document" | "video" | "iframe" | "unsupported" => {
+    // Check for direct embeddable links
+    if (
+        fileName.includes("docs.google.com") ||
+        fileName.includes("sheets.google.com") ||
+        fileName.includes("slides.google.com") ||
+        fileName.includes("drive.google.com") ||
+        fileName.includes("figma.com")
+    ) {
+        return "iframe";
+    }
+
+    const urlWithoutQuery = fileName.split("?")[0];
+    const ext = urlWithoutQuery.split(".").pop()?.toLowerCase() || "";
 
     // Image types
     if (["jpg", "jpeg", "png", "gif", "webp", "svg", "bmp"].includes(ext)) {
         return "image";
     }
 
-    // Document types that can be previewed
+    // Document types that can be previewed via Google Viewer
     if (["pdf", "doc", "docx", "ppt", "pptx", "xls", "xlsx"].includes(ext)) {
         return "document";
     }
@@ -36,6 +48,11 @@ const getPreviewType = (fileName: string): "image" | "document" | "video" | "uns
     // Video types
     if (["mp4", "webm", "ogg", "mov"].includes(ext)) {
         return "video";
+    }
+
+    // Any other external link -> try to iframe
+    if (typeProp === "link") {
+        return "iframe";
     }
 
     return "unsupported";
@@ -49,10 +66,11 @@ export const FilePreviewModal: React.FC<FilePreviewModalProps> = ({
     url,
     name,
     isOpen,
+    type,
     onClose,
 }) => {
     const [imageError, setImageError] = useState(false);
-    const previewType = getPreviewType(url);
+    const previewType = getPreviewType(url, type);
 
     const handleDownload = () => {
         const link = document.createElement("a");
@@ -82,10 +100,10 @@ export const FilePreviewModal: React.FC<FilePreviewModalProps> = ({
                                     <Button
                                         size="sm"
                                         color="secondary"
-                                        iconLeading={Download}
-                                        onClick={handleDownload}
+                                        iconLeading={previewType === "iframe" ? ExternalLink : Download}
+                                        onClick={previewType === "iframe" ? () => window.open(url, "_blank") : handleDownload}
                                     >
-                                        Завантажити
+                                        {previewType === "iframe" ? "Відкрити" : "Завантажити"}
                                     </Button>
                                     <Button
                                         size="sm"
@@ -110,13 +128,25 @@ export const FilePreviewModal: React.FC<FilePreviewModalProps> = ({
                                     </div>
                                 )}
 
-                                {/* Document Preview (PDF, Office files) */}
+                                {/* Document Preview (PDF, Office files via Google Viewer) */}
                                 {previewType === "document" && (
                                     <div className="h-full min-h-[50vh] w-full">
                                         <iframe
                                             src={`https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`}
                                             className="w-full h-full rounded-lg border-0"
                                             title={name}
+                                        />
+                                    </div>
+                                )}
+
+                                {/* Iframe Preview (Direct Links, Google Docs, Figma, etc.) */}
+                                {previewType === "iframe" && (
+                                    <div className="h-full min-h-[50vh] w-full bg-white rounded-lg overflow-hidden">
+                                        <iframe
+                                            src={url}
+                                            className="w-full h-full border-0"
+                                            title={name}
+                                            allowFullScreen
                                         />
                                     </div>
                                 )}

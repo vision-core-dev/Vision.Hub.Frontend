@@ -141,7 +141,6 @@
     outline: none !important;
 }
 
-/* Темна підкладка */
 .doneOverlay {
     position: absolute;
     bottom: 0;
@@ -150,8 +149,16 @@
     padding: 16px;
     background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.75) 100%);
     display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+}
+
+.doneOverlayTitleRow {
+    display: flex;
     align-items: center;
     gap: 8px;
+    width: 100%;
 }
 
 .doneIcon {
@@ -187,6 +194,12 @@
     align-items: center;
 }
 
+.doneContentText {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
 .doneTitleNoImage {
     font-size: 15px;
     font-weight: 600;
@@ -200,6 +213,14 @@
     flex-wrap: wrap;
     gap: 6px;
     align-items: center;
+}
+
+.miniDetailsDark .deadline > svg {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.miniDetailsDark .deadline > span {
+    color: rgba(255, 255, 255, 0.9) !important;
 }
 
 
