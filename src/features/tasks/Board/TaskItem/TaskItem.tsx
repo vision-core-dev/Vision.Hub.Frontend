@@ -35,7 +35,7 @@ const TaskItem = ({ task, boardTags, users }: TaskProps) => {
 
         return (
             <div className={`${styles.miniDetails} ${isDark ? styles.miniDetailsDark : ""}`}>
-                {task.has_description && (
+                {(task.has_description && !isDone) && (
                     <div className={styles.deadline}>
                         <AlignLeft />
                     </div>
@@ -45,16 +45,28 @@ const TaskItem = ({ task, boardTags, users }: TaskProps) => {
                     <div className={styles.deadline}>
                         <Clock />
                         <span>
-                            {task.started_at && safeDate(task.started_at)}
-                            {task.started_at && task.deadline_at ? " – " : ""}
-                            {task.deadline_at && safeDate(task.deadline_at)}
+                            {isDone ? (
+                                task.deadline_at && safeDate(task.deadline_at)
+                            ) : (
+                                <>
+                                    {task.started_at && safeDate(task.started_at)}
+                                    {task.started_at && !task.deadline_at ? " →" : ""}
+                                    {task.started_at && task.deadline_at ? " – " : ""}
+                                    {task.deadline_at && safeDate(task.deadline_at)}
+                                </>
+                            )}
                         </span>
                     </div>
                 )}
 
                 {(task.subtasks_total && task.subtasks_total > 0) ? (
                     <div className={styles.deadline}>
-                        <SquareCheckBig /><span>{task.subtasks_completed || 0}/{task.subtasks_total || 0}</span>
+                        <SquareCheckBig />
+                        {isDone ? (
+                            <span>{task.subtasks_total || 0}</span>
+                        ) : (
+                            <span>{task.subtasks_completed || 0}/{task.subtasks_total || 0}</span>
+                        )}
                     </div>
                 ) : null}
 
