@@ -4,6 +4,7 @@ import { Avatar } from "@/shared/ui/avatar/avatar";
 import LoaderDots from "@/shared/ui/loader-dots/LoaderDots";
 import { useAuth } from "@/core/auth/AuthContext";
 import { Trophy, TrendingUp, Medal } from "lucide-react";
+import { EmptyState } from "@/shared/ui/application/empty-state/empty-state";
 
 interface LeaderboardItem {
     user_id: string;
@@ -125,8 +126,16 @@ const Leaderboard: React.FC = () => {
                 </div>
                 
                 {items.length === 0 && (
-                    <div className="p-8 text-center text-tertiary text-sm">
-                        Дані поки що відсутні
+                    <div className="py-8">
+                        <EmptyState size="sm">
+                            <EmptyState.Header pattern="circle">
+                                <EmptyState.FeaturedIcon icon={Trophy} color="warning" />
+                            </EmptyState.Header>
+                            <EmptyState.Content>
+                                <EmptyState.Title>Рейтинг порожній</EmptyState.Title>
+                                <EmptyState.Description>Дані поки що відсутні.</EmptyState.Description>
+                            </EmptyState.Content>
+                        </EmptyState>
                     </div>
                 )}
             </div>

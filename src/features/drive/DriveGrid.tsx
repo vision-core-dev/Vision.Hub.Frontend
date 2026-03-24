@@ -11,6 +11,7 @@ import { driveApi } from "./api";
 import type { DriveFolder, DriveFile, AccessType } from "./types";
 import FilePreviewModal from "./FilePreviewModal";
 import { ButtonUtility } from "@/shared/ui/base/buttons/button-utility";
+import { DriveEmptyState } from "./DriveEmptyState";
 
 // ─── Helpers ───────────────────────────────────────────────────────
 
@@ -61,6 +62,10 @@ export default function DriveGrid({
     const [previewFile, setPreviewFile] = useState<DriveFile | null>(null);
 
     if (loading) return <div className="flex justify-center py-20 animate-pulse text-gray-400">Завантаження...</div>;
+
+    if (folders.length === 0 && files.length === 0) {
+        return <DriveEmptyState />;
+    }
 
     return (
         <>

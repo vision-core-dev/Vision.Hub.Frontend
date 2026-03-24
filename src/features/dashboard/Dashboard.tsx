@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@/core/auth/AuthContext";
 import LoaderDots from "@/shared/ui/loader-dots/LoaderDots";
+import { EmptyState } from "@/shared/ui/application/empty-state/empty-state";
 
 import { FeedItem } from "@/shared/components/activity-feed/activity-feed";
 import { api } from "@/shared/utils/api.ts";
@@ -107,8 +108,20 @@ const ActivityFeedConnected: React.FC = () => {
                 )}
             </div>
 
-            <ul className="space-y-0">
-                {news.map((item, index) => (
+            {news.length === 0 ? (
+                <div className="bg-primary rounded-xl border border-secondary py-8 mt-4">
+                    <EmptyState size="sm">
+                        <EmptyState.Content>
+                            <EmptyState.Title>Новин поки немає</EmptyState.Title>
+                            <EmptyState.Description>
+                                Останні оновлення та новини з'являться тут.
+                            </EmptyState.Description>
+                        </EmptyState.Content>
+                    </EmptyState>
+                </div>
+            ) : (
+                <ul className="space-y-0 mt-4">
+                    {news.map((item, index) => (
                     <li key={item.id}>
                         <FeedItem
                             id={item.id}
@@ -151,6 +164,7 @@ const ActivityFeedConnected: React.FC = () => {
                     </li>
                 ))}
             </ul>
+            )}
 
             <NewsModal 
                 isOpen={isCreateModalOpen || !!editingNews} 
@@ -216,9 +230,16 @@ const MyTasksConnected: React.FC = () => {
 
     if (tasks.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center p-8 bg-primary rounded-xl border border-secondary text-tertiary">
-                <CheckCircle2 className="w-8 h-8 mb-2" />
-                <p>У вас немає активних задач.</p>
+            <div className="bg-primary rounded-xl border border-secondary py-8">
+                <EmptyState size="sm">
+                    <EmptyState.Header pattern="circle">
+                        <EmptyState.FeaturedIcon icon={CheckCircle2} color="success" />
+                    </EmptyState.Header>
+                    <EmptyState.Content>
+                        <EmptyState.Title>Все виконано!</EmptyState.Title>
+                        <EmptyState.Description>У вас немає активних задач.</EmptyState.Description>
+                    </EmptyState.Content>
+                </EmptyState>
             </div>
         );
     }
