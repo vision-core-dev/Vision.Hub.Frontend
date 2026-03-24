@@ -30,8 +30,8 @@ export const CalendarMonthViewCell = ({ isDisabled, children, className, day, st
                 className={cx(
                     "flex size-6 items-center justify-center rounded-full text-xs font-semibold text-secondary",
                     state === "selected" && "bg-brand-solid text-white",
-                    state === "current" && "bg-active",
-                    isDisabled && "text-disabled",
+                    state === "current" && "bg-primary_hover",
+                    isDisabled && "",
                 )}
             >
                 {day}

@@ -61,7 +61,7 @@ const CreateEventPage = () => {
                 <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-medium text-secondary">Опис</label>
                     <textarea
-                        className="w-full rounded-lg border border-secondary px-3 py-2 text-md focus:ring-2 focus:ring-brand outline-none bg-primary text-primary"
+                        className="w-full rounded-lg border border-secondary px-3 py-2 text-md focus:ring-2 focus:ring-brand outline-hidden bg-primary text-primary"
                         value={formData.description}
                         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                         rows={4}

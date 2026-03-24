@@ -128,7 +128,7 @@ const TextEditorRoot = ({
                     // Resize handle
                     "[&::-webkit-resizer]:bg-(image:--resize-handle-bg) [&::-webkit-resizer]:bg-contain dark:[&::-webkit-resizer]:bg-(image:--resize-handle-bg-dark)",
 
-                    isDisabled && "cursor-not-allowed bg-disabled_subtle text-disabled ring-disabled",
+                    isDisabled && "cursor-not-allowed opacity-50  ",
                     isInvalid && "ring-error_subtle focus:ring-2 focus:ring-error",
                     inputClassName,
                 ),

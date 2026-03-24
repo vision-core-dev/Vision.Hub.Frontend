@@ -24,7 +24,7 @@ export const CalendarColumnHeader = ({ state, weekDay, day, className, onClick }
                     className={cx(
                         "flex h-6 items-center justify-center text-xs font-semibold text-secondary",
                         state === "selected" && "w-6 rounded-full bg-brand-solid text-white",
-                        state === "current" && "w-6 rounded-full bg-active",
+                        state === "current" && "w-6 rounded-full bg-primary_hover",
                     )}
                 >
                     {day}

@@ -90,8 +90,8 @@ export const FilePreviewModal: React.FC<FilePreviewModalProps> = ({
         <DialogTrigger isOpen={isOpen} onOpenChange={(open: boolean) => !open && onClose()}>
             <ModalOverlay isDismissable>
                 <Modal>
-                    <Dialog className="outline-none">
-                        <div className="relative w-full h-[80vh] max-w-7xl max-h-[90vh] m-4 bg-white dark:bg-gray-900 rounded-2xl shadow-2xl flex flex-col overflow-hidden outline-none">
+                    <Dialog className="outline-hidden">
+                        <div className="relative w-full h-[80vh] max-w-7xl max-h-[90vh] m-4 bg-white dark:bg-gray-900 rounded-2xl shadow-2xl flex flex-col overflow-hidden outline-hidden">
                             {/* Header */}
                             <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
                                 <div className="flex items-center gap-3 min-w-0 flex-1">

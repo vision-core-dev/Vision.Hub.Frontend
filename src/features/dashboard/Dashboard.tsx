@@ -453,7 +453,7 @@ const SubmitBirthdayModal = ({ isOpen, setIsOpen }: CreateUserModalProps) => {
                                     <PinInput.Group
                                         maxLength={2}
                                         value={day}
-                                        onChange={(v) => setDay(clampDay(v))}
+                                        onChange={(v: string) => setDay(clampDay(v))}
                                     >
                                         <PinInput.Slot index={0} />
                                         <PinInput.Slot index={1} />
@@ -466,7 +466,7 @@ const SubmitBirthdayModal = ({ isOpen, setIsOpen }: CreateUserModalProps) => {
                                     <PinInput.Group
                                         maxLength={2}
                                         value={month}
-                                        onChange={(v) => setMonth(clampMonth(v))}
+                                        onChange={(v: string) => setMonth(clampMonth(v))}
                                     >
                                         <PinInput.Slot index={0} />
                                         <PinInput.Slot index={1} />
@@ -476,7 +476,7 @@ const SubmitBirthdayModal = ({ isOpen, setIsOpen }: CreateUserModalProps) => {
                                 {/* Рік */}
                                 <PinInput size="sm">
                                     <PinInput.Label>Рік</PinInput.Label>
-                                    <PinInput.Group maxLength={4} value={year} onChange={(v) => setYear(clampYear(v))}>
+                                    <PinInput.Group maxLength={4} value={year} onChange={(v: string) => setYear(clampYear(v))}>
                                         <PinInput.Slot index={0} />
                                         <PinInput.Slot index={1} />
                                         <PinInput.Slot index={2} />
@@ -596,7 +596,7 @@ const NewsModal = ({ isOpen, setIsOpen, news, onSuccess }: NewsModalProps) => {
                                             value={title}
                                             onChange={(e) => setTitle(e.target.value)}
                                             placeholder="Напр. Оновлення системи"
-                                            className="w-full px-3 py-2 bg-primary border border-secondary rounded-lg text-primary focus:ring-2 focus:ring-brand outline-none"
+                                            className="w-full px-3 py-2 bg-primary border border-secondary rounded-lg text-primary focus:ring-2 focus:ring-brand outline-hidden"
                                         />
                                     </div>
 
@@ -606,7 +606,7 @@ const NewsModal = ({ isOpen, setIsOpen, news, onSuccess }: NewsModalProps) => {
                                             value={labels}
                                             onChange={(e) => setLabels(e.target.value)}
                                             placeholder="Процеси, Комунікація"
-                                            className="w-full px-3 py-2 bg-primary border border-secondary rounded-lg text-primary focus:ring-2 focus:ring-brand outline-none"
+                                            className="w-full px-3 py-2 bg-primary border border-secondary rounded-lg text-primary focus:ring-2 focus:ring-brand outline-hidden"
                                         />
                                     </div>
 
@@ -620,7 +620,7 @@ const NewsModal = ({ isOpen, setIsOpen, news, onSuccess }: NewsModalProps) => {
                                                 <div className="border-b border-secondary p-1">
                                                     <TextEditor.Toolbar type="simple" />
                                                 </div>
-                                                <TextEditor.Content className="min-h-[150px] p-4 focus:outline-none" />
+                                                <TextEditor.Content className="min-h-[150px] p-4 focus:outline-hidden" />
                                             </TextEditor.Root>
                                         </div>
                                     </div>
@@ -632,7 +632,7 @@ const NewsModal = ({ isOpen, setIsOpen, news, onSuccess }: NewsModalProps) => {
                                                 value={targetText}
                                                 onChange={(e) => setTargetText(e.target.value)}
                                                 placeholder="Детальніше"
-                                                className="w-full px-3 py-2 bg-primary border border-secondary rounded-lg text-primary focus:ring-2 focus:ring-brand outline-none"
+                                                className="w-full px-3 py-2 bg-primary border border-secondary rounded-lg text-primary focus:ring-2 focus:ring-brand outline-hidden"
                                             />
                                         </div>
                                         <div className="flex flex-col gap-1.5">
@@ -641,7 +641,7 @@ const NewsModal = ({ isOpen, setIsOpen, news, onSuccess }: NewsModalProps) => {
                                                 value={targetUrl}
                                                 onChange={(e) => setTargetUrl(e.target.value)}
                                                 placeholder="https://..."
-                                                className="w-full px-3 py-2 bg-primary border border-secondary rounded-lg text-primary focus:ring-2 focus:ring-brand outline-none"
+                                                className="w-full px-3 py-2 bg-primary border border-secondary rounded-lg text-primary focus:ring-2 focus:ring-brand outline-hidden"
                                             />
                                         </div>
                                     </div>

@@ -196,7 +196,7 @@ const SubtasksSection: React.FC<Props> = ({ taskId, initialSubtasks, users: init
                             <div className="flex-1 min-w-0 flex flex-col pt-0.5">
                                 {!isReadOnly && editingId === s.id ? (
                                     <input
-                                        className="flex-1 rounded border border-brand-primary px-1.5 py-0.5 text-sm leading-6 outline-none bg-primary font-medium text-primary"
+                                        className="flex-1 rounded border border-brand-primary px-1.5 py-0.5 text-sm leading-6 outline-hidden bg-primary font-medium text-primary"
                                         value={editingValue}
                                         autoFocus
                                         onChange={(e) => setEditingValue(e.target.value)}

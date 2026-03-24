@@ -197,7 +197,7 @@ const CreateEditNodeModal = ({ isOpen, onOpenChange, parentId, editNode, onSucce
                                                     type="button"
                                                     onClick={() => setNodeType(type.id as NodeType)}
                                                     className={cx(
-                                                        "flex flex-1 flex-col items-center gap-2 rounded-lg border p-3 transition-all outline-none focus:ring-2 focus:ring-focus-ring",
+                                                        "flex flex-1 flex-col items-center gap-2 rounded-lg border p-3 transition-all outline-hidden focus:ring-2 focus:ring-focus-ring",
                                                         nodeType === type.id
                                                             ? "border-brand-500 bg-brand-50 text-brand-600 dark:bg-brand-500/10"
                                                             : "border-secondary hover:bg-secondary/50"

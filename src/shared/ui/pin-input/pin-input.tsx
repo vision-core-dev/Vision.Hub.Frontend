@@ -88,11 +88,11 @@ const Slot = ({ index, className, ...props }: ComponentPropsWithRef<"div"> & { i
             {...props}
             aria-label={"Enter digit " + (index + 1) + " of " + slots.length}
             className={cx(
-                "relative flex items-center justify-center rounded-xl bg-primary text-center text-placeholder_subtle shadow-xs ring-1 ring-primary transition-[box-shadow,background-color] duration-100 ease-linear ring-inset",
+                "relative flex items-center justify-center rounded-xl bg-primary text-center  shadow-xs ring-1 ring-primary transition-[box-shadow,background-color] duration-100 ease-linear ring-inset",
                 sizes[size],
                 isFocused && slot?.isActive && "ring-2 ring-brand outline-2 outline-offset-2 outline-brand",
                 slot?.char && "text-brand-tertiary_alt ring-2 ring-brand",
-                disabled && "bg-disabled_subtle text-fg-disabled_subtle ring-disabled",
+                disabled && "opacity-50  ",
                 className,
             )}
         >
@@ -115,7 +115,7 @@ const FakeCaret = ({ size = "md" }: { size?: "sm" | "md" | "lg" }) => {
 
 const Separator = (props: ComponentPropsWithRef<"p">) => {
     return (
-        <div role="separator" {...props} className={cx("text-center text-display-xl font-medium text-placeholder_subtle", props.className)}>
+        <div role="separator" {...props} className={cx("text-center text-display-xl font-medium ", props.className)}>
             -
         </div>
     );

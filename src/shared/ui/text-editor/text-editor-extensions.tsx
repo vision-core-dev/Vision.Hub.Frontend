@@ -470,7 +470,7 @@ export const TextEditorColor = ({ className }: { className?: string }) => {
             </Tooltip>
 
             <Popover>
-                <Dialog className="rounded-xl bg-primary_alt p-3 shadow-lg ring-1 ring-secondary_alt outline-none">
+                <Dialog className="rounded-xl bg-primary_alt p-3 shadow-lg ring-1 ring-secondary_alt outline-hidden">
                     <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
                         <RadioGroup className="flex flex-col items-start gap-2" value={color?.toString("hex")} onChange={handleColorChange}>
                             <div className="grid grid-cols-8 gap-1">

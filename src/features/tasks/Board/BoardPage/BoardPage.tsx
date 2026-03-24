@@ -96,7 +96,7 @@ const FilterDropdown = ({ label, count, selectedPreviews, children }: FilterDrop
                     placement="bottom start"
                     className={styles.filterDropdownPanel}
                 >
-                    <Dialog className="outline-none">
+                    <Dialog className="outline-hidden">
                         <div className={styles.filterDropdownSearch}>
                             <SearchLg size={16} className="text-fg-quaternary" />
                             <input
@@ -105,7 +105,7 @@ const FilterDropdown = ({ label, count, selectedPreviews, children }: FilterDrop
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 autoFocus
-                                className="bg-transparent border-none outline-none text-sm w-full"
+                                className="bg-transparent border-none outline-hidden text-sm w-full"
                             />
                         </div>
                         <div className={styles.filterDropdownList}>

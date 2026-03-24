@@ -33,7 +33,7 @@ export const TextAreaBase = ({ className, ...props }: TextAreaBaseProps) => {
                     "[&::-webkit-resizer]:bg-(image:--resize-handle-bg) [&::-webkit-resizer]:bg-contain dark:[&::-webkit-resizer]:bg-(image:--resize-handle-bg-dark)",
 
                     state.isFocused && !state.isDisabled && "ring-2 ring-brand",
-                    state.isDisabled && "cursor-not-allowed bg-disabled_subtle text-disabled ring-disabled",
+                    state.isDisabled && "cursor-not-allowed opacity-50  ",
                     state.isInvalid && "ring-error_subtle",
                     state.isInvalid && state.isFocused && "ring-2 ring-error",
 

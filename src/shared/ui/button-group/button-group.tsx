@@ -11,15 +11,15 @@ import { isReactComponent } from "@/shared/utils/is-react-component";
 export const styles = sortCx({
     common: {
         root: [
-            "group/button-group inline-flex h-max cursor-pointer items-center bg-primary font-semibold whitespace-nowrap text-secondary shadow-skeumorphic ring-1 ring-primary outline-brand transition duration-100 ease-linear ring-inset",
+            "group/button-group inline-flex h-max cursor-pointer items-center bg-primary font-semibold whitespace-nowrap text-secondary shadow-skeuomorphic ring-1 ring-primary outline-brand transition duration-100 ease-linear ring-inset",
             // Hover and focus styles
             "hover:bg-primary_hover hover:text-secondary_hover focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2",
             // Disabled styles
-            "disabled:cursor-not-allowed disabled:bg-primary disabled:text-disabled",
+            "disabled:cursor-not-allowed disabled:bg-primary disabled:",
             // Selected styles
-            "selected:bg-active selected:text-secondary_hover selected:disabled:bg-disabled_subtle",
+            "selected:bg-primary_hover selected:text-secondary_hover selected:disabled:opacity-50",
         ].join(" "),
-        icon: "pointer-events-none text-fg-quaternary transition-[inherit] group-hover/button-group:text-fg-quaternary_hover group-disabled/button-group:text-fg-disabled_subtle",
+        icon: "pointer-events-none text-fg-quaternary transition-[inherit] group-hover/button-group:text-fg-quaternary_hover group-disabled/button-group:",
     },
 
     sizes: {

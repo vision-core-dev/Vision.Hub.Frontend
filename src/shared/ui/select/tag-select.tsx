@@ -286,7 +286,7 @@ const InnerMultiSelect = ({ isDisabled, shortcut, shortcutClassName, placeholder
                     placeholder={placeholder}
                     onKeyDown={handleInputKeyDown}
                     onMouseDown={handleInputMouseDown}
-                    className="w-full flex-[1_0_0] appearance-none bg-transparent text-md text-ellipsis text-primary caret-alpha-black/90 outline-none placeholder:text-placeholder focus:outline-hidden disabled:cursor-not-allowed disabled:text-disabled disabled:placeholder:text-disabled"
+                    className="w-full flex-[1_0_0] appearance-none bg-transparent text-md text-ellipsis text-primary caret-alpha-black/90 outline-hidden placeholder:text-placeholder focus:outline-hidden disabled:cursor-not-allowed disabled: disabled:placeholder:"
                 />
 
                 {shortcut && (
@@ -300,7 +300,7 @@ const InnerMultiSelect = ({ isDisabled, shortcut, shortcutClassName, placeholder
                         <span
                             className={cx(
                                 "pointer-events-none rounded px-1 py-px text-xs font-medium text-quaternary ring-1 ring-secondary select-none ring-inset",
-                                isDisabled && "bg-transparent text-disabled",
+                                isDisabled && "bg-transparent ",
                             )}
                         >
                             ⌘K
@@ -328,7 +328,7 @@ export const MultiSelectTagsValue = ({
             className={({ isFocusWithin, isDisabled }) =>
                 cx(
                     "relative flex w-full items-center gap-2 rounded-lg bg-primary shadow-xs ring-1 ring-primary outline-hidden transition duration-100 ease-linear ring-inset",
-                    isDisabled && "cursor-not-allowed bg-disabled_subtle",
+                    isDisabled && "cursor-not-allowed opacity-50",
                     isFocusWithin && "ring-2 ring-brand",
                     sizes[size].root,
                 )

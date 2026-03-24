@@ -16,7 +16,7 @@ export const RangePresetButton = ({ value, className, children, ...props }: Rang
             {...props}
             className={cx(
                 "cursor-pointer rounded-md px-3 py-2 text-left text-sm font-medium outline-focus-ring transition duration-100 ease-linear focus-visible:outline-2 focus-visible:outline-offset-2",
-                isSelected ? "bg-active text-secondary_hover hover:bg-secondary_hover" : "text-secondary hover:bg-primary_hover hover:text-secondary_hover",
+                isSelected ? "bg-primary_hover text-secondary_hover hover:bg-secondary_hover" : "text-secondary hover:bg-primary_hover hover:text-secondary_hover",
                 className,
             )}
         >

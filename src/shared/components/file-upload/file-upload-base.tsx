@@ -201,7 +201,7 @@ export const FileUploadDropZone = ({
             className={cx(
                 "relative flex flex-col items-center gap-3 rounded-xl bg-primary px-6 py-4 text-tertiary ring-1 ring-secondary transition duration-100 ease-linear ring-inset",
                 isDraggingOver && "ring-2 ring-brand",
-                isDisabled && "cursor-not-allowed bg-disabled_subtle ring-disabled_subtle",
+                isDisabled && "cursor-not-allowed opacity-50 ",
                 className,
             )}
         >

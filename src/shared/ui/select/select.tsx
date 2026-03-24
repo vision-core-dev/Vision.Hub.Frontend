@@ -58,7 +58,7 @@ const SelectValue = ({ isOpen, isFocused, isDisabled, size, placeholder, placeho
             className={cx(
                 "relative flex w-full cursor-pointer items-center rounded-lg bg-primary shadow-xs ring-1 ring-primary outline-hidden transition duration-100 ease-linear ring-inset",
                 (isFocused || isOpen) && "ring-2 ring-brand",
-                isDisabled && "cursor-not-allowed bg-disabled_subtle text-disabled",
+                isDisabled && "cursor-not-allowed opacity-50 ",
             )}
         >
             <AriaSelectValue<SelectItemType>
@@ -66,7 +66,7 @@ const SelectValue = ({ isOpen, isFocused, isDisabled, size, placeholder, placeho
                     "flex h-max w-full items-center justify-start gap-2 truncate text-left align-middle",
 
                     // Icon styles
-                    "*:data-icon:size-5 *:data-icon:shrink-0 *:data-icon:text-fg-quaternary in-disabled:*:data-icon:text-fg-disabled",
+                    "*:data-icon:size-5 *:data-icon:shrink-0 *:data-icon:text-fg-quaternary in-disabled:*:data-icon:",
 
                     sizes[size].root,
                 )}
@@ -89,7 +89,7 @@ const SelectValue = ({ isOpen, isFocused, isDisabled, size, placeholder, placeho
                                     {state.selectedItem?.supportingText && <p className="text-md text-tertiary">{state.selectedItem?.supportingText}</p>}
                                 </section>
                             ) : (
-                                <p className={cx("text-md text-placeholder", isDisabled && "text-disabled")}>{placeholder}</p>
+                                <p className={cx("text-md text-placeholder", isDisabled && "")}>{placeholder}</p>
                             )}
 
                             <ChevronDown
