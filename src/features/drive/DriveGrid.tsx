@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Folder, DotsVertical, Trash01, Edit03, ShieldTick } from "@untitledui/icons";
-import { Globe, Lock, Users, Eye, Download } from "lucide-react";
+import { Globe, Lock, Users, Eye, Download, ArrowLeft, CornerUpRight } from "lucide-react";
 import { Dropdown } from "@/shared/ui/dropdown/dropdown";
 import { Button } from "@/shared/ui/buttons/button";
 import { Input } from "@/shared/ui/input/input";
@@ -174,6 +174,69 @@ function AccessModal({ isOpen, onClose, item, onConfirm }: any) {
     );
 }
 
+function MoveModal({ isOpen, onClose, itemName, onConfirm }: any) {
+    const [history, setHistory] = useState<{ id: string | null, name: string }[]>([{ id: null, name: "Головна папка" }]);
+    const [folders, setFolders] = useState<DriveFolder[]>([]);
+    const [loading, setLoading] = useState(false);
+
+    const curr = history[history.length - 1];
+
+    useEffect(() => {
+        if (isOpen) {
+            setLoading(true);
+            driveApi.list(curr.id).then(res => {
+                setFolders(res.folders || []);
+            }).finally(() => setLoading(false));
+        } else {
+            setHistory([{ id: null, name: "Головна папка" }]);
+        }
+    }, [isOpen, curr.id]);
+
+    const navigateTo = (f: DriveFolder) => setHistory([...history, { id: f.id, name: f.name }]);
+    const goBack = () => setHistory(history.slice(0, -1));
+
+    return (
+        <DialogTrigger isOpen={isOpen} onOpenChange={v => !v && onClose()}>
+            <ModalOverlay isDismissable>
+                <Modal><Dialog>
+                    <div className="p-6 w-[400px] bg-white rounded-xl flex flex-col max-h-[80vh]">
+                        <h3 className="text-md font-semibold mb-4 text-gray-900">Перемістити {itemName}</h3>
+
+                        <div className="flex items-center gap-2 mb-4 bg-gray-50 p-2 rounded-lg">
+                            {history.length > 1 && (
+                                <button onClick={goBack} className="p-1 hover:bg-gray-200 rounded-md">
+                                    <ArrowLeft size={16} />
+                                </button>
+                            )}
+                            <span className="font-medium text-sm text-gray-700 truncate">{curr.name}</span>
+                        </div>
+
+                        <div className="flex-1 overflow-y-auto min-h-[200px] border rounded-lg border-gray-100 p-2 space-y-1">
+                            {loading ? (
+                                <div className="text-center text-gray-400 py-4 text-sm animate-pulse">Завантаження...</div>
+                            ) : folders.length === 0 ? (
+                                <div className="text-center text-gray-400 py-4 text-sm">Тут пусто</div>
+                            ) : (
+                                folders.map(f => (
+                                    <div key={f.id} className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition" onClick={() => navigateTo(f)}>
+                                        <Folder size={18} className="text-gray-400" />
+                                        <span className="text-sm font-medium text-gray-700 truncate">{f.name}</span>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+
+                        <div className="flex justify-end gap-2 mt-6">
+                            <Button color="secondary" onClick={onClose}>Скасувати</Button>
+                            <Button color="primary" onClick={() => onConfirm(curr.id)}>Перемістити сюди</Button>
+                        </div>
+                    </div>
+                </Dialog></Modal>
+            </ModalOverlay>
+        </DialogTrigger>
+    );
+}
+
 // ─── Cards ─────────────────────────────────────────────────────────
 
 function FolderCard({ folder, onOpen, onDeleted, onUpdated }: any) {
@@ -181,7 +244,8 @@ function FolderCard({ folder, onOpen, onDeleted, onUpdated }: any) {
     const actions = {
         rename: (n: string) => driveApi.updateFolder(folder.id, { name: n }).then(() => { onUpdated(); setM(null); }),
         access: (a: any, r: any) => driveApi.updateFolder(folder.id, { access_type: a, allowed_role_ids: r }).then(() => { onUpdated(); setM(null); }),
-        delete: () => driveApi.deleteFolder(folder.id).then(() => { onDeleted(); setM(null); })
+        delete: () => driveApi.deleteFolder(folder.id).then(() => { onDeleted(); setM(null); }),
+        move: (parentId: string | null) => driveApi.updateFolder(folder.id, { parent_id: parentId }).then(() => { onUpdated(); setM(null); })
     };
     return (
         <div className="group border border-gray-100 bg-white rounded-2xl p-4 hover:shadow-xl hover:border-green-200 transition-all cursor-pointer" onDoubleClick={onOpen}>
@@ -194,6 +258,7 @@ function FolderCard({ folder, onOpen, onDeleted, onUpdated }: any) {
                     <ButtonUtility icon={DotsVertical} />
                     <Dropdown.Popover><Dropdown.Menu>
                         <Dropdown.Item icon={Edit03} onClick={() => setM("rename")}>Змінити назву</Dropdown.Item>
+                        <Dropdown.Item icon={CornerUpRight} onClick={() => setM("move")}>Перемістити</Dropdown.Item>
                         <Dropdown.Item icon={ShieldTick} onClick={() => setM("access")}>Доступ</Dropdown.Item>
                         <Dropdown.Item icon={Trash01} className="text-red-600" onClick={() => setM("delete")}>Видалити</Dropdown.Item>
                     </Dropdown.Menu></Dropdown.Popover>
@@ -204,6 +269,7 @@ function FolderCard({ folder, onOpen, onDeleted, onUpdated }: any) {
             <RenameModal isOpen={m === "rename"} onClose={() => setM(null)} name={folder.name} onConfirm={actions.rename} title="Перейменувати папку" />
             <DeleteConfirmModal isOpen={m === "delete"} onClose={() => setM(null)} name={folder.name} onConfirm={actions.delete} />
             <AccessModal isOpen={m === "access"} onClose={() => setM(null)} item={folder} onConfirm={actions.access} />
+            <MoveModal isOpen={m === "move"} onClose={() => setM(null)} itemName={`"${folder.name}"`} onConfirm={actions.move} />
         </div>
     );
 }
@@ -213,7 +279,8 @@ function FileCard({ file, onPreview, onDeleted, onUpdated }: any) {
     const actions = {
         rename: (n: string) => driveApi.updateFile(file.id, { name: n }).then(() => { onUpdated(); setM(null); }),
         access: (a: any, r: any) => driveApi.updateFile(file.id, { access_type: a, allowed_role_ids: r }).then(() => { onUpdated(); setM(null); }),
-        delete: () => driveApi.deleteFile(file.id).then(() => { onDeleted(); setM(null); })
+        delete: () => driveApi.deleteFile(file.id).then(() => { onDeleted(); setM(null); }),
+        move: (folderId: string | null) => driveApi.updateFile(file.id, { folder_id: folderId }).then(() => { onUpdated(); setM(null); })
     };
     return (
         <div className="group border border-gray-100 bg-white rounded-2xl overflow-hidden hover:shadow-xl hover:border-green-200 transition-all cursor-pointer" onDoubleClick={onPreview}>
@@ -224,11 +291,12 @@ function FileCard({ file, onPreview, onDeleted, onUpdated }: any) {
                 <div className="flex justify-between items-center mb-1">
                     {getAccessIcon(file.access_type)}
                     <Dropdown.Root>
-                        <button className="p-1 hover:bg-gray-100 rounded-lg"><DotsVertical size={16} className="text-gray-400" /></button>
+                        <ButtonUtility icon={DotsVertical} />
                         <Dropdown.Popover><Dropdown.Menu>
                             <Dropdown.Item icon={Eye} onClick={onPreview}>Переглянути</Dropdown.Item>
                             <Dropdown.Item icon={Download} onClick={() => window.open(file.url)}>Завантажити</Dropdown.Item>
                             <Dropdown.Item icon={Edit03} onClick={() => setM("rename")}>Перейменувати</Dropdown.Item>
+                            <Dropdown.Item icon={CornerUpRight} onClick={() => setM("move")}>Перемістити</Dropdown.Item>
                             <Dropdown.Item icon={ShieldTick} onClick={() => setM("access")}>Доступ</Dropdown.Item>
                             <Dropdown.Item icon={Trash01} className="text-red-600" onClick={() => setM("delete")}>Видалити</Dropdown.Item>
                         </Dropdown.Menu></Dropdown.Popover>
@@ -240,6 +308,7 @@ function FileCard({ file, onPreview, onDeleted, onUpdated }: any) {
             <RenameModal isOpen={m === "rename"} onClose={() => setM(null)} name={file.name} onConfirm={actions.rename} title="Перейменувати файл" />
             <DeleteConfirmModal isOpen={m === "delete"} onClose={() => setM(null)} name={file.name} onConfirm={actions.delete} />
             <AccessModal isOpen={m === "access"} onClose={() => setM(null)} item={file} onConfirm={actions.access} />
+            <MoveModal isOpen={m === "move"} onClose={() => setM(null)} itemName={`"${file.name}"`} onConfirm={actions.move} />
         </div>
     );
 }

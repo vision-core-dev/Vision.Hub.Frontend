@@ -22,6 +22,7 @@ export const driveApi = {
 
     async updateFolder(folderId: string, data: {
         name?: string;
+        parent_id?: string | null;
         access_type?: AccessType;
         allowed_role_ids?: string[];
     }) {
@@ -37,9 +38,9 @@ export const driveApi = {
     },
 
     /**
-     * Upload with XMLHttpRequest for progress tracking.
+     * Upload with WebSockets to bypass 100s timeouts for large files.
      * Returns a promise that resolves with the server response
-     * and calls onProgress with 0-100 percent.
+     * and calls onProgress with 0-50 percent (client to server).
      */
     uploadFile(
         file: File,
@@ -53,53 +54,93 @@ export const driveApi = {
         } = {}
     ): Promise<any> {
         return new Promise((resolve, reject) => {
-            const xhr = new XMLHttpRequest();
-            const formData = new FormData();
-            formData.append("file", file);
-            formData.append("folder_id", options.folderId || "");
-            formData.append("access_type", options.accessType || "public");
-            formData.append(
-                "allowed_role_ids",
-                (options.allowedRoleIds || []).join(",")
-            );
-
-            const url = `${import.meta.env.VITE_API_URL}/v1/Hub/Drive/Files/Upload${options.uploadId ? `?upload_id=${options.uploadId}` : ''}`;
-
-            xhr.open("POST", url.toString());
-
+            let baseUrl = import.meta.env.VITE_API_URL || "";
+            // Replace http/https with ws/wss
+            const wsUrl = baseUrl.replace(/^http/, "ws") + "/v1/Hub/Drive/Files/UploadWS";
+            
             const token = localStorage.getItem("token");
-            if (token) {
-                xhr.setRequestHeader("Authorization", `Bearer ${token}`);
-            }
+            if (!token) return reject(new Error("No token available"));
 
-            xhr.upload.onprogress = (e) => {
-                if (e.lengthComputable && options.onProgress) {
-                    options.onProgress(Math.round((e.loaded / e.total) * 100));
-                }
-            };
-
-            xhr.onload = () => {
-                if (xhr.status >= 200 && xhr.status < 300) {
-                    try {
-                        resolve(JSON.parse(xhr.responseText));
-                    } catch {
-                        resolve({ ok: true });
-                    }
-                } else {
-                    reject(new Error(`Upload failed: ${xhr.status}`));
-                }
-            };
-
-            xhr.onerror = () => reject(new Error("Upload failed"));
+            const ws = new WebSocket(wsUrl);
 
             if (options.signal) {
                 options.signal.addEventListener("abort", () => {
-                    xhr.abort();
+                    if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) {
+                        ws.close(1000, "Aborted");
+                    }
                     reject(new Error("Upload cancelled"));
                 });
             }
 
-            xhr.send(formData);
+            ws.onopen = () => {
+                // 1. Send initialization config
+                ws.send(JSON.stringify({
+                    token,
+                    filename: file.name,
+                    content_type: file.type || "application/octet-stream",
+                    folder_id: options.folderId || null,
+                    access_type: options.accessType || "public",
+                    allowed_role_ids: options.allowedRoleIds || [],
+                    upload_id: options.uploadId,
+                }));
+            };
+
+            ws.onmessage = async (event) => {
+                try {
+                    const msg = JSON.parse(event.data);
+                    
+                    if (msg.status === "ready") {
+                        // 2. Start sending chunks
+                        const chunkSize = 1024 * 1024; // 1MB chunks
+                        let offset = 0;
+
+                        while (offset < file.size) {
+                            if (ws.readyState !== WebSocket.OPEN) break;
+                            
+                            // Backpressure: wait if browser has buffered > 4MB to prevent connection flood (ping timeouts)
+                            while (ws.bufferedAmount > 4 * 1024 * 1024) {
+                                await new Promise(r => setTimeout(r, 50));
+                                if (ws.readyState !== WebSocket.OPEN) break;
+                            }
+                            
+                            if (ws.readyState !== WebSocket.OPEN) break;
+                            
+                            const chunk = file.slice(offset, offset + chunkSize);
+                            // We wait for the chunk to be read as ArrayBuffer, then send it via ws
+                            const buffer = await chunk.arrayBuffer();
+                            ws.send(buffer);
+                            offset += chunk.size;
+                            
+                            if (options.onProgress) {
+                                // Maps exactly to 0-50% progress range for client->server part
+                                options.onProgress(Math.round((offset / file.size) * 50));
+                            }
+                        }
+
+                        // Send End of File
+                        if (ws.readyState === WebSocket.OPEN) {
+                            ws.send(JSON.stringify({ type: "eof" }));
+                        }
+                    } else if (msg.status === "success" || msg.status === "processing") {
+                        // 3. Backend fully received the file, returning ok
+                        resolve({ status: "processing", upload_id: options.uploadId });
+                    } else if (msg.type === "error") {
+                        reject(new Error(msg.message || "WebSocket Error"));
+                    }
+                } catch(e) {
+                    console.error("WS Parse error", e);
+                }
+            };
+
+            ws.onerror = () => {
+                reject(new Error("WebSocket upload failed for " + file.name));
+            };
+
+            ws.onclose = (e) => {
+                if (e.code !== 1000) {
+                    reject(new Error(`WebSocket closed early (Code: ${e.code}) for file: ${file.name}`));
+                }
+            };
         });
     },
 
@@ -111,6 +152,7 @@ export const driveApi = {
 
     async updateFile(fileId: string, data: {
         name?: string;
+        folder_id?: string | null;
         access_type?: AccessType;
         allowed_role_ids?: string[];
     }) {

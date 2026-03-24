@@ -1,62 +1,81 @@
 const BASE_URL = import.meta.env.VITE_API_URL;
 
+const MAX_RETRIES = 2;
+const RETRY_DELAY_MS = 1000;
+
+async function _fetch(
+    url: string,
+    options: RequestInit = {},
+    retries = MAX_RETRIES,
+): Promise<Response> {
+    const token = localStorage.getItem("token");
+
+    const headers: Record<string, string> = {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(options.headers as Record<string, string> || {}),
+    };
+
+    const res = await fetch(BASE_URL + url, {
+        ...options,
+        headers,
+        credentials: "include",
+    });
+
+    // Auto-redirect on 401 (unauthorized / expired token)
+    // Skip for auth-related endpoints to prevent infinite redirect loops
+    if (res.status === 401 && !url.includes("/Auth/")) {
+        localStorage.removeItem("token");
+        window.location.href = "/login";
+        throw new Error("Unauthorized");
+    }
+
+    // Auto-retry on server errors (5xx)
+    if (res.status >= 500 && retries > 0) {
+        await new Promise((r) => setTimeout(r, RETRY_DELAY_MS));
+        return _fetch(url, options, retries - 1);
+    }
+
+    return res;
+}
+
 export const api = {
-    async post(url: string, body?: any, customHeaders: Record<string, string> = {}) {
+    async post(url: string, body?: any, customHeaders: Record<string, string> = {}, signal?: AbortSignal) {
         const isFormData = body instanceof FormData;
 
-        const token = localStorage.getItem("token");
-
-        return fetch(BASE_URL + url, {
+        return _fetch(url, {
             method: "POST",
             headers: {
-                ...(token ? { Authorization: `Bearer ${token}` } : {}),
                 ...(isFormData ? {} : { "Content-Type": "application/json" }),
                 ...customHeaders,
             },
             body: isFormData ? body : body ? JSON.stringify(body) : undefined,
-            credentials: "include",
+            signal,
         });
     },
 
-    async get(url: string) {
-        const token = localStorage.getItem("token");
-        return fetch(BASE_URL + url, {
-            headers: {
-                ...(token ? { Authorization: `Bearer ${token}` } : {}),
-            },
-            credentials: "include",
-        });
+    async get(url: string, signal?: AbortSignal) {
+        return _fetch(url, { signal });
     },
 
-    async patch(url: string, body?: any, customHeaders: Record<string, string> = {}) {
-        const token = localStorage.getItem("token");
-        return fetch(BASE_URL + url, {
+    async patch(url: string, body?: any, customHeaders: Record<string, string> = {}, signal?: AbortSignal) {
+        return _fetch(url, {
             method: "PATCH",
             headers: {
-                ...(token ? { Authorization: `Bearer ${token}` } : {}),
                 "Content-Type": "application/json",
                 ...customHeaders,
             },
             body: body ? JSON.stringify(body) : undefined,
-            credentials: "include",
+            signal,
         });
     },
 
-    async delete(url: string) {
-        const token = localStorage.getItem("token");
-        return fetch(BASE_URL + url, {
+    async delete(url: string, signal?: AbortSignal) {
+        return _fetch(url, {
             method: "DELETE",
-            headers: {
-                ...(token ? { Authorization: `Bearer ${token}` } : {}),
-            },
-            credentials: "include",
+            signal,
         });
     },
 };
-
-
-
-
 
 
 
