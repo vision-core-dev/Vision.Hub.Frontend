@@ -20,6 +20,7 @@ function getFileIcon(name: string): string {
     if (["pdf", "doc", "docx"].includes(ext)) return "📄";
     if (["xls", "xlsx", "csv"].includes(ext)) return "📊";
     if (["mp4", "webm", "mov"].includes(ext)) return "🎬";
+    if (["mp3", "m4a", "wav", "aac"].includes(ext)) return "🎵";
     return "📎";
 }
 

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { X, Download, FileText, AlertCircle, ExternalLink } from "lucide-react";
+import { X, Download, FileText, AlertCircle, ExternalLink, Music } from "lucide-react";
 import { Button } from "@/shared/ui/buttons/button";
 import { VideoPlayer } from "@/shared/ui/base/video-player/video-player";
 import { Dialog, DialogTrigger, Modal, ModalOverlay } from "@/shared/components/modals/modal";
@@ -17,23 +17,22 @@ interface FilePreviewModalProps {
     onClose: () => void;
 }
 
-/**
- * Determines the preview type based on file extension
- */
-const getPreviewType = (fileName: string, typeProp?: string): "image" | "document" | "video" | "iframe" | "unsupported" => {
+const getPreviewType = (url: string, name: string, typeProp?: string): "image" | "document" | "video" | "audio" | "iframe" | "unsupported" => {
     // Check for direct embeddable links
     if (
-        fileName.includes("docs.google.com") ||
-        fileName.includes("sheets.google.com") ||
-        fileName.includes("slides.google.com") ||
-        fileName.includes("drive.google.com") ||
-        fileName.includes("figma.com")
+        url.includes("docs.google.com") ||
+        url.includes("sheets.google.com") ||
+        url.includes("slides.google.com") ||
+        url.includes("drive.google.com") ||
+        url.includes("figma.com")
     ) {
         return "iframe";
     }
 
-    const urlWithoutQuery = fileName.split("?")[0];
-    const ext = urlWithoutQuery.split(".").pop()?.toLowerCase() || "";
+    const urlWithoutQuery = url.split("?")[0];
+    const extFromUrl = urlWithoutQuery.includes(".") ? urlWithoutQuery.split(".").pop()?.toLowerCase() || "" : "";
+    const extFromName = name.includes(".") ? name.split(".").pop()?.toLowerCase() || "" : "";
+    const ext = extFromName || extFromUrl;
 
     // Image types
     if (["jpg", "jpeg", "png", "gif", "webp", "svg", "bmp"].includes(ext)) {
@@ -48,6 +47,11 @@ const getPreviewType = (fileName: string, typeProp?: string): "image" | "documen
     // Video types
     if (["mp4", "webm", "ogg", "mov"].includes(ext)) {
         return "video";
+    }
+
+    // Audio types
+    if (["mp3", "m4a", "wav", "aac"].includes(ext)) {
+        return "audio";
     }
 
     // Any other external link -> try to iframe
@@ -70,7 +74,7 @@ export const FilePreviewModal: React.FC<FilePreviewModalProps> = ({
     onClose,
 }) => {
     const [imageError, setImageError] = useState(false);
-    const previewType = getPreviewType(url, type);
+    const previewType = getPreviewType(url, name, type);
 
     const handleDownload = () => {
         const link = document.createElement("a");
@@ -160,6 +164,23 @@ export const FilePreviewModal: React.FC<FilePreviewModalProps> = ({
                                             autoPlay
                                             size="lg"
                                         />
+                                    </div>
+                                )}
+
+                                {/* Audio Preview */}
+                                {previewType === "audio" && (
+                                    <div className="flex flex-col items-center justify-center h-full gap-6">
+                                        <div className="p-8 rounded-full bg-gray-200 dark:bg-gray-700 shadow-sm">
+                                            <Music size={64} className="text-gray-400 dark:text-gray-500" />
+                                        </div>
+                                        <audio
+                                            controls
+                                            src={url}
+                                            className="w-full max-w-md"
+                                            autoPlay
+                                        >
+                                            Ваш браузер не підтримує аудіо елемент.
+                                        </audio>
                                     </div>
                                 )}
 
