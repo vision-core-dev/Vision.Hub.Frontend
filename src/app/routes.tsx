@@ -14,6 +14,7 @@ const OfferAgreementPage = lazy(() => import("@/features/auth/OfferAgreementPage
 const DashboardPage = lazy(() => import("@/features/dashboard/Dashboard"));
 const UsersListPage = lazy(() => import("@/features/users/UsersListPage"));
 const UserDetailsPage = lazy(() => import("@/features/users/UserDetails/UserDetailsPage"));
+const RolesPage = lazy(() => import("@/features/users/Roles/RolesPage"));
 const UnifiedCalendarPage = lazy(() => import("@/features/events/UnifiedCalendarPage/UnifiedCalendarPage"));
 const EventDetailRouter = lazy(() => import("@/features/events/EventDetails/EventDetailRouter"));
 const CreateEventPage = lazy(() => import("@/features/events/CreateEventPage"));
@@ -78,6 +79,7 @@ export function AppRoutes() {
                         <Route path="users">
                             <Route index element={<Navigate to="list" replace />} />
                             <Route path="list" element={<UsersListPage />} />
+                            <Route path="roles" element={<RolesPage />} />
                             <Route path="u/:id" element={<UserDetailsPage />} />
                         </Route>
 
