@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Tabs } from "@/shared/components/tabs/tabs";
 import { Breadcrumbs } from "@/shared/components/breadcrumbs/breadcrumbs.tsx";
-import { HomeLine } from "@untitledui/icons";
+import { HomeLine, UploadCloud01 } from "@untitledui/icons";
 import DriveToolbar from "./DriveToolbar";
 import DriveGrid from "./DriveGrid";
 import TaskDisk from "./TaskDisk";
@@ -22,6 +22,43 @@ export default function DrivePage() {
     const [loading, setLoading] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [uploads, setUploads] = useState<UploadProgress[]>([]);
+    
+    // Drag & Drop State
+    const [isDragging, setIsDragging] = useState(false);
+    const dragCounter = useRef(0);
+
+    const handleDragEnter = (e: React.DragEvent) => {
+        e.preventDefault();
+        dragCounter.current += 1;
+        if (e.dataTransfer.types && e.dataTransfer.types.includes("Files")) {
+            setIsDragging(true);
+        }
+    };
+
+    const handleDragLeave = (e: React.DragEvent) => {
+        e.preventDefault();
+        dragCounter.current -= 1;
+        if (dragCounter.current === 0) {
+            setIsDragging(false);
+        }
+    };
+
+    const handleDragOver = (e: React.DragEvent) => {
+        e.preventDefault(); // needed to allow drop
+    };
+
+    const handleDrop = (e: React.DragEvent) => {
+        e.preventDefault();
+        dragCounter.current = 0;
+        setIsDragging(false);
+        
+        if (activeTab !== "drive") return;
+
+        const droppedFiles = Array.from(e.dataTransfer.files);
+        if (droppedFiles.length > 0) {
+            handleUploadFiles(droppedFiles, "public", []);
+        }
+    };
 
     useEffect(() => {
         const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -96,6 +133,63 @@ export default function DrivePage() {
         ));
     };
 
+    const processUpload = async (upload: UploadProgress) => {
+        updateUploadProgress(upload.id, 0, "uploading");
+        
+        let pollingActive = true;
+        const streamingId = upload.serverStreamingId!;
+
+        try {
+            // Phase 1: Upload to Server (Green)
+            const res = await driveApi.uploadFile(upload.file, {
+                folderId: upload.folderId !== undefined ? upload.folderId : currentFolderId,
+                accessType: upload.accessType || "private",
+                allowedRoleIds: upload.allowedRoleIds || [],
+                uploadId: streamingId,
+                onProgress: (percent) => {
+                    if (!pollingActive) return;
+                    updateUploadProgress(upload.id, percent, "uploading");
+                },
+            });
+
+            // Phase 2: Stream from Server to Bunny (Blue)
+            if (res && res.status === "processing") {
+                updateUploadProgress(upload.id, 0, "streaming");
+                await new Promise<void>((resolve, reject) => {
+                    const poll = setInterval(async () => {
+                        if (!pollingActive) {
+                            clearInterval(poll);
+                            reject(new Error("Upload cancelled"));
+                            return;
+                        }
+                        try {
+                            const statusData = await driveApi.getUploadStatus(streamingId);
+                            if (!pollingActive) return;
+                            
+                            if (statusData.status === "streaming") {
+                                updateUploadProgress(upload.id, statusData.progress, "streaming");
+                            } else {
+                                clearInterval(poll);
+                                resolve();
+                            }
+                        } catch (e) {
+                            clearInterval(poll);
+                            reject(e);
+                        }
+                    }, 1000);
+                });
+            }
+
+            // Phase 3: Finished
+            pollingActive = false;
+            updateUploadProgress(upload.id, 100, "completed");
+            setTimeout(() => loadDrive(upload.folderId !== undefined ? upload.folderId : currentFolderId), 500); 
+        } catch (err: any) {
+            pollingActive = false;
+            updateUploadProgress(upload.id, 0, "error", err.message || "Upload failed");
+        }
+    };
+
     const handleUploadFiles = async (
         filesToUpload: File[],
         accessType: AccessType,
@@ -106,66 +200,32 @@ export default function DrivePage() {
             file: file,
             progress: 0,
             status: "pending" as const,
-            serverStreamingId: crypto.randomUUID()
+            serverStreamingId: crypto.randomUUID(),
+            accessType,
+            allowedRoleIds,
+            folderId: currentFolderId
         }));
         
         setUploads(prev => [...prev, ...newUploads]);
 
-        newUploads.forEach(async (upload) => {
-            updateUploadProgress(upload.id, 0, "uploading");
+        newUploads.forEach(processUpload);
+    };
+
+    const handleRetryUpload = (uploadId: string) => {
+        setUploads(prev => {
+            const upload = prev.find(u => u.id === uploadId);
+            if (!upload) return prev;
             
-            let pollingActive = true;
-            const streamingId = upload.serverStreamingId!;
-
-            try {
-                // Phase 1: Upload to Server (Green)
-                const res = await driveApi.uploadFile(upload.file, {
-                    folderId: currentFolderId,
-                    accessType,
-                    allowedRoleIds,
-                    uploadId: streamingId,
-                    onProgress: (percent) => {
-                        if (!pollingActive) return;
-                        updateUploadProgress(upload.id, percent, "uploading");
-                    },
-                });
-
-                // Phase 2: Stream from Server to Bunny (Blue)
-                if (res && res.status === "processing") {
-                    updateUploadProgress(upload.id, 0, "streaming");
-                    await new Promise<void>((resolve, reject) => {
-                        const poll = setInterval(async () => {
-                            if (!pollingActive) {
-                                clearInterval(poll);
-                                reject(new Error("Upload cancelled"));
-                                return;
-                            }
-                            try {
-                                const statusData = await driveApi.getUploadStatus(streamingId);
-                                if (!pollingActive) return;
-                                
-                                if (statusData.status === "streaming") {
-                                    updateUploadProgress(upload.id, statusData.progress, "streaming");
-                                } else {
-                                    clearInterval(poll);
-                                    resolve();
-                                }
-                            } catch (e) {
-                                clearInterval(poll);
-                                reject(e);
-                            }
-                        }, 1000);
-                    });
-                }
-
-                // Phase 3: Finished
-                pollingActive = false;
-                updateUploadProgress(upload.id, 100, "completed");
-                setTimeout(() => loadDrive(currentFolderId), 500); 
-            } catch (err: any) {
-                pollingActive = false;
-                updateUploadProgress(upload.id, 0, "error", err.message || "Upload failed");
-            }
+            const retryUpload: UploadProgress = {
+                ...upload,
+                status: "pending",
+                progress: 0,
+                error: undefined,
+                serverStreamingId: crypto.randomUUID()
+            };
+            
+            processUpload(retryUpload);
+            return prev.map(u => u.id === uploadId ? retryUpload : u);
         });
     };
 
@@ -183,7 +243,24 @@ export default function DrivePage() {
     ];
 
     return (
-        <div className="flex flex-col gap-4 p-6">
+        <div 
+            className="flex flex-col gap-4 p-6 relative min-h-full flex-1"
+            onDragEnter={handleDragEnter}
+            onDragLeave={handleDragLeave}
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
+        >
+            {/* Drag & Drop Overlay */}
+            {isDragging && activeTab === "drive" && (
+                <div className="absolute inset-0 z-50 flex items-center justify-center bg-green-50/90 rounded-xl border-2 border-dashed border-green-400 m-4 pointer-events-none">
+                    <div className="flex flex-col items-center text-green-600">
+                        <UploadCloud01 className="w-16 h-16 mb-4 animate-bounce" />
+                        <h2 className="text-2xl font-bold">Відпустіть файли для завантаження</h2>
+                        <p className="text-green-500 mt-2">Файли будуть збережені у поточну папку</p>
+                    </div>
+                </div>
+            )}
+
             {activeTab === "drive" && (
                 <div className="flex flex-col gap-8">
                     <Breadcrumbs type="button" divider="slash" maxVisibleItems={6}>
@@ -238,6 +315,7 @@ export default function DrivePage() {
                 <UploadProgressPanel
                     uploads={uploads}
                     onClear={clearFinishedUploads}
+                    onRetry={handleRetryUpload}
                 />
             )}
         </div>

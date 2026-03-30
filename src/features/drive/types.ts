@@ -51,4 +51,7 @@ export interface UploadProgress {
     error?: string;
     serverStreamingId?: string;
     result?: DriveFile;
+    accessType?: AccessType;
+    allowedRoleIds?: string[];
+    folderId?: string | null;
 }

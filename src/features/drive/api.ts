@@ -42,7 +42,7 @@ export const driveApi = {
      * Returns a promise that resolves with the server response
      * and calls onProgress with 0-50 percent (client to server).
      */
-    uploadFile(
+    async uploadFile(
         file: File,
         options: {
             folderId?: string | null;
@@ -53,95 +53,115 @@ export const driveApi = {
             signal?: AbortSignal;
         } = {}
     ): Promise<any> {
-        return new Promise((resolve, reject) => {
-            let baseUrl = import.meta.env.VITE_API_URL || "";
-            // Replace http/https with ws/wss
-            const wsUrl = baseUrl.replace(/^http/, "ws") + "/v1/Hub/Drive/Files/UploadWS";
-            
-            const token = localStorage.getItem("token");
-            if (!token) return reject(new Error("No token available"));
+        let attempts = 0;
+        const maxAttempts = 10;
 
-            const ws = new WebSocket(wsUrl);
-
-            if (options.signal) {
-                options.signal.addEventListener("abort", () => {
-                    if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) {
-                        ws.close(1000, "Aborted");
-                    }
-                    reject(new Error("Upload cancelled"));
-                });
-            }
-
-            ws.onopen = () => {
-                // 1. Send initialization config
-                ws.send(JSON.stringify({
-                    token,
-                    filename: file.name,
-                    content_type: file.type || "application/octet-stream",
-                    folder_id: options.folderId || null,
-                    access_type: options.accessType || "public",
-                    allowed_role_ids: options.allowedRoleIds || [],
-                    upload_id: options.uploadId,
-                }));
-            };
-
-            ws.onmessage = async (event) => {
-                try {
-                    const msg = JSON.parse(event.data);
+        while (attempts < maxAttempts) {
+            try {
+                return await new Promise((resolve, reject) => {
+                    let baseUrl = import.meta.env.VITE_API_URL || "";
+                    // Replace http/https with ws/wss
+                    const wsUrl = baseUrl.replace(/^http/, "ws") + "/v1/Hub/Drive/Files/UploadWS";
                     
-                    if (msg.status === "ready") {
-                        // 2. Start sending chunks
-                        const chunkSize = 1024 * 1024; // 1MB chunks
-                        let offset = 0;
+                    const token = localStorage.getItem("token");
+                    if (!token) return reject(new Error("No token available"));
 
-                        while (offset < file.size) {
-                            if (ws.readyState !== WebSocket.OPEN) break;
-                            
-                            // Backpressure: wait if browser has buffered > 4MB to prevent connection flood (ping timeouts)
-                            while (ws.bufferedAmount > 4 * 1024 * 1024) {
-                                await new Promise(r => setTimeout(r, 50));
-                                if (ws.readyState !== WebSocket.OPEN) break;
-                            }
-                            
-                            if (ws.readyState !== WebSocket.OPEN) break;
-                            
-                            const chunk = file.slice(offset, offset + chunkSize);
-                            // We wait for the chunk to be read as ArrayBuffer, then send it via ws
-                            const buffer = await chunk.arrayBuffer();
-                            ws.send(buffer);
-                            offset += chunk.size;
-                            
-                            if (options.onProgress) {
-                                // Maps exactly to 0-50% progress range for client->server part
-                                options.onProgress(Math.round((offset / file.size) * 50));
-                            }
-                        }
+                    const ws = new WebSocket(wsUrl);
 
-                        // Send End of File
-                        if (ws.readyState === WebSocket.OPEN) {
-                            ws.send(JSON.stringify({ type: "eof" }));
-                        }
-                    } else if (msg.status === "success" || msg.status === "processing") {
-                        // 3. Backend fully received the file, returning ok
-                        resolve({ status: "processing", upload_id: options.uploadId });
-                    } else if (msg.type === "error") {
-                        reject(new Error(msg.message || "WebSocket Error"));
+                    if (options.signal) {
+                        options.signal.addEventListener("abort", () => {
+                            if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) {
+                                ws.close(1000, "Aborted");
+                            }
+                            reject(new Error("Upload cancelled"));
+                        });
                     }
-                } catch(e) {
-                    console.error("WS Parse error", e);
-                }
-            };
 
-            ws.onerror = () => {
-                reject(new Error("WebSocket upload failed for " + file.name));
-            };
+                    ws.onopen = () => {
+                        // 1. Send initialization config
+                        ws.send(JSON.stringify({
+                            token,
+                            filename: file.name,
+                            content_type: file.type || "application/octet-stream",
+                            folder_id: options.folderId || null,
+                            access_type: options.accessType || "public",
+                            allowed_role_ids: options.allowedRoleIds || [],
+                            upload_id: options.uploadId,
+                        }));
+                    };
 
-            ws.onclose = (e) => {
-                if (e.code !== 1000) {
-                    reject(new Error(`WebSocket closed early (Code: ${e.code}) for file: ${file.name}`));
+                    ws.onmessage = async (event) => {
+                        try {
+                            const msg = JSON.parse(event.data);
+                            
+                            if (msg.status === "ready") {
+                                // 2. Start sending chunks
+                                const chunkSize = 1024 * 1024; // 1MB chunks
+                                let offset = msg.offset || 0; // Resume from backend's offset
+
+                                while (offset < file.size) {
+                                    if (ws.readyState !== WebSocket.OPEN) break;
+                                    
+                                    // Backpressure: wait if browser has buffered > 4MB to prevent connection flood (ping timeouts)
+                                    while (ws.bufferedAmount > 4 * 1024 * 1024) {
+                                        await new Promise(r => setTimeout(r, 50));
+                                        if (ws.readyState !== WebSocket.OPEN) break;
+                                    }
+                                    
+                                    if (ws.readyState !== WebSocket.OPEN) break;
+                                    
+                                    const chunk = file.slice(offset, offset + chunkSize);
+                                    // We wait for the chunk to be read as ArrayBuffer, then send it via ws
+                                    const buffer = await chunk.arrayBuffer();
+                                    ws.send(buffer);
+                                    offset += chunk.size;
+                                    
+                                    if (options.onProgress) {
+                                        // Maps exactly to 0-50% progress range for client->server part
+                                        options.onProgress(Math.round((offset / file.size) * 50));
+                                    }
+                                }
+
+                                // Send End of File
+                                if (ws.readyState === WebSocket.OPEN) {
+                                    ws.send(JSON.stringify({ type: "eof" }));
+                                }
+                            } else if (msg.status === "success" || msg.status === "processing") {
+                                // 3. Backend fully received the file, returning ok
+                                resolve({ status: "processing", upload_id: options.uploadId });
+                            } else if (msg.type === "error") {
+                                reject(new Error(msg.message || "WebSocket Error"));
+                            }
+                        } catch(e) {
+                            console.error("WS Parse error", e);
+                        }
+                    };
+
+                    ws.onerror = () => {
+                        reject(new Error("network_error"));
+                    };
+
+                    ws.onclose = (e) => {
+                        if (e.code !== 1000) {
+                            reject(new Error("network_error"));
+                        }
+                    };
+                });
+            } catch (err: any) {
+                if (options.signal?.aborted || err.message === "Upload cancelled") {
+                    throw err;
                 }
-            };
-        });
+                if (err.message !== "network_error") {
+                    throw err; // Non-network error, don't retry
+                }
+                attempts++;
+                if (attempts >= maxAttempts) {
+                    throw new Error("WebSocket upload failed for " + file.name + " after " + maxAttempts + " attempts");
+                }
+                console.warn(`Connection dropped for ${file.name}. Reconnecting in 2 seconds... (Attempt ${attempts}/${maxAttempts})`);
+                await new Promise(r => setTimeout(r, 2000));
+            }
+        }
     },
 
     async deleteFile(fileId: string) {

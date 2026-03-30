@@ -1,13 +1,14 @@
 import { useState } from "react";
-import { ChevronDown, ChevronUp, X, Check, AlertCircle, Loader2 } from "lucide-react";
+import { ChevronDown, ChevronUp, X, Check, AlertCircle, Loader2, RefreshCw } from "lucide-react";
 import type { UploadProgress } from "./types";
 
 interface UploadProgressPanelProps {
     uploads: UploadProgress[];
     onClear: () => void;
+    onRetry?: (uploadId: string) => void;
 }
 
-export default function UploadProgressPanel({ uploads, onClear }: UploadProgressPanelProps) {
+export default function UploadProgressPanel({ uploads, onClear, onRetry }: UploadProgressPanelProps) {
     const [collapsed, setCollapsed] = useState(false);
 
     const activeUploads = uploads.filter(u => u.status === "uploading" || u.status === "pending" || u.status === "streaming");
@@ -75,7 +76,18 @@ export default function UploadProgressPanel({ uploads, onClear }: UploadProgress
                                     <Check size={14} className="text-green-500 shrink-0" />
                                 )}
                                 {upload.status === "error" && (
-                                    <AlertCircle size={14} className="text-red-500 shrink-0" />
+                                    <div className="flex items-center gap-2 shrink-0">
+                                        {onRetry && (
+                                            <button 
+                                                onClick={() => onRetry(upload.id)}
+                                                className="p-1 text-gray-400 hover:text-blue-500 hover:bg-blue-50 bg-white rounded transition-colors"
+                                                title="Повторити завантаження"
+                                            >
+                                                <RefreshCw size={14} />
+                                            </button>
+                                        )}
+                                        <AlertCircle size={14} className="text-red-500" />
+                                    </div>
                                 )}
                                 {upload.status === "uploading" && (
                                     <span className="text-xs text-green-500 font-medium shrink-0">
