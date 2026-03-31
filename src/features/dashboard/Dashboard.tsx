@@ -405,7 +405,7 @@ const SubmitBirthdayModal = ({ isOpen, setIsOpen }: CreateUserModalProps) => {
         if (value.length < 4) return value;
 
         const n = Number(value);
-        if (n < 1990) return year;
+        if (n < 1970) return year;
 
         const currYear = new Date().getFullYear();
 
