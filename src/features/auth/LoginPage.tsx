@@ -7,6 +7,7 @@ import { getErrorText } from "@/shared/types/Messages.ts";
 import { Input } from "@/shared/ui/input/input.tsx";
 import { Button } from "@/shared/ui/buttons/button.tsx";
 import { startOAuth } from "@/core/auth/oauth.ts";
+import { GoogleIcon, DiscordIcon, TelegramIcon, RobloxIcon } from "@/shared/assets/icons/oauth-icons";
 
 const LoginPage = () => {
     const [email, setEmail] = useState("");
@@ -96,28 +97,22 @@ function getTelegramLoginUrl(mode: string): string {
     return `https://oauth.telegram.org/auth?bot_id=${botUsername}&origin=${encodeURIComponent(window.location.origin)}&request_access=write&return_to=${encodeURIComponent(redirectUri)}?state=${encodeURIComponent(JSON.stringify({ provider: "telegram", mode }))}`;
 }
 
-const providerColors: Record<string, string> = {
-    google: "bg-white text-gray-700 border border-border-primary hover:bg-gray-50",
-    discord: "bg-[#5865F2] text-white hover:bg-[#4752C4]",
-    telegram: "bg-[#2AABEE] text-white hover:bg-[#229ED9]",
-    roblox: "bg-[#E2231A] text-white hover:bg-[#C81E17]",
-};
-
-const providerIcons: Record<string, string> = {
-    google: "G",
-    discord: "D",
-    telegram: "T",
-    roblox: "R",
+const providerConfig: Record<string, { colors: string; Icon: typeof GoogleIcon }> = {
+    google: { colors: "bg-white text-gray-700 border border-border-primary hover:bg-gray-50", Icon: GoogleIcon },
+    discord: { colors: "bg-[#5865F2] text-white hover:bg-[#4752C4]", Icon: DiscordIcon },
+    telegram: { colors: "bg-[#2AABEE] text-white hover:bg-[#229ED9]", Icon: TelegramIcon },
+    roblox: { colors: "bg-[#E2231A] text-white hover:bg-[#C81E17]", Icon: RobloxIcon },
 };
 
 function OAuthButton({ provider, label, onClick }: { provider: string; label: string; onClick: () => void }) {
+    const { colors, Icon } = providerConfig[provider];
     return (
         <button
             type="button"
             onClick={onClick}
-            className={`w-full flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors cursor-pointer ${providerColors[provider]}`}
+            className={`w-full flex items-center justify-center gap-2.5 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors cursor-pointer ${colors}`}
         >
-            <span className="font-bold text-base w-5 text-center">{providerIcons[provider]}</span>
+            <Icon className="size-5 shrink-0" />
             Увійти через {label}
         </button>
     );
