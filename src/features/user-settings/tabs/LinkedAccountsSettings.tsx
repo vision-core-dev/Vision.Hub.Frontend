@@ -58,26 +58,22 @@ export default function LinkedAccountsSettings({ user }: Props) {
 
             {providers.map((p) => {
                 const isLinked = !!user[p.idField];
-                const providerId = user[p.idField] as string | null;
                 const username = user[p.usernameField] as string | null;
 
                 return (
                     <div
                         key={p.key}
-                        className="flex items-center justify-between gap-4 rounded-xl border border-border-secondary p-4"
+                        className="flex items-center justify-between gap-3 rounded-xl border border-border-secondary p-4"
                     >
-                        <div className="flex items-center gap-3">
-                            <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-lg ${p.color}`}>
+                        <div className="flex items-center gap-3 min-w-0">
+                            <div className={`w-10 h-10 shrink-0 rounded-lg flex items-center justify-center text-white font-bold text-lg ${p.color}`}>
                                 <span className={p.key === "google" ? "text-gray-700" : ""}>{p.icon}</span>
                             </div>
-                            <div className="flex flex-col">
+                            <div className="flex flex-col min-w-0">
                                 <span className="text-fg-primary font-medium">{p.label}</span>
                                 {isLinked ? (
-                                    <span className="text-fg-tertiary text-sm">
-                                        {username || providerId}
-                                        {providerId && username && (
-                                            <span className="text-fg-quaternary ml-1">({providerId})</span>
-                                        )}
+                                    <span className="text-fg-tertiary text-sm truncate">
+                                        {username}
                                     </span>
                                 ) : (
                                     <span className="text-fg-quaternary text-sm">Не привʼязано</span>
