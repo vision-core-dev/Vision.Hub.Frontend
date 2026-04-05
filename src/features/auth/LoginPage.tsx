@@ -92,9 +92,9 @@ const LoginPage = () => {
 };
 
 function getTelegramLoginUrl(mode: string): string {
-    const botUsername = import.meta.env.VITE_TELEGRAM_BOT_USERNAME ?? "";
-    const redirectUri = `${window.location.origin}/auth/callback`;
-    return `https://oauth.telegram.org/auth?bot_id=${botUsername}&origin=${encodeURIComponent(window.location.origin)}&request_access=write&return_to=${encodeURIComponent(redirectUri)}?state=${encodeURIComponent(JSON.stringify({ provider: "telegram", mode }))}`;
+    const botId = import.meta.env.VITE_TELEGRAM_BOT_ID ?? "";
+    const returnTo = `${window.location.origin}/auth/callback?state=${encodeURIComponent(JSON.stringify({ provider: "telegram", mode }))}`;
+    return `https://oauth.telegram.org/auth?bot_id=${botId}&origin=${encodeURIComponent(window.location.origin)}&request_access=write&return_to=${encodeURIComponent(returnTo)}`;
 }
 
 const providerConfig: Record<string, { colors: string; Icon: typeof GoogleIcon }> = {

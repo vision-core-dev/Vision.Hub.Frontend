@@ -12,10 +12,9 @@ export default function OAuthCallbackPage() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const code = searchParams.get("code");
         const stateRaw = searchParams.get("state");
 
-        if (!code || !stateRaw) {
+        if (!stateRaw) {
             setError("Невірні параметри авторизації");
             return;
         }
@@ -29,36 +28,84 @@ export default function OAuthCallbackPage() {
         }
 
         const { provider, mode } = state;
+
+        // Telegram returns data via #tgAuthResult hash fragment
+        if (provider === "telegram") {
+            processTelegram(mode);
+            return;
+        }
+
+        // Other providers return ?code=
+        const code = searchParams.get("code");
+        if (!code) {
+            setError("Невірні параметри авторизації");
+            return;
+        }
+
+        processOAuth(provider, mode, code);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+    const processOAuth = async (provider: string, mode: string, code: string) => {
         const redirect_uri = getRedirectUri();
+        try {
+            const endpoint = mode === "link"
+                ? `/v1/Hub/UserMe/LinkedAccounts/Link/${capitalize(provider)}`
+                : `/v1/Hub/Auth/Login/${capitalize(provider)}`;
 
-        const process = async () => {
-            try {
-                const endpoint = mode === "link"
-                    ? `/v1/Hub/UserMe/LinkedAccounts/Link/${capitalize(provider)}`
-                    : `/v1/Hub/Auth/Login/${capitalize(provider)}`;
+            const res = await api.post(endpoint, { code, redirect_uri });
+            const data = await res.json();
 
-                const res = await api.post(endpoint, { code, redirect_uri });
-                const data = await res.json();
-
-                if (!res.ok) {
-                    setError(data.detail || "Помилка авторизації");
-                    return;
-                }
-
-                if (mode === "link") {
-                    navigate("/my/settings?tab=accounts", { replace: true });
-                } else {
-                    login(data.token);
-                    navigate("/dashboard", { replace: true });
-                    window.location.reload();
-                }
-            } catch {
-                setError("Помилка підключення до сервера");
+            if (!res.ok) {
+                setError(data.detail || "Помилка авторизації");
+                return;
             }
-        };
 
-        process();
-    }, [searchParams, navigate, login]);
+            handleSuccess(mode, data.token);
+        } catch {
+            setError("Помилка підключення до сервера");
+        }
+    };
+
+    const processTelegram = async (mode: string) => {
+        // Telegram puts auth result in URL hash: #tgAuthResult=BASE64
+        const hash = window.location.hash;
+        const match = hash.match(/tgAuthResult=([^&]+)/);
+
+        if (!match) {
+            setError("Telegram не повернув дані авторизації");
+            return;
+        }
+
+        try {
+            const decoded = JSON.parse(atob(match[1]));
+
+            const endpoint = mode === "link"
+                ? `/v1/Hub/UserMe/LinkedAccounts/Link/Telegram`
+                : `/v1/Hub/Auth/Login/Telegram`;
+
+            const res = await api.post(endpoint, decoded);
+            const data = await res.json();
+
+            if (!res.ok) {
+                setError(data.detail || "Помилка авторизації Telegram");
+                return;
+            }
+
+            handleSuccess(mode, data.token);
+        } catch {
+            setError("Помилка обробки даних Telegram");
+        }
+    };
+
+    const handleSuccess = (mode: string, token?: string) => {
+        if (mode === "link") {
+            navigate("/my/settings?tab=accounts", { replace: true });
+        } else {
+            if (token) login(token);
+            navigate("/dashboard", { replace: true });
+            window.location.reload();
+        }
+    };
 
     if (error) {
         return (

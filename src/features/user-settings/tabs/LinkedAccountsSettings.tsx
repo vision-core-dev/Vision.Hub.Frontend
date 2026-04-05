@@ -44,10 +44,10 @@ export default function LinkedAccountsSettings({ user }: Props) {
 
     const handleLink = (provider: string) => {
         if (provider === "telegram") {
-            const botUsername = import.meta.env.VITE_TELEGRAM_BOT_USERNAME ?? "";
-            const redirectUri = `${window.location.origin}/auth/callback`;
+            const botId = import.meta.env.VITE_TELEGRAM_BOT_ID ?? "";
             const state = JSON.stringify({ provider: "telegram", mode: "link" });
-            window.location.href = `https://oauth.telegram.org/auth?bot_id=${botUsername}&origin=${encodeURIComponent(window.location.origin)}&request_access=write&return_to=${encodeURIComponent(redirectUri)}?state=${encodeURIComponent(state)}`;
+            const returnTo = `${window.location.origin}/auth/callback?state=${encodeURIComponent(state)}`;
+            window.location.href = `https://oauth.telegram.org/auth?bot_id=${botId}&origin=${encodeURIComponent(window.location.origin)}&request_access=write&return_to=${encodeURIComponent(returnTo)}`;
             return;
         }
         startOAuth(provider as "google" | "discord" | "roblox", "link");
