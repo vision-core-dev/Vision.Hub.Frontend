@@ -22,6 +22,14 @@ export interface MeUser {
     created_at: string;
     updated_at: string;
     is_active: boolean;
+    google_id: string | null;
+    google_email: string | null;
+    discord_id: string | null;
+    discord_username: string | null;
+    telegram_id: string | null;
+    telegram_username: string | null;
+    roblox_id: string | null;
+    roblox_username: string | null;
 }
 
 export interface CheckMeResponse {

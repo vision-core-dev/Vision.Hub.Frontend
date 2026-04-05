@@ -2,22 +2,22 @@ import { Tabs } from "@/shared/components/tabs/tabs.tsx";
 import { NativeSelect } from "@/shared/ui/select/select-native.tsx";
 import type { Key } from "react-aria-components";
 import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import ProfileSettings from "@/features/user-settings/tabs/ProfileSettings.tsx";
 import InterfaceSettings from "@/features/user-settings/tabs/InterfaceSettings.tsx";
+import LinkedAccountsSettings from "@/features/user-settings/tabs/LinkedAccountsSettings.tsx";
 import { useAuth } from "@/core/auth/AuthContext.tsx";
 
 const tabs = [
     { id: "profile", label: "Профіль" },
     { id: "interface", label: "Інтерфейс" },
-    // { id: "password", label: "Password" },
-    // { id: "team", label: "Team" },
-    // { id: "notifications", label: "Notifications", badge: 2 },
-    // { id: "integrations", label: "Integrations" },
-    // { id: "api", label: "API" },
+    { id: "accounts", label: "Акаунти" },
 ];
 
 export default function UserSettingsPage() {
-    const [selectedTabIndex, setSelectedTabIndex] = useState<Key>("profile");
+    const [searchParams] = useSearchParams();
+    const initialTab = searchParams.get("tab") || "profile";
+    const [selectedTabIndex, setSelectedTabIndex] = useState<Key>(initialTab);
     const { user } = useAuth();
 
     if (!user) {
@@ -30,8 +30,8 @@ export default function UserSettingsPage() {
                 return <ProfileSettings user={user} />;
             case "interface":
                 return <InterfaceSettings />;
-            // case "password":
-            //     return <PasswordSettings />;
+            case "accounts":
+                return <LinkedAccountsSettings user={user} />;
             default:
                 return null;
         }

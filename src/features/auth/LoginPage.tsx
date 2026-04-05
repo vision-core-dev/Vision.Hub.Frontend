@@ -6,6 +6,7 @@ import { Lock, Mail } from "lucide-react";
 import { getErrorText } from "@/shared/types/Messages.ts";
 import { Input } from "@/shared/ui/input/input.tsx";
 import { Button } from "@/shared/ui/buttons/button.tsx";
+import { startOAuth } from "@/core/auth/oauth.ts";
 
 const LoginPage = () => {
     const [email, setEmail] = useState("");
@@ -72,9 +73,55 @@ const LoginPage = () => {
                     Увійти
                 </Button>
             </form>
+
+            <div className="flex items-center gap-3 my-1">
+                <div className="flex-1 h-px bg-border-secondary" />
+                <span className="text-fg-quaternary text-sm">або</span>
+                <div className="flex-1 h-px bg-border-secondary" />
+            </div>
+
+            <div className="flex flex-col gap-2 w-full">
+                <OAuthButton provider="google" label="Google" onClick={() => startOAuth("google", "login")} />
+                <OAuthButton provider="discord" label="Discord" onClick={() => startOAuth("discord", "login")} />
+                <OAuthButton provider="telegram" label="Telegram" onClick={() => window.location.href = getTelegramLoginUrl("login")} />
+                <OAuthButton provider="roblox" label="Roblox" onClick={() => startOAuth("roblox", "login")} />
+            </div>
         </div>
     );
 };
+
+function getTelegramLoginUrl(mode: string): string {
+    const botUsername = import.meta.env.VITE_TELEGRAM_BOT_USERNAME ?? "";
+    const redirectUri = `${window.location.origin}/auth/callback`;
+    return `https://oauth.telegram.org/auth?bot_id=${botUsername}&origin=${encodeURIComponent(window.location.origin)}&request_access=write&return_to=${encodeURIComponent(redirectUri)}?state=${encodeURIComponent(JSON.stringify({ provider: "telegram", mode }))}`;
+}
+
+const providerColors: Record<string, string> = {
+    google: "bg-white text-gray-700 border border-border-primary hover:bg-gray-50",
+    discord: "bg-[#5865F2] text-white hover:bg-[#4752C4]",
+    telegram: "bg-[#2AABEE] text-white hover:bg-[#229ED9]",
+    roblox: "bg-[#E2231A] text-white hover:bg-[#C81E17]",
+};
+
+const providerIcons: Record<string, string> = {
+    google: "G",
+    discord: "D",
+    telegram: "T",
+    roblox: "R",
+};
+
+function OAuthButton({ provider, label, onClick }: { provider: string; label: string; onClick: () => void }) {
+    return (
+        <button
+            type="button"
+            onClick={onClick}
+            className={`w-full flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors cursor-pointer ${providerColors[provider]}`}
+        >
+            <span className="font-bold text-base w-5 text-center">{providerIcons[provider]}</span>
+            Увійти через {label}
+        </button>
+    );
+}
 
 export default LoginPage;
 

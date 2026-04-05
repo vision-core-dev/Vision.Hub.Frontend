@@ -38,6 +38,7 @@ const ChatPage = lazy(() => import("@/features/chat/Chat"));
 const NotFound = lazy(() => import("@/layouts/NotFound/NotFound"));
 const OrgStructurePage = lazy(() => import("@/features/org-structure/OrgStructurePage"));
 const JobsPage = lazy(() => import("@/features/jobs/JobsPage"));
+const OAuthCallbackPage = lazy(() => import("@/features/auth/OAuthCallbackPage"));
 
 const EventRedirect = () => {
     const { id } = useParams();
@@ -56,6 +57,7 @@ export function AppRoutes() {
             <Routes>
                 {/* PUBLIC */}
                 <Route path="/login" element={<LoginPage />} />
+                <Route path="/auth/callback" element={<OAuthCallbackPage />} />
                 <Route path="/deactivated" element={<AccountDeactivated />} />
                 <Route path="/offer-agreement" element={<OfferAgreementPage />} />
                 <Route path="/public/boards/b/:id" element={<BoardPage is_public />} />

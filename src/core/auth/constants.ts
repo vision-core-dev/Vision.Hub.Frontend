@@ -11,7 +11,7 @@ export const AUTH_GREETINGS = [
     "❄️ Тепла в серці й холодного розуму в розробці",
 ] as const;
 
-export const PUBLIC_ROUTES = ["/login", "/deactivated", "/offer-agreement"] as const;
+export const PUBLIC_ROUTES = ["/login", "/auth/callback", "/deactivated", "/offer-agreement"] as const;
 
 export const ALWAYS_ALLOWED_ROUTES = ["dashboard", "my", ""] as const;
 
