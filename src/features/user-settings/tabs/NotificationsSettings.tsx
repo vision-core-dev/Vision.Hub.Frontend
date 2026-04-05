@@ -2,6 +2,7 @@ import { useState } from "react";
 import { api } from "@/shared/utils/api";
 import type { MeUser } from "@/shared/types/AuthUser";
 import { DiscordIcon, TelegramIcon } from "@/shared/assets/icons/oauth-icons";
+import { Toggle } from "@/shared/ui/base/toggle/toggle";
 
 interface Props {
     user: MeUser;
@@ -75,44 +76,13 @@ export default function NotificationsSettings({ user }: Props) {
                     </div>
 
                     <Toggle
-                        checked={p.enabled}
-                        disabled={!p.linked || saving}
+                        size="md"
+                        isSelected={p.enabled}
+                        isDisabled={!p.linked || saving}
                         onChange={(v) => toggle(p.key, v)}
                     />
                 </div>
             ))}
         </div>
-    );
-}
-
-function Toggle({ checked, disabled, onChange }: {
-    checked: boolean;
-    disabled: boolean;
-    onChange: (value: boolean) => void;
-}) {
-    return (
-        <button
-            type="button"
-            role="switch"
-            aria-checked={checked}
-            disabled={disabled}
-            onClick={() => onChange(!checked)}
-            className={`
-                relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full
-                transition-colors duration-200 ease-in-out
-                focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand
-                ${disabled ? "opacity-40 cursor-not-allowed" : ""}
-                ${checked ? "bg-brand-solid" : "bg-quaternary"}
-            `}
-        >
-            <span
-                className={`
-                    pointer-events-none inline-block size-5 rounded-full bg-white shadow-sm
-                    ring-0 transition duration-200 ease-in-out transform
-                    ${checked ? "translate-x-5" : "translate-x-0.5"}
-                    mt-0.5
-                `}
-            />
-        </button>
     );
 }
