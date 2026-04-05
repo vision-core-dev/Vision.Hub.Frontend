@@ -22,6 +22,8 @@ export interface MeUser {
     created_at: string;
     updated_at: string;
     is_active: boolean;
+    notify_discord: boolean;
+    notify_telegram: boolean;
     google_id: string | null;
     google_email: string | null;
     discord_id: string | null;

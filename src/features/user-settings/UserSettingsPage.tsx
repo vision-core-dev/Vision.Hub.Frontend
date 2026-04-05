@@ -6,12 +6,14 @@ import { useSearchParams } from "react-router-dom";
 import ProfileSettings from "@/features/user-settings/tabs/ProfileSettings.tsx";
 import InterfaceSettings from "@/features/user-settings/tabs/InterfaceSettings.tsx";
 import LinkedAccountsSettings from "@/features/user-settings/tabs/LinkedAccountsSettings.tsx";
+import NotificationsSettings from "@/features/user-settings/tabs/NotificationsSettings.tsx";
 import { useAuth } from "@/core/auth/AuthContext.tsx";
 
 const tabs = [
     { id: "profile", label: "Профіль" },
     { id: "interface", label: "Інтерфейс" },
     { id: "accounts", label: "Акаунти" },
+    { id: "notifications", label: "Сповіщення" },
 ];
 
 export default function UserSettingsPage() {
@@ -32,6 +34,8 @@ export default function UserSettingsPage() {
                 return <InterfaceSettings />;
             case "accounts":
                 return <LinkedAccountsSettings user={user} />;
+            case "notifications":
+                return <NotificationsSettings user={user} />;
             default:
                 return null;
         }
