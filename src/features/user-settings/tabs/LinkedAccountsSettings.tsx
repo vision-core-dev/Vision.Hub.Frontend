@@ -88,17 +88,17 @@ export default function LinkedAccountsSettings({ user }: Props) {
                         {isLinked ? (
                             <Button
                                 size="sm"
-                                variant="destructive-secondary"
+                                color="secondary-destructive"
                                 isLoading={unlinkingProvider === p.key}
-                                onPress={() => handleUnlink(p.key)}
+                                onClick={() => handleUnlink(p.key)}
                             >
                                 Відвʼязати
                             </Button>
                         ) : (
                             <Button
                                 size="sm"
-                                variant="secondary"
-                                onPress={() => handleLink(p.key)}
+                                color="secondary"
+                                onClick={() => handleLink(p.key)}
                             >
                                 Привʼязати
                             </Button>
