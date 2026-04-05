@@ -38,6 +38,8 @@ const ChatPage = lazy(() => import("@/features/chat/Chat"));
 const NotFound = lazy(() => import("@/layouts/NotFound/NotFound"));
 const OrgStructurePage = lazy(() => import("@/features/org-structure/OrgStructurePage"));
 const JobsPage = lazy(() => import("@/features/jobs/JobsPage"));
+const PrivacyPage = lazy(() => import("@/features/legal/PrivacyPage"));
+const TermsPage = lazy(() => import("@/features/legal/TermsPage"));
 const OAuthCallbackPage = lazy(() => import("@/features/auth/OAuthCallbackPage"));
 
 const EventRedirect = () => {
@@ -63,6 +65,8 @@ export function AppRoutes() {
                 <Route path="/public/boards/b/:id" element={<BoardPage is_public />} />
                 <Route path="/public/boards/b/:id/t/:taskId" element={<BoardPage is_public />} />
                 <Route path="/jobs/:slug?" element={<JobsPage />} />
+                <Route path="/privacy" element={<PrivacyPage />} />
+                <Route path="/terms" element={<TermsPage />} />
 
                 {/* PROTECTED */}
                 <Route element={<ProtectedRoute />}>
