@@ -1,39 +1,26 @@
 import type { Badge } from "../UserDetailsPage.tsx";
+import { Tooltip, TooltipTrigger } from "@/shared/ui/tooltip/tooltip.tsx";
 
 interface BadgesSectionProps {
     badges: Badge[];
 }
 
 const BadgesSection = ({ badges }: BadgesSectionProps) => {
-    return badges.length > 0 && (
-        <div className="flex w-full flex-col gap-2.5">
+    if (badges.length === 0) return null;
+
+    return (
+        <div className="flex flex-wrap gap-1.5">
             {badges.map((badge) => (
-                <div key={badge.id} className="flex items-center gap-3 rounded-[10px] border border-secondary bg-secondary/30 px-3 py-2.5 transition-colors duration-150 hover:bg-secondary/50">
-                    <div className="flex h-[38px] w-[38px] items-center justify-center rounded-full border border-secondary bg-primary text-[1.4rem]">
-                        {badge.emoji ? (
-                            <span className="text-[1.4rem]">{badge.emoji}</span>
-                        ) : (
-                            <img src={badge.icon_url} alt={badge.name} className="h-[70%] w-[70%] object-contain" />
+                <Tooltip key={badge.id} title={badge.name} description={badge.description}>
+                    <TooltipTrigger className="flex h-8 w-8 items-center justify-center rounded-full border border-secondary bg-secondary/30 text-base cursor-default transition-colors hover:bg-secondary/60">
+                        {badge.emoji || (
+                            <img src={badge.icon_url} alt={badge.name} className="h-4 w-4 object-contain" />
                         )}
-                    </div>
-                    <div className="flex flex-col gap-0.5">
-                        <p className="text-[0.95rem] font-semibold text-primary">{badge.name}</p>
-                        {badge.description && (
-                            <p className="text-xs leading-tight text-tertiary">{badge.description}</p>
-                        )}
-                    </div>
-                </div>
+                    </TooltipTrigger>
+                </Tooltip>
             ))}
         </div>
-    )
-}
+    );
+};
 
 export default BadgesSection;
-
-
-
-
-
-
-
-

@@ -10,6 +10,7 @@ import ListsTab from "./tabs/ListsTab";
 import BannerTab from "./tabs/BannerTab";
 import MembersTab from "./tabs/MembersTab";
 import LoaderDots from "@/shared/ui/loader-dots/LoaderDots.tsx";
+import { CloseButton } from "@/shared/ui/buttons/close-button.tsx";
 import type {BoardDetails} from "@/features/tasks/Board/BoardPage/BoardPage.tsx";
 import GeneralTab from "@/features/tasks/Board/BoardPage/BoardSettings/tabs/GeneralTab.tsx";
 
@@ -73,7 +74,8 @@ export default function BoardSettings({ boardId, isOpen, onOpenChange }: Props) 
             <ModalOverlay isDismissable>
                 <Modal>
                     <Dialog>
-                        <div className="p-4 w-[900px] max-w-full max-h-[90vh] overflow-y-auto flex flex-col gap-4 bg-primary rounded-lg">
+                        <div className="p-4 w-[900px] max-w-full max-h-[90vh] overflow-y-auto flex flex-col gap-4 bg-primary rounded-lg relative">
+                            <CloseButton onClick={() => onOpenChange(false)} className="absolute top-4 right-4" />
 
                             {loading && (
                                 <LoaderDots />

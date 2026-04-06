@@ -71,7 +71,7 @@ export const AssigneeSelector = ({ taskId, assignees, onUpdate, isReadOnly = fal
                             initials={(u.first_name[0] || "") + (u.last_name?.[0] || "")}
                         />
                         <span className="text-xs font-medium text-gray-700 dark:text-gray-200">
-                            {u.first_name}
+                            {u.first_name}{u.active_badge_emoji ? ` ${u.active_badge_emoji}` : ""}
                         </span>
                         {!isReadOnly && (
                             <button
@@ -120,6 +120,7 @@ export const AssigneeSelector = ({ taskId, assignees, onUpdate, isReadOnly = fal
                                             src={u.avatar_url}
                                             title={`${u.first_name} ${u.last_name ?? ""}`}
                                             subtitle={u.role.name}
+                                            badgeEmoji={u.active_badge_emoji}
                                             userId={u.id}
                                             disableDropdown
                                         />

@@ -2,6 +2,7 @@ import { type ReactNode } from "react";
 import { cx } from "@/shared/utils/cx";
 import { Avatar, type AvatarProps } from "./avatar";
 import { useOnlineUsers } from "@/shared/contexts/OnlineUsersContext";
+import { Tooltip, TooltipTrigger } from "@/shared/ui/tooltip/tooltip";
 
 const styles = {
     sm: { root: "gap-2", title: "text-sm font-semibold", subtitle: "text-xs" },
@@ -14,22 +15,37 @@ interface AvatarLabelGroupProps extends AvatarProps {
     size: "sm" | "md" | "lg" | "xl";
     title: string | ReactNode;
     subtitle?: string | ReactNode;
+    badgeEmoji?: string | null;
+    badgeName?: string | null;
+    badgeDescription?: string | null;
     onClick?: () => void;
     userId?: string;
     onAvatarClick?: () => void;
 }
 
-export const AvatarLabelGroup = ({ title, subtitle, className, userId, status, onAvatarClick, ...props }: AvatarLabelGroupProps) => {
+export const AvatarLabelGroup = ({ title, subtitle, badgeEmoji, badgeName, badgeDescription, className, userId, status, onAvatarClick, ...props }: AvatarLabelGroupProps) => {
     const { isUserOnline } = useOnlineUsers();
 
     // Auto-detect online status if not explicitly provided
     const computedStatus = status || (userId && isUserOnline(userId) ? "online" : "offline");
 
+    const badgeEl = badgeEmoji ? (
+        badgeName ? (
+            <Tooltip title={badgeName} description={badgeDescription}>
+                <TooltipTrigger className="ml-1 cursor-default">{badgeEmoji}</TooltipTrigger>
+            </Tooltip>
+        ) : (
+            <span className="ml-1" title={badgeName || undefined}>{badgeEmoji}</span>
+        )
+    ) : null;
+
     return (
         <figure className={cx("group flex min-w-0 flex-1 items-center", styles[props.size].root, props.onClick && "cursor-pointer", className)} onClick={props.onClick}>
             <Avatar {...props} status={computedStatus} onClick={onAvatarClick} focusable={onAvatarClick ? true : false} />
             <figcaption className="min-w-0 flex-1">
-                <p className={cx("text-primary", styles[props.size].title)}>{title}</p>
+                <p className={cx("text-primary", styles[props.size].title)}>
+                    {title}{badgeEl}
+                </p>
                 {subtitle && <p className={cx("truncate text-tertiary", styles[props.size].subtitle)}>{subtitle}</p>}
             </figcaption>
         </figure>

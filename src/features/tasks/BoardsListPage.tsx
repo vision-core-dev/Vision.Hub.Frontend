@@ -19,6 +19,10 @@ type BoardType = {
     description?: string | null;
     banner_url?: string | null;
     created_at: string;
+    total_tasks: number;
+    done_tasks: number;
+    overdue_tasks: number;
+    due_today_tasks: number;
 };
 
 const BoardsListPage = () => {
@@ -108,7 +112,7 @@ const BoardCard = ({ board, onClick }: BoardCardProps) => {
             </div>
 
             {/* 📝 Content */}
-            <div className="flex flex-col gap-1 p-4">
+            <div className="flex flex-col gap-2 p-4">
                 <h3 className="line-clamp-2 text-sm font-semibold text-fg-primary">
                     {board.name}
                 </h3>
@@ -118,6 +122,21 @@ const BoardCard = ({ board, onClick }: BoardCardProps) => {
                         {board.description}
                     </p>
                 )}
+
+                {board.total_tasks > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mt-1">
+                        <BoardBadge label={`${board.total_tasks}`} color="gray" title="Всього задач" />
+                        {board.done_tasks > 0 && (
+                            <BoardBadge label={`${board.done_tasks} ✓`} color="green" title="Завершено" />
+                        )}
+                        {board.due_today_tasks > 0 && (
+                            <BoardBadge label={`${board.due_today_tasks} сьогодні`} color="yellow" title="Дедлайн сьогодні" />
+                        )}
+                        {board.overdue_tasks > 0 && (
+                            <BoardBadge label={`${board.overdue_tasks} прострочено`} color="red" title="Прострочено" />
+                        )}
+                    </div>
+                )}
             </div>
         </div>
     );
@@ -125,6 +144,19 @@ const BoardCard = ({ board, onClick }: BoardCardProps) => {
 
 
 
+
+const badgeColors = {
+    gray: "bg-gray-100 text-gray-600",
+    green: "bg-emerald-50 text-emerald-700",
+    yellow: "bg-amber-50 text-amber-700",
+    red: "bg-red-50 text-red-700",
+};
+
+const BoardBadge = ({ label, color, title }: { label: string; color: keyof typeof badgeColors; title: string }) => (
+    <span title={title} className={`inline-flex items-center rounded-md px-1.5 py-0.5 text-[11px] font-medium ${badgeColors[color]}`}>
+        {label}
+    </span>
+);
 
 interface CreateUserModalProps {
     isOpen: boolean;

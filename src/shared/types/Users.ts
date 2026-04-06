@@ -35,6 +35,16 @@ export interface UserType {
     is_active: boolean;
     last_login?: string;
     created_at: string;
+    active_badge_emoji?: string | null;
+    google_id?: string | null;
+    google_email?: string | null;
+    discord_id?: string | null;
+    discord_username?: string | null;
+    telegram_id?: string | null;
+    telegram_username?: string | null;
+    roblox_id?: string | null;
+    roblox_username?: string | null;
+    board_names?: string[];
 }
 
 

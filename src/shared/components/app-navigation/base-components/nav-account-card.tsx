@@ -148,6 +148,7 @@ export const NavAccountCard = ({
                     src={user.avatar_url}
                     title={user.first_name}
                     subtitle={role.name}
+                    badgeEmoji={user.active_badge_emoji}
                     userId={user.id}
                     disableDropdown
                 />

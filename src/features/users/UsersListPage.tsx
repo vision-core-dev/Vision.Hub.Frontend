@@ -23,8 +23,10 @@ import { CloseButton } from "@/shared/ui/buttons/close-button.tsx";
 import { Input, InputBase } from "@/shared/ui/input/input.tsx";
 import { InputGroup } from "@/shared/ui/input/input-group.tsx";
 import { Shuffle } from "lucide-react";
+import { DiscordIcon, TelegramIcon } from "@/shared/assets/icons/oauth-icons";
 import type { Role } from "@/features/users/UserDetails/UserDetailsPage.tsx";
 import { Select } from "@/shared/ui/select/select.tsx";
+import { Tooltip } from "@/shared/ui/tooltip/tooltip";
 
 
 const UsersTable = ({
@@ -69,8 +71,9 @@ const UsersTable = ({
             >
                 <Table.Header>
                     <Table.Head id="first_name" label="Користувач" isRowHeader allowsSorting />
+                    <Table.Head id="socials" label="Акаунти" />
                     <Table.Head id="birthday" label="День народження" allowsSorting />
-                    <Table.Head id="email" label="Email" />
+                    <Table.Head id="boards" label="Дошки" />
                     <Table.Head id="actions" />
                 </Table.Header>
 
@@ -84,9 +87,30 @@ const UsersTable = ({
                                     size="md"
                                     title={`${user.first_name} ${user.last_name || ""}`}
                                     subtitle={user.role.name}
+                                    badgeEmoji={user.active_badge_emoji}
                                     userId={user.id}
                                     onViewProfile={() => onRowClick(user)}
                                 />
+                            </Table.Cell>
+
+                            <Table.Cell>
+                                <div className="flex flex-col gap-1">
+                                    {user.discord_username && (
+                                        <span className="inline-flex items-center gap-1.5 text-sm text-fg-secondary">
+                                            <DiscordIcon className="size-3.5 text-[#5865F2] shrink-0" />
+                                            {user.discord_username}
+                                        </span>
+                                    )}
+                                    {user.telegram_username && (
+                                        <span className="inline-flex items-center gap-1.5 text-sm text-fg-secondary">
+                                            <TelegramIcon className="size-3.5 text-[#2AABEE] shrink-0" />
+                                            {user.telegram_username}
+                                        </span>
+                                    )}
+                                    {!user.discord_username && !user.telegram_username && (
+                                        <span className="text-fg-quaternary text-sm">—</span>
+                                    )}
+                                </div>
                             </Table.Cell>
 
                             <Table.Cell>
@@ -94,7 +118,19 @@ const UsersTable = ({
                             </Table.Cell>
 
                             <Table.Cell>
-                                {user.email}
+                                {user.board_names && user.board_names.length > 0 ? (
+                                    <Tooltip title='Дошки' description={<>
+                                        {user.board_names.map((boardName, index) => (
+                                            <div key={index}>{boardName}</div>
+                                        ))}
+                                    </>}>
+                                        <Button size="sm" color="link-gray">
+                                            {user.board_names.length} {user.board_names.length === 1 ? "дошка" : user.board_names.length < 5 ? "дошки" : "дошок"}
+                                        </Button>
+                                    </Tooltip>
+                                ) : (
+                                    <span className="text-fg-quaternary text-sm">—</span>
+                                )}
                             </Table.Cell>
 
                             <Table.Cell>

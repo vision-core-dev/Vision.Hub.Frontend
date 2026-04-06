@@ -14,6 +14,7 @@ import { Input } from "@/shared/components/base/input/input";
 import { SearchLg } from "@untitledui/icons";
 import { HubCommandMenu } from "@/shared/ui/application/command-menus/hub-command-menu";
 import { useHotkeys } from "react-hotkeys-hook";
+import PomodoroTimer, { usePomodoroEnabled } from "@/shared/components/pomodoro/PomodoroTimer";
 
 interface SidebarNavigationProps {
     /** URL of the currently active item. */
@@ -52,6 +53,7 @@ export const SidebarNavigation = ({
     const [showNotifs, setShowNotifs] = useState(false);
     const [unreadCount, setUnreadCount] = useState(0);
     const [isCommandMenuOpen, setIsCommandMenuOpen] = useState(false);
+    const { enabled: pomodoroEnabled } = usePomodoroEnabled();
 
     useHotkeys("/", (e) => {
         e.preventDefault();
@@ -132,6 +134,8 @@ export const SidebarNavigation = ({
                         </li>
                     ))}
                 </ul>
+
+                {pomodoroEnabled && <PomodoroTimer />}
 
                 {featureCard}
 

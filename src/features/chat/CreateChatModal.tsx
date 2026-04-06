@@ -185,6 +185,7 @@ export default function CreateChatModal({ isOpen, onClose, onChatCreated }: Crea
                                                     src={user.avatar_url}
                                                     title={`${user.first_name} ${user.last_name || ""}`}
                                                     subtitle={user.role?.name}
+                                                    badgeEmoji={user.active_badge_emoji}
                                                 />
 
                                                 {tab === "group" && selectedUserIds.includes(user.id) && (

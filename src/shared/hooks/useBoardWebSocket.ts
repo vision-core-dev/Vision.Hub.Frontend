@@ -63,13 +63,10 @@ export const useBoardWebSocket = ({ boardId, onUpdate, onUserPresenceChange, ena
         try {
             const wsUrl = `${import.meta.env.VITE_WS_URL}/v1/Hub/Boards/${boardId}/ws`;
 
-            console.log(`🔌 Connecting to WebSocket: ${wsUrl}`);
-
             const ws = new WebSocket(wsUrl);
             wsRef.current = ws;
 
             ws.onopen = () => {
-                console.log(`✅ WebSocket connected to board ${boardId}`);
                 reconnectAttemptsRef.current = 0;
 
                 if (currentUserRef.current) {
@@ -84,13 +81,8 @@ export const useBoardWebSocket = ({ boardId, onUpdate, onUserPresenceChange, ena
                 try {
                     const message: WebSocketMessage = JSON.parse(event.data);
 
-                    if (message.type !== 'pong') {
-                        console.log('📨 WebSocket message:', message);
-                    }
-
                     switch (message.type) {
                         case 'connected':
-                            console.log('✅ WebSocket connection confirmed. Board:', message.board_id);
                             if (currentUserRef.current && ws.readyState === WebSocket.OPEN) {
                                 ws.send(JSON.stringify({
                                     type: 'user_identify',
@@ -100,19 +92,16 @@ export const useBoardWebSocket = ({ boardId, onUpdate, onUserPresenceChange, ena
                             break;
 
                         case 'identified':
-                            console.log('✅ User identified successfully');
                             break;
 
                         case 'user_presence': {
                             const users = message.users || [];
-                            console.log(`👥 Active users update (${users.length}):`, users.map(u => u.name));
                             setActiveUsers(users);
                             onUserPresenceChangeRef.current?.(users);
                             break;
                         }
 
                         case 'board_update':
-                            console.log(`🔄 Board update: ${message.action}`);
                             onUpdateRef.current?.();
                             break;
 
@@ -120,29 +109,21 @@ export const useBoardWebSocket = ({ boardId, onUpdate, onUserPresenceChange, ena
                             break;
 
                         case 'error':
-                            console.error('❌ WebSocket server error:', message.message);
                             break;
 
                         default:
-                            console.warn('Unknown message type received:', message.type);
+                            break;
                     }
                 } catch (error) {
-                    console.error('Error parsing WebSocket message:', error);
                 }
             };
 
-            ws.onerror = (error) => {
-                console.error('❌ WebSocket error:', error);
-            };
-
             ws.onclose = (event) => {
-                console.log(`🔌 WebSocket disconnected from board ${boardId}`, event.code, event.reason);
                 wsRef.current = null;
                 setActiveUsers([]);
 
                 if (event.code !== 1000 && reconnectAttemptsRef.current < maxReconnectAttempts && enabled) {
                     reconnectAttemptsRef.current++;
-                    console.log(`🔄 Reconnecting... (Attempt ${reconnectAttemptsRef.current}/${maxReconnectAttempts})`);
 
                     reconnectTimeoutRef.current = setTimeout(() => {
                         connect();
@@ -151,7 +132,6 @@ export const useBoardWebSocket = ({ boardId, onUpdate, onUserPresenceChange, ena
             };
 
         } catch (error) {
-            console.error('Error creating WebSocket connection:', error);
         }
     }, [boardId, enabled]);
 
@@ -170,8 +150,6 @@ export const useBoardWebSocket = ({ boardId, onUpdate, onUserPresenceChange, ena
     const sendMessage = useCallback((message: WebSocketMessage) => {
         if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
             wsRef.current.send(JSON.stringify(message));
-        } else {
-            console.warn('WebSocket is not connected');
         }
     }, []);
 

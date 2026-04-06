@@ -24,6 +24,7 @@ export interface MeUser {
     is_active: boolean;
     notify_discord: boolean;
     notify_telegram: boolean;
+    active_badge_emoji: string | null;
     google_id: string | null;
     google_email: string | null;
     discord_id: string | null;

@@ -3,6 +3,9 @@ const BASE_URL = import.meta.env.VITE_API_URL;
 const MAX_RETRIES = 2;
 const RETRY_DELAY_MS = 1000;
 
+// In-flight GET deduplication — if same URL is already fetching, reuse the promise
+const _inflight = new Map<string, Promise<Response>>();
+
 async function _fetch(
     url: string,
     options: RequestInit = {},
@@ -54,7 +57,12 @@ export const api = {
     },
 
     async get(url: string, signal?: AbortSignal) {
-        return _fetch(url, { signal });
+        const existing = _inflight.get(url);
+        if (existing) return existing.then(r => r.clone());
+
+        const promise = _fetch(url, { signal }).finally(() => _inflight.delete(url));
+        _inflight.set(url, promise);
+        return promise;
     },
 
     async patch(url: string, body?: any, customHeaders: Record<string, string> = {}, signal?: AbortSignal) {

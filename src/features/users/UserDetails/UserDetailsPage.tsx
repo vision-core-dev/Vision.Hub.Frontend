@@ -18,7 +18,11 @@ import {
     ChevronRight,
     Settings,
     Activity,
+    Link2,
+    ExternalLink,
 } from "lucide-react";
+import { GoogleIcon, DiscordIcon, TelegramIcon, RobloxIcon } from "@/shared/assets/icons/oauth-icons";
+import { Award } from "lucide-react";
 import TransactionsListSection, {
     type TransactionItem
 } from "../../finance/TransactionsListSection/TransactionsListSection";
@@ -103,6 +107,8 @@ const UserDetailsPage = () => {
     const [isStructureModalOpen, setIsStructureModalOpen] = useState(false);
     const [isTasksModalOpen, setIsTasksModalOpen] = useState(false);
     const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
+    const [isBadgeModalOpen, setIsBadgeModalOpen] = useState(false);
+    const [allBadges, setAllBadges] = useState<Badge[]>([]);
 
     // Transactions pagination
     const [showAllTransactions, setShowAllTransactions] = useState(false);
@@ -262,6 +268,7 @@ const UserDetailsPage = () => {
                             size="xl"
                             title={`${user.first_name} ${user.last_name || ""}`}
                             subtitle={user.role?.name || ""}
+                            badgeEmoji={user.active_badge_emoji}
                             src={user.avatar_url}
                             status={isOnline(user.last_login) ? "online" : "offline"}
                             userId={user.id}
@@ -285,6 +292,21 @@ const UserDetailsPage = () => {
                         </div>
 
                         <BadgesSection badges={badges} />
+
+                        {actions.includes("give_badge") && (
+                            <Button
+                                color="secondary"
+                                iconLeading={Award}
+                                className="w-full"
+                                onClick={async () => {
+                                    const res = await api.get("/v1/Hub/Badges/List");
+                                    if (res.ok) setAllBadges(await res.json());
+                                    setIsBadgeModalOpen(true);
+                                }}
+                            >
+                                Керувати бейджиками
+                            </Button>
+                        )}
 
                         {/* Швидкі дії */}
                         <div className="flex w-full flex-col gap-3">
@@ -363,6 +385,9 @@ const UserDetailsPage = () => {
                             <InfoItem icon={Briefcase} label="Відділ" value="Development Team" /> */}
                         </div>
                     </section>
+
+                    {/* Підключені акаунти */}
+                    <LinkedAccountsSection user={user} />
 
                     {/* Особиста інформація */}
                     <section className="rounded-xl border border-secondary bg-primary px-6 py-5 shadow-sm">
@@ -489,6 +514,16 @@ const UserDetailsPage = () => {
                 userId={user.id}
                 userName={`${user.first_name} ${user.last_name || ''}`}
                 tasks={tasks}
+            />
+
+            {/* Модалка бейджиків */}
+            <BadgeManageModal
+                isOpen={isBadgeModalOpen}
+                onOpenChange={setIsBadgeModalOpen}
+                userId={user.id}
+                userBadges={badges}
+                allBadges={allBadges}
+                onUpdate={refreshUserData}
             />
         </DefaultPage>
     );
@@ -650,6 +685,7 @@ const UsersGroup = ({ title, users }: UsersGroupProps) => {
                         size="md"
                         title={`${u.first_name} ${u.last_name || ""}`}
                         subtitle={u.role?.name || ""}
+                        badgeEmoji={u.active_badge_emoji}
                         src={u.avatar_url}
                         userId={u.id}
                         onViewProfile={() => navigate(`/users/u/${u.id}`)}
@@ -918,6 +954,165 @@ const TasksModal = ({ isOpen, onOpenChange, tasks }: TasksModalProps) => {
                 </Modal>
             </ModalOverlay>
         </DialogTrigger >
+    );
+};
+
+const linkedAccountsConfig = [
+    {
+        key: "google",
+        label: "Google",
+        Icon: GoogleIcon,
+        color: "bg-white border border-border-primary",
+        iconClass: "",
+        idField: "google_id" as const,
+        nameField: "google_email" as const,
+        getLink: null,
+    },
+    {
+        key: "discord",
+        label: "Discord",
+        Icon: DiscordIcon,
+        color: "bg-[#5865F2]",
+        iconClass: "text-white",
+        idField: "discord_id" as const,
+        nameField: "discord_username" as const,
+        getLink: (id: string) => `https://discord.com/users/${id}`,
+    },
+    {
+        key: "telegram",
+        label: "Telegram",
+        Icon: TelegramIcon,
+        color: "bg-[#2AABEE]",
+        iconClass: "text-white",
+        idField: "telegram_id" as const,
+        nameField: "telegram_username" as const,
+        getLink: (_: string, username?: string) => username ? `https://t.me/${username}` : null,
+    },
+    {
+        key: "roblox",
+        label: "Roblox",
+        Icon: RobloxIcon,
+        color: "bg-[#E2231A]",
+        iconClass: "text-white",
+        idField: "roblox_id" as const,
+        nameField: "roblox_username" as const,
+        getLink: (id: string) => `https://www.roblox.com/users/${id}/profile`,
+    },
+];
+
+const LinkedAccountsSection = ({ user }: { user: UserType }) => {
+    const linked = linkedAccountsConfig.filter((p) => user[p.idField]);
+    if (linked.length === 0) return null;
+
+    return (
+        <section className="rounded-xl border border-secondary bg-primary px-6 py-5 shadow-sm">
+            <div className="mb-4 flex items-center gap-2">
+                <Link2 size={18} className="text-fg-brand-primary" />
+                <h3 className="m-0 text-base font-semibold text-primary">Підключені акаунти</h3>
+            </div>
+            <div className="flex flex-col gap-2.5">
+                {linked.map((p) => {
+                    const username = user[p.nameField] as string | undefined;
+                    const id = user[p.idField] as string;
+                    const link = p.getLink?.(id, username ?? undefined);
+
+                    return (
+                        <div key={p.key} className="flex items-center gap-3">
+                            <div className={`w-8 h-8 shrink-0 rounded-lg flex items-center justify-center ${p.color}`}>
+                                <p.Icon className={`size-4 ${p.iconClass}`} />
+                            </div>
+                            <div className="flex flex-col min-w-0">
+                                <span className="text-xs text-tertiary">{p.label}</span>
+                                <span className="text-sm font-medium text-primary truncate">
+                                    {username || id}
+                                </span>
+                            </div>
+                            {link && (
+                                <a
+                                    href={link}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="ml-auto shrink-0 text-fg-quaternary hover:text-fg-brand-primary transition-colors"
+                                >
+                                    <ExternalLink size={14} />
+                                </a>
+                            )}
+                        </div>
+                    );
+                })}
+            </div>
+        </section>
+    );
+};
+
+// Badge management modal
+const BadgeManageModal = ({ isOpen, onOpenChange, userId, userBadges, allBadges, onUpdate }: {
+    isOpen: boolean;
+    onOpenChange: (v: boolean) => void;
+    userId: string;
+    userBadges: Badge[];
+    allBadges: Badge[];
+    onUpdate: () => void;
+}) => {
+    const [loading, setLoading] = useState<string | null>(null);
+    const userBadgeIds = new Set(userBadges.map(b => b.id));
+
+    const handleAward = async (badgeId: string) => {
+        setLoading(badgeId);
+        await api.post("/v1/Hub/Badges/Award", { user_id: userId, badge_id: badgeId });
+        onUpdate();
+        setLoading(null);
+    };
+
+    const handleRevoke = async (badgeId: string) => {
+        setLoading(badgeId);
+        await api.post("/v1/Hub/Badges/Revoke", { user_id: userId, badge_id: badgeId });
+        onUpdate();
+        setLoading(null);
+    };
+
+    return (
+        <DialogTrigger isOpen={isOpen} onOpenChange={onOpenChange}>
+            <ModalOverlay isDismissable>
+                <Modal>
+                    <Dialog>
+                        <div className="relative w-full max-w-[480px] max-h-[80vh] flex flex-col rounded-2xl bg-primary shadow-xl p-6 gap-4">
+                            <CloseButton onClick={() => onOpenChange(false)} className="absolute top-4 right-4" />
+                            <h2 className="text-lg font-semibold text-fg-primary">Бейджики користувача</h2>
+
+                            <div className="flex flex-col gap-2 overflow-y-auto">
+                                {allBadges.length === 0 && (
+                                    <p className="text-sm text-fg-tertiary">Бейджиків ще немає. Створіть на сторінці /users/badges</p>
+                                )}
+                                {allBadges.map((b) => {
+                                    const has = userBadgeIds.has(b.id);
+                                    return (
+                                        <div key={b.id} className="flex items-center gap-3 rounded-xl border border-border-secondary p-3">
+                                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border-secondary bg-secondary text-lg">
+                                                {b.emoji || "🏅"}
+                                            </div>
+                                            <div className="flex flex-col min-w-0 flex-1">
+                                                <span className="text-sm font-medium text-fg-primary">{b.name}</span>
+                                                {b.description && <span className="text-xs text-fg-tertiary truncate">{b.description}</span>}
+                                            </div>
+                                            {has ? (
+                                                <Button size="sm" color="secondary-destructive" isLoading={loading === b.id} onClick={() => handleRevoke(b.id)}>
+                                                    Забрати
+                                                </Button>
+                                            ) : (
+                                                <Button size="sm" color="primary" isLoading={loading === b.id} onClick={() => handleAward(b.id)}>
+                                                    Дати
+                                                </Button>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </Dialog>
+                </Modal>
+            </ModalOverlay>
+        </DialogTrigger>
     );
 };
 

@@ -128,6 +128,7 @@ const FinancePage: React.FC = () => {
                                         <AvatarLabelGroupWithDropdown
                                             src={item.user.avatar_url || undefined}
                                             title={`${item.user.first_name || ""} ${item.user.last_name || ""}`}
+                                            badgeEmoji={item.user.active_badge_emoji}
                                             size="sm"
                                             userId={item.user.id}
                                             onViewProfile={() => navigate(`/users/u/${item.user.id}`)}

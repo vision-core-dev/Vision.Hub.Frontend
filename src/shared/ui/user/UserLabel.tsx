@@ -11,9 +11,10 @@ interface UserLabelProps {
     tags?: string;
     outline?: boolean;
     user_id?: string;
+    badge_emoji?: string | null;
 }
 
-const UserLabel: React.FC<UserLabelProps> = ({ avatar_url, name, email, role, user_id }) => {
+const UserLabel: React.FC<UserLabelProps> = ({ avatar_url, name, email, role, user_id, badge_emoji }) => {
     const navigate = useNavigate();
     return (
         <div className={styles.userLabel}>
@@ -21,7 +22,7 @@ const UserLabel: React.FC<UserLabelProps> = ({ avatar_url, name, email, role, us
             <div className={styles.details}>
                 <div className={`${styles.name} ${user_id ? styles.clickable : ""}`}
                     onClick={() => user_id && navigate(`/users/u/${user_id}`)}
-                >{name}</div>
+                >{name}{badge_emoji ? ` ${badge_emoji}` : ""}</div>
                 {role && <div className={styles.role}>{role}</div>}
                 {email && <div className={styles.email}>{email}</div>}
             </div>

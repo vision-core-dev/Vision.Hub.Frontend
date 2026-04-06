@@ -12,6 +12,7 @@ export type BoardMember = {
     first_name: string;
     last_name?: string;
     avatar_url?: string;
+    active_badge_emoji?: string | null;
     role: string;
 };
 
@@ -215,6 +216,7 @@ export default function MembersTab({
                                             ? ` ${m.last_name}`
                                             : ""
                                         }`}
+                                    badgeEmoji={m.active_badge_emoji}
                                     userId={m.id}
                                     disableDropdown
                                 />

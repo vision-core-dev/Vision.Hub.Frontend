@@ -11,6 +11,9 @@ interface AvatarLabelGroupWithDropdownProps extends AvatarProps {
     size: "sm" | "md" | "lg" | "xl";
     title: string | ReactNode;
     subtitle?: string | ReactNode;
+    badgeEmoji?: string | null;
+    badgeName?: string | null;
+    badgeDescription?: string | null;
     className?: string;
     userId?: string;
     onViewProfile?: () => void;

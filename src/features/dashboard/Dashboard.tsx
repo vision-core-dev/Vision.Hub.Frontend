@@ -18,6 +18,7 @@ import { CheckCircle2, Clock, SquareCheckBig, Kanban } from "lucide-react";
 import { getTextColor } from "@/shared/utils/colors.ts";
 import { safeDate } from "@/shared/utils/safeDate.ts";
 import Leaderboard from "./components/Leaderboard.tsx";
+import BadgeTimeline from "./components/BadgeTimeline.tsx";
 import { Edit01, Trash01, Plus } from "@untitledui/icons";
 import { TextEditor } from "@/shared/ui/text-editor/text-editor.tsx";
 import { toast } from "sonner";
@@ -41,10 +42,10 @@ interface NewsItem {
     };
 }
 
-const ActivityFeedConnected: React.FC = () => {
+const ActivityFeedConnected: React.FC<{ initialNews?: NewsItem[] }> = ({ initialNews }) => {
     const { role } = useAuth();
-    const [news, setNews] = useState<NewsItem[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [news, setNews] = useState<NewsItem[]>(initialNews || []);
+    const [loading, setLoading] = useState(!initialNews);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [editingNews, setEditingNews] = useState<NewsItem | null>(null);
 
@@ -65,7 +66,7 @@ const ActivityFeedConnected: React.FC = () => {
     };
 
     useEffect(() => {
-        fetchNews();
+        if (!initialNews) fetchNews();
     }, []);
 
     const handleDelete = async (id: string) => {
@@ -199,11 +200,12 @@ interface ActiveTask {
     subtasks_completed: number;
 }
 
-const MyTasksConnected: React.FC = () => {
-    const [tasks, setTasks] = useState<ActiveTask[]>([]);
-    const [loading, setLoading] = useState(true);
+const MyTasksConnected: React.FC<{ initialTasks?: ActiveTask[] }> = ({ initialTasks }) => {
+    const [tasks, setTasks] = useState<ActiveTask[]>(initialTasks || []);
+    const [loading, setLoading] = useState(!initialTasks);
 
     useEffect(() => {
+        if (initialTasks) return;
         const fetchTasks = async () => {
             try {
                 const res = await api.get("/v1/Hub/UserMe/Tasks/Active");
@@ -301,23 +303,34 @@ const MyTasksConnected: React.FC = () => {
 
 /* ===================== DASHBOARD PAGE ===================== */
 
+interface DashboardData {
+    tasks: ActiveTask[];
+    leaderboard: any[];
+    badge_awards: any[];
+    news: NewsItem[];
+}
+
 const DashboardPage: React.FC = () => {
     const { user } = useAuth();
     const [birthdayModal, setBirthdayModal] = useState(false);
+    const [data, setData] = useState<DashboardData | null>(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (user && !user.birthday) {
-            setBirthdayModal(true);
-        }
+        if (user && !user.birthday) setBirthdayModal(true);
     }, [user]);
 
-    if (!user) {
-        return <LoaderDots />;
-    }
+    useEffect(() => {
+        api.get("/v1/Hub/UserMe/Dashboard/Get").then(async (res) => {
+            if (res.ok) setData(await res.json());
+            setLoading(false);
+        });
+    }, []);
+
+    if (!user || loading) return <LoaderDots />;
 
     return (
         <div className="p-6 space-y-6">
-            {/* Header */}
             <h2 className="text-xl font-semibold text-primary">
                 Привіт,{" "}
                 <span className="text-[#0a9a59] dark:text-fg-success-primary font-extrabold">
@@ -325,27 +338,22 @@ const DashboardPage: React.FC = () => {
                 </span>
             </h2>
 
-            {/* Updates, Tasks, Leaderboard */}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 items-start">
-
-                {/* My Tasks */}
                 <div className="flex flex-col gap-4">
                     <h3 className="text-lg font-semibold flex items-center gap-2 text-primary">
                         ✅ Мої задачі
                     </h3>
-                    <MyTasksConnected />
+                    <MyTasksConnected initialTasks={data?.tasks} />
                 </div>
 
-                {/* Leaderboard */}
+                <div className="flex flex-col gap-8">
+                    <Leaderboard initialItems={data?.leaderboard} />
+                    <BadgeTimeline initialAwards={data?.badge_awards} />
+                </div>
+
                 <div className="flex flex-col gap-4">
-                    <Leaderboard />
+                    <ActivityFeedConnected initialNews={data?.news} />
                 </div>
-
-                {/* Updates */}
-                <div className="flex flex-col gap-4">
-                    <ActivityFeedConnected />
-                </div>
-
             </div>
 
             <SubmitBirthdayModal isOpen={birthdayModal} setIsOpen={setBirthdayModal} />

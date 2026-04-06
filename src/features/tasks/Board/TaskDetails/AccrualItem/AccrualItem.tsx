@@ -11,6 +11,7 @@ interface Props {
         first_name: string;
         last_name?: string;
         avatar_url?: string;
+        active_badge_emoji?: string | null;
     };
     name?: string;
     amount: number;
@@ -48,6 +49,7 @@ export default function AccrualItem({ id, user, name, amount, canEdit, onUpdate,
             <div className={styles.editItem}>
                 <AvatarLabelGroup
                     title={`${user.first_name} ${user.last_name || ""}`}
+                    badgeEmoji={user.active_badge_emoji}
                     size="sm"
                     src={user.avatar_url}
                     initials={initials}
@@ -83,6 +85,7 @@ export default function AccrualItem({ id, user, name, amount, canEdit, onUpdate,
         <div className={styles.item}>
             <AvatarLabelGroup
                 title={`${user.first_name} ${user.last_name || ""}`}
+                badgeEmoji={user.active_badge_emoji}
                 size="sm"
                 src={user.avatar_url}
                 initials={initials}

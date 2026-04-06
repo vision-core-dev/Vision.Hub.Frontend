@@ -26,6 +26,7 @@ export interface TaskUser {
     first_name: string;
     last_name?: string;
     avatar_url?: string;
+    active_badge_emoji?: string | null;
 }
 
 interface Tag {

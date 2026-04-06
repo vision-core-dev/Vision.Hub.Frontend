@@ -3,7 +3,7 @@ import { api } from "@/shared/utils/api";
 import { Avatar } from "@/shared/ui/avatar/avatar";
 import LoaderDots from "@/shared/ui/loader-dots/LoaderDots";
 import { useAuth } from "@/core/auth/AuthContext";
-import { Trophy, TrendingUp, Medal } from "lucide-react";
+import { Trophy, Medal } from "lucide-react";
 import { EmptyState } from "@/shared/ui/application/empty-state/empty-state";
 
 interface LeaderboardItem {
@@ -11,15 +11,17 @@ interface LeaderboardItem {
     first_name: string;
     last_name: string | null;
     avatar_url: string | null;
+    active_badge_emoji: string | null;
     total_earnings: number;
 }
 
-const Leaderboard: React.FC = () => {
+const Leaderboard: React.FC<{ initialItems?: LeaderboardItem[] }> = ({ initialItems }) => {
     const { user } = useAuth();
-    const [items, setItems] = useState<LeaderboardItem[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [items, setItems] = useState<LeaderboardItem[]>(initialItems || []);
+    const [loading, setLoading] = useState(!initialItems);
 
     useEffect(() => {
+        if (initialItems) return;
         const fetchLeaderboard = async () => {
             try {
                 const res = await api.get("/v1/Hub/Finance/GetLeaderboard");
@@ -53,16 +55,16 @@ const Leaderboard: React.FC = () => {
                 <Trophy className="w-5 h-5 text-yellow-500" />
                 Рейтинг за місяць
             </h3>
-            
+
             <div className="bg-primary rounded-xl border border-secondary shadow-sm overflow-hidden">
                 <div className="divide-y divide-secondary">
                     {items.slice(0, 10).map((item, index) => {
                         const rank = index + 1;
                         const isMe = item.user_id === user?.id;
-                        
+
                         return (
-                            <div 
-                                key={item.user_id} 
+                            <div
+                                key={item.user_id}
                                 className={`flex items-center gap-3 p-3 transition-colors ${isMe ? 'bg-brand-secondary/5' : 'hover:bg-secondary/50'}`}
                             >
                                 <div className="flex items-center justify-center w-6 text-sm font-bold text-tertiary">
@@ -71,20 +73,20 @@ const Leaderboard: React.FC = () => {
                                     {rank === 3 && <Medal className="w-5 h-5 text-amber-600" />}
                                     {rank > 3 && rank}
                                 </div>
-                                
-                                <Avatar 
-                                    size="sm" 
-                                    src={item.avatar_url} 
+
+                                <Avatar
+                                    size="sm"
+                                    src={item.avatar_url}
                                     initials={`${item.first_name[0]}${item.last_name?.[0] || ""}`}
                                 />
-                                
+
                                 <div className="flex-1 min-w-0">
                                     <p className={`text-sm font-medium truncate ${isMe ? 'text-brand-secondary' : 'text-primary'}`}>
-                                        {item.first_name} {item.last_name}
+                                        {item.first_name} {item.last_name}{item.active_badge_emoji ? ` ${item.active_badge_emoji}` : ""}
                                         {isMe && <span className="ml-1.5 text-[10px] bg-brand-solid text-white px-1.5 py-0.5 rounded-full uppercase tracking-wider">Ви</span>}
                                     </p>
                                 </div>
-                                
+
                                 <div className="text-right">
                                     <p className="text-sm font-bold text-success-tertiary">
                                         {item.total_earnings.toLocaleString()} ₴
@@ -104,9 +106,9 @@ const Leaderboard: React.FC = () => {
                                 <div className="flex items-center justify-center w-6 text-sm font-bold text-brand-secondary">
                                     {myRank}
                                 </div>
-                                <Avatar 
-                                    size="sm" 
-                                    src={user?.avatar_url} 
+                                <Avatar
+                                    size="sm"
+                                    src={user?.avatar_url}
                                     initials={`${user?.first_name?.[0] || ""}${user?.last_name?.[0] || ""}`}
                                 />
                                 <div className="flex-1 min-w-0">
@@ -124,7 +126,7 @@ const Leaderboard: React.FC = () => {
                         </>
                     )}
                 </div>
-                
+
                 {items.length === 0 && (
                     <div className="py-8">
                         <EmptyState size="sm">
@@ -139,13 +141,7 @@ const Leaderboard: React.FC = () => {
                     </div>
                 )}
             </div>
-            
-            <div className="flex items-center gap-2 p-3 bg-secondary/30 rounded-lg border border-secondary/50">
-                <TrendingUp className="w-4 h-4 text-brand-secondary" />
-                <p className="text-xs text-tertiary">
-                    Рейтинг оновлюється автоматично на основі нарахованих коштів за цей місяць.
-                </p>
-            </div>
+
         </div>
     );
 };

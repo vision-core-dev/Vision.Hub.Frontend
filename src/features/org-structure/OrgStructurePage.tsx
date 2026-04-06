@@ -67,6 +67,7 @@ const OrgNodeItemWrapper = ({ node, level, searchQuery }: { node: OrgNode, level
                                 userId={node.user_id || undefined}
                                 title={`${node.user?.first_name} ${node.user?.last_name || ''}`}
                                 subtitle={node.user?.role?.name}
+                                badgeEmoji={node.user?.active_badge_emoji}
                                 size="sm"
                                 src={node.user?.avatar_url}
                             />

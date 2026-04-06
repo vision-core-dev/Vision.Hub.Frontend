@@ -153,7 +153,7 @@ const KnowledgeContent: React.FC<Props> = ({ documentId, sidebarButton, sidebarC
                     <h1 className={styles.title}>{doc.title}</h1>
 
                     <div className={styles.meta}>
-                        <div><UserLabel avatar_url={doc.author.avatar_url} name={`${doc.author.first_name} ${doc.author.last_name || ""}`} user_id={doc.author.id} /></div>
+                        <div><UserLabel avatar_url={doc.author.avatar_url} name={`${doc.author.first_name} ${doc.author.last_name || ""}`} user_id={doc.author.id} badge_emoji={doc.author.active_badge_emoji} /></div>
                         <div><Calendar size={20} /><span>{safeDatetime(doc.updated_at)}</span></div>
                     </div>
                 </div>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "@/shared/utils/api";
-import { Trash } from "lucide-react";
+import { Trash, ChevronUp, ChevronDown } from "lucide-react";
 import { Button } from "@/shared/ui/buttons/button";
 import { Input } from "@/shared/ui/input/input";
 
@@ -79,16 +79,17 @@ export default function ListsTab({
         }
     };
 
-    const updateList = async (id: string) => {
-        const edited = editing[id];
+    const updateList = async (id: string, extraFields?: Partial<BoardList>) => {
+        const edited = { ...editing[id], ...extraFields };
         const original = lists.find(l => l.id === id);
         if (!edited || !original) return;
 
         if (
             edited.name === original.name &&
-            edited.color === original.color
+            edited.color === original.color &&
+            !extraFields?.order
         ) {
-            return; // ⛔ нічого не мінялось
+            return;
         }
 
         try {
@@ -98,6 +99,7 @@ export default function ListsTab({
                 {
                     name: edited.name,
                     color: edited.color,
+                    ...(extraFields?.order != null ? { order: extraFields.order } : {}),
                 }
             );
             onUpdate();
@@ -106,6 +108,28 @@ export default function ListsTab({
         }
     };
 
+    const moveList = async (index: number, direction: "up" | "down") => {
+        const swapIndex = direction === "up" ? index - 1 : index + 1;
+        if (swapIndex < 0 || swapIndex >= lists.length) return;
+
+        const current = lists[index];
+        const target = lists[swapIndex];
+
+        // Swap orders
+        const currentOrder = current.order ?? index;
+        const targetOrder = target.order ?? swapIndex;
+
+        try {
+            setLoadingId(current.id);
+            await Promise.all([
+                api.post(`/v1/Hub/Boards/${boardId}/Lists/${current.id}/Update`, { order: targetOrder }),
+                api.post(`/v1/Hub/Boards/${boardId}/Lists/${target.id}/Update`, { order: currentOrder }),
+            ]);
+            onUpdate();
+        } finally {
+            setLoadingId(null);
+        }
+    };
 
     /* ===================== RENDER ===================== */
 
@@ -154,7 +178,7 @@ export default function ListsTab({
                         </span>
                     )}
 
-                    {lists.map((list) => {
+                    {lists.map((list, index) => {
                         const value = editing[list.id];
 
                         return (
@@ -162,6 +186,26 @@ export default function ListsTab({
                                 key={list.id}
                                 className="flex items-center gap-2 rounded-lg border border-secondary bg-primary px-3 py-2"
                             >
+                                {/* Reorder arrows */}
+                                <div className="flex flex-col -my-1">
+                                    <button
+                                        type="button"
+                                        disabled={index === 0}
+                                        onClick={() => moveList(index, "up")}
+                                        className="p-0.5 text-fg-quaternary hover:text-fg-primary disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
+                                    >
+                                        <ChevronUp size={14} />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        disabled={index === lists.length - 1}
+                                        onClick={() => moveList(index, "down")}
+                                        className="p-0.5 text-fg-quaternary hover:text-fg-primary disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
+                                    >
+                                        <ChevronDown size={14} />
+                                    </button>
+                                </div>
+
                                 <Input
                                     className="w-16"
                                     type="color"
@@ -219,12 +263,3 @@ export default function ListsTab({
         </div>
     );
 }
-
-
-
-
-
-
-
-
-
