@@ -20,9 +20,12 @@ import {
     Activity,
     Link2,
     ExternalLink,
+    Award,
+    KeyRound,
+    Copy,
+    Check,
 } from "lucide-react";
 import { GoogleIcon, DiscordIcon, TelegramIcon, RobloxIcon } from "@/shared/assets/icons/oauth-icons";
-import { Award } from "lucide-react";
 import TransactionsListSection, {
     type TransactionItem
 } from "../../finance/TransactionsListSection/TransactionsListSection";
@@ -109,6 +112,7 @@ const UserDetailsPage = () => {
     const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
     const [isBadgeModalOpen, setIsBadgeModalOpen] = useState(false);
     const [allBadges, setAllBadges] = useState<Badge[]>([]);
+    const [resetPasswordResult, setResetPasswordResult] = useState<string | null>(null);
 
     // Transactions pagination
     const [showAllTransactions, setShowAllTransactions] = useState(false);
@@ -320,6 +324,22 @@ const UserDetailsPage = () => {
                                     Редагувати структуру
                                 </Button>
                             )}
+                            {actions.includes("reset_password") && (
+                                <Button
+                                    color="secondary"
+                                    iconLeading={KeyRound}
+                                    onClick={async () => {
+                                        if (!window.confirm(`Скинути пароль для ${user.first_name} ${user.last_name || ""}? Старий пароль буде втрачено.`)) return;
+                                        const res = await api.post(`/v1/Hub/Users/${user.id}/ResetPassword`);
+                                        if (res.ok) {
+                                            const data = await res.json();
+                                            setResetPasswordResult(data.new_password);
+                                        }
+                                    }}
+                                >
+                                    Скинути пароль
+                                </Button>
+                            )}
                             {user.is_active ? (
                                 <Button color="primary-destructive" onClick={handleDeactivate}>Деактивувати</Button>
                             ) : (
@@ -525,6 +545,17 @@ const UserDetailsPage = () => {
                 allBadges={allBadges}
                 onUpdate={refreshUserData}
             />
+
+            {/* Password reset result */}
+            <DialogTrigger isOpen={!!resetPasswordResult} onOpenChange={(open) => { if (!open) setResetPasswordResult(null); }}>
+                <ModalOverlay isDismissable>
+                    <Modal>
+                        <Dialog>
+                            <PasswordResetResult password={resetPasswordResult!} onClose={() => setResetPasswordResult(null)} />
+                        </Dialog>
+                    </Modal>
+                </ModalOverlay>
+            </DialogTrigger>
         </DefaultPage>
     );
 };
@@ -1113,6 +1144,44 @@ const BadgeManageModal = ({ isOpen, onOpenChange, userId, userBadges, allBadges,
                 </Modal>
             </ModalOverlay>
         </DialogTrigger>
+    );
+};
+
+const PasswordResetResult = ({ password, onClose }: { password: string; onClose: () => void }) => {
+    const [copied, setCopied] = useState(false);
+
+    const handleCopy = () => {
+        navigator.clipboard.writeText(password);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+
+    return (
+        <div className="relative w-full max-w-[360px] rounded-2xl bg-primary shadow-xl p-6 flex flex-col gap-4">
+            <CloseButton onClick={onClose} className="absolute top-4 right-4" />
+
+            <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-success-secondary">
+                    <KeyRound size={20} className="text-fg-success-primary" />
+                </div>
+                <div>
+                    <h3 className="text-base font-semibold text-fg-primary">Пароль скинуто</h3>
+                    <p className="text-sm text-fg-tertiary">Збережіть або передайте користувачу</p>
+                </div>
+            </div>
+
+            <div className="flex items-center gap-2 rounded-lg border border-border-secondary bg-secondary/30 p-3">
+                <code className="flex-1 text-base font-mono font-semibold text-fg-primary select-all">{password}</code>
+                <button
+                    onClick={handleCopy}
+                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-secondary hover:bg-secondary_hover transition-colors cursor-pointer"
+                >
+                    {copied ? <Check size={14} className="text-fg-success-primary" /> : <Copy size={14} className="text-fg-quaternary" />}
+                </button>
+            </div>
+
+            <p className="text-xs text-fg-quaternary">Пароль показується лише один раз</p>
+        </div>
     );
 };
 
