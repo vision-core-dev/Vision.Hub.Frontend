@@ -7,7 +7,7 @@ import { NavList } from "../base-components/nav-list";
 import type { NavItemType } from "../config";
 import { useNavigate } from "react-router-dom";
 import { api } from "@/shared/utils/api.ts";
-import { Bell, MessageCircle } from "lucide-react";
+import { Bell, MessageCircle, Zap } from "lucide-react";
 import NotificationsMenu from "@/layouts/Notifications/NotificationsMenu.tsx";
 import { Badge } from "@/shared/ui/badges/badges.tsx";
 import { Input } from "@/shared/components/base/input/input";
@@ -15,6 +15,7 @@ import { SearchLg } from "@untitledui/icons";
 import { HubCommandMenu } from "@/shared/ui/application/command-menus/hub-command-menu";
 import { useHotkeys } from "react-hotkeys-hook";
 import PomodoroTimer, { usePomodoroEnabled } from "@/shared/components/pomodoro/PomodoroTimer";
+import { useAuth } from "@/core/auth/AuthContext";
 
 interface SidebarNavigationProps {
     /** URL of the currently active item. */
@@ -54,6 +55,9 @@ export const SidebarNavigation = ({
     const [unreadCount, setUnreadCount] = useState(0);
     const [isCommandMenuOpen, setIsCommandMenuOpen] = useState(false);
     const { enabled: pomodoroEnabled } = usePomodoroEnabled();
+    const { user: authUser } = useAuth();
+    const hasWorkingNotify = authUser && ((authUser.notify_discord && authUser.discord_id) || (authUser.notify_telegram && authUser.telegram_id));
+    const showNotifyBanner = authUser && !hasWorkingNotify && localStorage.getItem("notify_setup_skipped") !== "true";
 
     useHotkeys("/", (e) => {
         e.preventDefault();
@@ -136,6 +140,19 @@ export const SidebarNavigation = ({
                 </ul>
 
                 {pomodoroEnabled && <PomodoroTimer />}
+
+                {showNotifyBanner && (
+                    <button
+                        onClick={() => navigate("/my/settings")}
+                        className="flex items-center gap-3 rounded-xl bg-brand-primary_alt p-3 text-left transition-colors hover:bg-brand-secondary cursor-pointer"
+                    >
+                        <Zap size={16} className="text-fg-brand-primary shrink-0" />
+                        <div className="flex flex-col">
+                            <span className="text-xs font-semibold text-fg-brand-primary">Увімкни сповіщення</span>
+                            <span className="text-[11px] text-fg-tertiary">Discord або Telegram</span>
+                        </div>
+                    </button>
+                )}
 
                 {featureCard}
 

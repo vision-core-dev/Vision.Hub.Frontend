@@ -39,6 +39,7 @@ const ChatPage = lazy(() => import("@/features/chat/Chat"));
 const NotFound = lazy(() => import("@/layouts/NotFound/NotFound"));
 const OrgStructurePage = lazy(() => import("@/features/org-structure/OrgStructurePage"));
 const JobsPage = lazy(() => import("@/features/jobs/JobsPage"));
+const KolektoralPage = lazy(() => import("@/features/kolektoral/KolektoralPage"));
 const PrivacyPage = lazy(() => import("@/features/legal/PrivacyPage"));
 const TermsPage = lazy(() => import("@/features/legal/TermsPage"));
 const OAuthCallbackPage = lazy(() => import("@/features/auth/OAuthCallbackPage"));
@@ -159,6 +160,9 @@ export function AppRoutes() {
                             <Route index element={<ChatPage />} />
                             <Route path=":chatId" element={<ChatPage />} />
                         </Route>
+
+                        {/* kolektoral */}
+                        <Route path="kolektoral" element={<KolektoralPage />} />
 
                     </Route>
                 </Route>

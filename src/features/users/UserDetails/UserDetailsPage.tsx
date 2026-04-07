@@ -596,7 +596,7 @@ const TaskItem = ({ task }: TaskItemProps) => {
     const isOverdue = !isDone && task.deadline_at && new Date(task.deadline_at) < new Date();
 
     const getStatusColor = () => {
-        if (isOverdue) return 'text-fg-error-primary bg-bg-error-primary border-error_subtle';
+        if (isOverdue) return 'text-fg-error-primary bg-bg-error-primary border-red';
         if (isDone) return 'text-tertiary bg-secondary border-secondary opacity-70';
         return 'text-primary bg-secondary/30 border-secondary';
     };

@@ -19,6 +19,7 @@ import { getTextColor } from "@/shared/utils/colors.ts";
 import { safeDate } from "@/shared/utils/safeDate.ts";
 import Leaderboard from "./components/Leaderboard.tsx";
 import BadgeTimeline from "./components/BadgeTimeline.tsx";
+import NotifySetupWizard from "./components/NotifySetupWizard.tsx";
 import { Edit01, Trash01, Plus } from "@untitledui/icons";
 import { TextEditor } from "@/shared/ui/text-editor/text-editor.tsx";
 import { toast } from "sonner";
@@ -313,12 +314,10 @@ interface DashboardData {
 const DashboardPage: React.FC = () => {
     const { user } = useAuth();
     const [birthdayModal, setBirthdayModal] = useState(false);
+    const [notifySetup, setNotifySetup] = useState(false);
     const [data, setData] = useState<DashboardData | null>(null);
     const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        if (user && !user.birthday) setBirthdayModal(true);
-    }, [user]);
+    const [modalsChecked, setModalsChecked] = useState(false);
 
     useEffect(() => {
         api.get("/v1/Hub/UserMe/Dashboard/Get").then(async (res) => {
@@ -326,6 +325,23 @@ const DashboardPage: React.FC = () => {
             setLoading(false);
         });
     }, []);
+
+    // Show modals only after dashboard loaded
+    useEffect(() => {
+        if (!user || loading || modalsChecked) return;
+        setModalsChecked(true);
+
+        if (!user.birthday) {
+            setBirthdayModal(true);
+            return;
+        }
+
+        const hasWorkingNotify = (user.notify_discord && user.discord_id) || (user.notify_telegram && user.telegram_id);
+        const skipped = localStorage.getItem("notify_setup_skipped") === "true";
+        if (!hasWorkingNotify && !skipped) {
+            setNotifySetup(true);
+        }
+    }, [user, loading]);
 
     if (!user || loading) return <LoaderDots />;
 
@@ -357,6 +373,7 @@ const DashboardPage: React.FC = () => {
             </div>
 
             <SubmitBirthdayModal isOpen={birthdayModal} setIsOpen={setBirthdayModal} />
+            {user && <NotifySetupWizard isOpen={notifySetup} setIsOpen={setNotifySetup} user={user} />}
         </div>
     );
 };
