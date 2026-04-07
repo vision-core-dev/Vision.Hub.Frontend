@@ -345,9 +345,8 @@ function BadgesSection() {
                     return (
                         <div
                             key={b.id}
-                            className={`flex items-center gap-3 rounded-xl border p-3 transition-colors cursor-pointer ${
-                                isActive ? "border-brand-solid bg-brand-primary_alt" : "border-border-secondary hover:bg-secondary/30"
-                            }`}
+                            className={`flex items-center gap-3 rounded-xl border p-3 transition-colors cursor-pointer ${isActive ? "border-brand-solid bg-brand-primary_alt" : "border-border-secondary hover:bg-secondary/30"
+                                }`}
                             onClick={() => handleSetActive(isActive ? null : b)}
                         >
                             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border-secondary bg-secondary text-lg">
