@@ -33,6 +33,7 @@ const SupportLayout = lazy(() => import("@/features/vision-support/SupportLayout
 const ChatLayout = lazy(() => import("@/features/vision-support/SupportChat/ChatLayout"));
 const SubmitForm = lazy(() => import("@/features/forms/SubmitForm/SubmitForm"));
 const FormResultsView = lazy(() => import("@/features/forms/FormResultsView/FormResultsView"));
+const FormsListPage = lazy(() => import("@/features/forms/FormsListPage"));
 const UserSettingsPage = lazy(() => import("@/features/user-settings/UserSettingsPage"));
 const DrivePage = lazy(() => import("@/features/drive/Drive"));
 const ChatPage = lazy(() => import("@/features/chat/Chat"));
@@ -149,6 +150,7 @@ export function AppRoutes() {
                         </Route>
 
                         {/* forms */}
+                        <Route path="forms" element={<FormsListPage />} />
                         <Route path="forms/f/:formId/results" element={<FormResultsView />} />
                         <Route path="form/:formSlug/submit" element={<SubmitForm />} />
 

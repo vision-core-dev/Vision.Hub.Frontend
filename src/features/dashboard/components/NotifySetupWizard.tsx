@@ -21,8 +21,7 @@ type Step = "intro" | "choose" | "connect-discord" | "connect-telegram" | "done"
 
 export default function NotifySetupWizard({ isOpen, setIsOpen, user }: Props) {
     const [step, setStep] = useState<Step>("intro");
-    const [enabling, setEnabling] = useState(false);
-
+    const [, setEnabling] = useState(false);
     const hasDiscord = !!user.discord_id;
     const hasTelegram = !!user.telegram_id;
 
