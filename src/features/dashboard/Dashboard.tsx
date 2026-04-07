@@ -20,6 +20,8 @@ import { safeDate } from "@/shared/utils/safeDate.ts";
 import Leaderboard from "./components/Leaderboard.tsx";
 import BadgeTimeline from "./components/BadgeTimeline.tsx";
 import NotifySetupWizard from "./components/NotifySetupWizard.tsx";
+import { getUnfinishedForm } from "@/features/forms/SubmitForm/SubmitForm";
+import { FileText } from "lucide-react";
 import { Edit01, Trash01, Plus } from "@untitledui/icons";
 import { TextEditor } from "@/shared/ui/text-editor/text-editor.tsx";
 import { toast } from "sonner";
@@ -343,10 +345,27 @@ const DashboardPage: React.FC = () => {
         }
     }, [user, loading]);
 
+    const unfinishedForm = getUnfinishedForm();
+
     if (!user || loading) return <LoaderDots />;
 
     return (
         <div className="p-6 space-y-6">
+            {/* Unfinished form banner */}
+            {unfinishedForm && (
+                <Link
+                    to={`/form/${unfinishedForm.slug}/submit`}
+                    className="flex items-center gap-3 rounded-xl border border-border-brand bg-brand-primary_alt px-4 py-3 transition-colors hover:bg-brand-secondary"
+                >
+                    <FileText size={18} className="text-fg-brand-primary shrink-0" />
+                    <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-fg-brand-primary">Незавершене опитування</p>
+                        <p className="text-xs text-fg-tertiary truncate">{unfinishedForm.title}</p>
+                    </div>
+                    <span className="text-xs font-medium text-fg-brand-primary shrink-0">Продовжити →</span>
+                </Link>
+            )}
+
             <h2 className="text-xl font-semibold text-primary">
                 Привіт,{" "}
                 <span className="text-[#0a9a59] dark:text-fg-success-primary font-extrabold">
