@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { api } from "@/shared/utils/api";
 import DefaultPage from "@/shared/ui/default-page/DefaultPage";
 import { Button } from "@/shared/ui/buttons/button";
-import { FileText, ExternalLink, BarChart3, Eye, Copy, Check, Users, EyeOff } from "lucide-react";
+import { FileText, ExternalLink, BarChart3, Copy, Check, Users, EyeOff } from "lucide-react";
 import { Badge } from "@/shared/ui/badges/badges";
 
 interface FormItem {
