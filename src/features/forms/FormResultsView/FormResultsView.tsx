@@ -54,21 +54,33 @@ function FieldResultBlock({
 }
 
 function RatingStats({ values }: { values: number[] }) {
-    const avg =
-        values.reduce((a, b) => a + b, 0) / Math.max(values.length, 1);
+    const avg = values.reduce((a, b) => a + b, 0) / Math.max(values.length, 1);
+    const dist: Record<number, number> = {};
+    values.forEach(v => { dist[v] = (dist[v] || 0) + 1; });
+    const maxCount = Math.max(...Object.values(dist), 1);
 
     return (
         <div className={styles.ratingStat}>
-            <strong>Середнє:</strong> {avg.toFixed(1)} / 10
-            <div className={styles.ratingBar}>
-                <div
-                    className={styles.ratingFill}
-                    style={{ width: `${(avg / 10) * 100}%` }}
-                />
+            <div style={{ display: "flex", alignItems: "baseline", gap: "0.5rem", marginBottom: "0.75rem" }}>
+                <span style={{ fontSize: "2rem", fontWeight: 700, color: "var(--color-text-brand-secondary)" }}>{avg.toFixed(1)}</span>
+                <span style={{ fontSize: "0.9rem", color: "var(--color-text-quaternary)" }}>/ 10</span>
+                <span style={{ fontSize: "0.8rem", color: "var(--color-text-quaternary)", marginLeft: "auto" }}>{values.length} відп.</span>
             </div>
-            <span className={styles.count}>
-                Відповідей: {values.length}
-            </span>
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.3rem" }}>
+                {Array.from({ length: 10 }, (_, i) => 10 - i).map(n => {
+                    const count = dist[n] || 0;
+                    const pct = (count / maxCount) * 100;
+                    return (
+                        <div key={n} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                            <span style={{ width: "1.5rem", textAlign: "right", fontSize: "0.8rem", fontWeight: 500, color: "var(--color-text-tertiary)" }}>{n}</span>
+                            <div style={{ flex: 1, height: "8px", borderRadius: "4px", background: "var(--color-bg-quaternary)" }}>
+                                {count > 0 && <div style={{ height: "100%", width: `${pct}%`, borderRadius: "4px", background: "var(--color-bg-brand-solid)", transition: "width 0.3s" }} />}
+                            </div>
+                            <span style={{ width: "1.5rem", fontSize: "0.75rem", color: count > 0 ? "var(--color-text-primary)" : "var(--color-text-quaternary)", fontWeight: count > 0 ? 600 : 400 }}>{count}</span>
+                        </div>
+                    );
+                })}
+            </div>
         </div>
     );
 }

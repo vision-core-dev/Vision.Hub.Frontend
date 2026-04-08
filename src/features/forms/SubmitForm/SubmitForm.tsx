@@ -80,6 +80,7 @@ export default function SubmitForm() {
     const [form, setForm] = useState<FormSchema | null>(null);
     const [values, setValues] = useState<Record<string, any>>({});
     const [loading, setLoading] = useState(true);
+    const [submitting, setSubmitting] = useState(false);
     const [step, setStep] = useState(0);
 
     useEffect(() => {
@@ -144,6 +145,8 @@ export default function SubmitForm() {
     }
 
     async function handleSubmit() {
+        if (submitting) return;
+        setSubmitting(true);
         await api.post("/v1/Hub/Forms/Submit", { form_id: formId, answers: values });
         clearProgress(formSlug!);
         setStep(totalQuestions);
