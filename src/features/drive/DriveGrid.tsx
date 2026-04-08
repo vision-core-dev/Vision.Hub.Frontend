@@ -299,7 +299,7 @@ function FileCard({ file, onPreview, onDeleted, onUpdated }: any) {
                         <ButtonUtility icon={DotsVertical} />
                         <Dropdown.Popover><Dropdown.Menu>
                             <Dropdown.Item icon={Eye} onClick={onPreview}>Переглянути</Dropdown.Item>
-                            <Dropdown.Item icon={Download} onClick={() => window.open(file.url)}>Завантажити</Dropdown.Item>
+                            <Dropdown.Item icon={Download} onClick={async () => { try { const r = await fetch(file.url); const b = await r.blob(); const u = URL.createObjectURL(b); const a = document.createElement("a"); a.href = u; a.download = file.name; a.click(); URL.revokeObjectURL(u); } catch { window.open(file.url, "_blank"); } }}>Завантажити</Dropdown.Item>
                             <Dropdown.Item icon={Edit03} onClick={() => setM("rename")}>Перейменувати</Dropdown.Item>
                             <Dropdown.Item icon={CornerUpRight} onClick={() => setM("move")}>Перемістити</Dropdown.Item>
                             <Dropdown.Item icon={ShieldTick} onClick={() => setM("access")}>Доступ</Dropdown.Item>
