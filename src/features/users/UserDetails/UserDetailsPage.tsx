@@ -67,6 +67,7 @@ interface Response {
     subordinates: UserType[];
     transactions: TransactionItem[];
     badges: Badge[];
+    positions: { position: string; project: string | null; project_type: string | null; is_head: boolean }[];
     tasks: UserTask[];
     tasks_total_completed: number;
     tasks_total_active: number;
@@ -91,6 +92,7 @@ const UserDetailsPage = () => {
     const [supervisors, setSupervisors] = useState<UserType[]>([]);
     const [subordinates, setSubordinates] = useState<UserType[]>([]);
     const [badges, setBadges] = useState<Badge[]>([]);
+    const [positions, setPositions] = useState<{ position: string; project: string | null; project_type: string | null; is_head: boolean }[]>([]);
     const [roles, setRoles] = useState<Role[]>([]);
     const [transactions, setTransactions] = useState<TransactionItem[]>([]);
     const [tasks, setTasks] = useState<UserTask[]>([]); // Store all tasks
@@ -142,6 +144,7 @@ const UserDetailsPage = () => {
             setSubordinates(data.subordinates);
 
             setBadges(data.badges ?? []);
+            setPositions(data.positions ?? []);
             setActions(data.actions ?? []);
             setTransactions(data.transactions ?? []);
             setTaskStats({
@@ -297,30 +300,15 @@ const UserDetailsPage = () => {
 
                         <BadgesSection badges={badges} />
 
-                        {actions.includes("give_badge") && (
-                            <Button
-                                color="secondary"
-                                iconLeading={Award}
-                                className="w-full"
-                                onClick={async () => {
-                                    const res = await api.get("/v1/Hub/Badges/List");
-                                    if (res.ok) setAllBadges(await res.json());
-                                    setIsBadgeModalOpen(true);
-                                }}
-                            >
-                                Керувати бейджиками
-                            </Button>
-                        )}
-
                         {/* Швидкі дії */}
                         <div className="flex w-full flex-col gap-3">
                             {actions.includes("change_role") && (
-                                <Button onClick={() => setIsRoleModalOpen(true)} iconLeading={Settings}>
+                                <Button color="secondary" onClick={() => setIsRoleModalOpen(true)} iconLeading={Settings}>
                                     Змінити роль
                                 </Button>
                             )}
                             {actions.includes("change_org_structure") && (
-                                <Button onClick={() => setIsStructureModalOpen(true)} iconLeading={Users}>
+                                <Button color="secondary" onClick={() => setIsStructureModalOpen(true)} iconLeading={Users}>
                                     Редагувати структуру
                                 </Button>
                             )}
@@ -338,6 +326,22 @@ const UserDetailsPage = () => {
                                     }}
                                 >
                                     Скинути пароль
+                                </Button>
+                            )}
+
+
+                            {actions.includes("give_badge") && (
+                                <Button
+                                    color="secondary"
+                                    iconLeading={Award}
+                                    className="w-full"
+                                    onClick={async () => {
+                                        const res = await api.get("/v1/Hub/Badges/List");
+                                        if (res.ok) setAllBadges(await res.json());
+                                        setIsBadgeModalOpen(true);
+                                    }}
+                                >
+                                    Керувати бейджиками
                                 </Button>
                             )}
                             {user.is_active ? (
@@ -461,12 +465,34 @@ const UserDetailsPage = () => {
 
                 {/* Права колонка - Структура та транзакції */}
                 <div className="flex flex-col gap-6">
-                    {(supervisors.length > 0 || subordinates.length > 0) && (
+                    {/* Positions + Org structure */}
+                    {(positions.length > 0 || supervisors.length > 0 || subordinates.length > 0) && (
                         <section className="flex flex-col gap-4 rounded-xl border border-secondary bg-primary px-6 py-5 shadow-sm">
                             <div className="flex items-center gap-2">
                                 <Users size={18} className="text-fg-brand-primary" />
                                 <h3 className="m-0 text-base font-semibold text-primary">Організаційна структура</h3>
                             </div>
+
+                            {positions.length > 0 && (
+                                <div className="flex flex-col gap-1.5">
+                                    {positions.map((p, i) => (
+                                        <div key={i} className="flex items-center gap-2.5 rounded-lg bg-secondary/30 px-3 py-2">
+                                            {p.project_type === "department" ? (
+                                                <Activity size={14} className="text-blue-500 shrink-0" />
+                                            ) : (
+                                                <ListTodo size={14} className="text-purple-500 shrink-0" />
+                                            )}
+                                            <div className="flex flex-col min-w-0 flex-1">
+                                                <span className="text-sm font-medium text-fg-primary">{p.project || "—"}</span>
+                                                {p.position && <span className="text-xs text-fg-tertiary">{p.position}</span>}
+                                            </div>
+                                            {p.is_head && (
+                                                <span className="text-[10px] font-semibold text-fg-warning-primary bg-warning-primary/10 rounded px-1.5 py-0.5">Керівник</span>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
 
                             <UsersGroup
                                 title="Керівники"
@@ -596,7 +622,7 @@ const TaskItem = ({ task }: TaskItemProps) => {
     const isOverdue = !isDone && task.deadline_at && new Date(task.deadline_at) < new Date();
 
     const getStatusColor = () => {
-        if (isOverdue) return 'text-fg-error-primary bg-bg-error-primary border-red';
+        if (isOverdue) return 'text-fg-error-primary bg-bg-error-primary border-error_subtle';
         if (isDone) return 'text-tertiary bg-secondary border-secondary opacity-70';
         return 'text-primary bg-secondary/30 border-secondary';
     };

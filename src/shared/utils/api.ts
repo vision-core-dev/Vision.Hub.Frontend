@@ -27,6 +27,15 @@ async function _fetch(
     // Auto-redirect on 401 (unauthorized / expired token)
     // Skip for auth-related endpoints to prevent infinite redirect loops
     if (res.status === 401 && !url.includes("/Auth/")) {
+        try {
+            const body = await res.clone().json();
+            if (body?.detail === "user_is_deactivated") {
+                window.location.href = "/deactivated";
+                throw new Error("Deactivated");
+            }
+        } catch (e) {
+            if ((e as Error).message === "Deactivated") throw e;
+        }
         localStorage.removeItem("token");
         window.location.href = "/login";
         throw new Error("Unauthorized");

@@ -8,6 +8,7 @@ import { api } from "@/shared/utils/api.ts";
 import { safeDatetime } from "@/shared/utils/safeDate.ts";
 import type { UserType } from "@/shared/types/Users.ts";
 import { Button } from "@/shared/ui/buttons/button.tsx";
+import CreateTransactionModal from "./CreateTransactionModal";
 import { AvatarLabelGroupWithDropdown } from "@/shared/ui/avatar";
 import { ModalOverlay, Modal, Dialog } from "@/shared/components/modals/modal";
 import { Input } from "@/shared/ui/input/input";
@@ -34,6 +35,8 @@ interface DataModel {
 const TransactionsList: React.FC = () => {
     const [data, setData] = React.useState<DataModel | null>(null);
     const navigate = useNavigate();
+
+    const [createOpen, setCreateOpen] = useState(false);
 
     // Modal state
     const [selectedTx, setSelectedTx] = useState<Transaction | null>(null);
@@ -161,7 +164,7 @@ const TransactionsList: React.FC = () => {
                     <Button
                         color="primary"
                         iconLeading={Plus}
-                        onClick={() => navigate("/finance/transactions/create")}
+                        onClick={() => setCreateOpen(true)}
                     >
                         Додати транзакцію
                     </Button>
@@ -337,6 +340,7 @@ const TransactionsList: React.FC = () => {
                     </Dialog>
                 </Modal>
             </ModalOverlay>
+            <CreateTransactionModal isOpen={createOpen} setIsOpen={setCreateOpen} onSuccess={fetchData} />
         </DefaultPage>
     );
 };

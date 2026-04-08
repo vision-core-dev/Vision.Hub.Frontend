@@ -3,30 +3,28 @@ import { useNavigate } from "react-router-dom";
 import { Calendar } from "@/shared/ui/application/calendar/calendar";
 import { useCalendarEvents } from "../hooks/useCalendarEvents";
 import EventsListView from "./EventsListView";
-import DefaultPage from "@/shared/ui/default-page/DefaultPage";
+import LoaderDots from "@/shared/ui/loader-dots/LoaderDots";
 import { CalendarDays, List } from "lucide-react";
+import CreateEventModal from "../CreateEventModal";
 
 const UnifiedCalendarPage = () => {
     const navigate = useNavigate();
-    const { events, loading, isAdmin } = useCalendarEvents();
+    const { events, loading, isAdmin, refetch } = useCalendarEvents();
     const [viewMode, setViewMode] = useState<"calendar" | "list">("calendar");
+    const [createOpen, setCreateOpen] = useState(false);
 
     const handleEventClick = (eventId: string) => {
         navigate(`/calendar/e/${eventId}`);
     };
 
-    const handleAddEvent = () => {
-        navigate("/calendar/create");
-    };
-
     if (loading) {
-        return <DefaultPage title="Календар" isLoading={true} />;
+        return <div className="flex h-full items-center justify-center"><LoaderDots /></div>;
     }
 
     return (
-        <DefaultPage>
+        <div className="flex h-full flex-col overflow-hidden">
             {isAdmin && (
-                <div className="flex items-center gap-1 border-b border-secondary px-6 pb-0 mb-4">
+                <div className="flex items-center gap-1 border-b border-secondary px-4 shrink-0">
                     <button
                         onClick={() => setViewMode("calendar")}
                         className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors ${
@@ -52,17 +50,21 @@ const UnifiedCalendarPage = () => {
                 </div>
             )}
 
-            {viewMode === "calendar" ? (
-                <Calendar
-                    events={events}
-                    view="week"
-                    onEventClick={handleEventClick}
-                    onAddEvent={isAdmin ? handleAddEvent : undefined}
-                />
-            ) : (
-                <EventsListView onEventClick={handleEventClick} />
-            )}
-        </DefaultPage>
+            <div className="flex-1 overflow-auto">
+                {viewMode === "calendar" ? (
+                    <Calendar
+                        events={events}
+                        view="week"
+                        onEventClick={handleEventClick}
+                        onAddEvent={isAdmin ? () => setCreateOpen(true) : undefined}
+                    />
+                ) : (
+                    <EventsListView onEventClick={handleEventClick} />
+                )}
+            </div>
+
+            <CreateEventModal isOpen={createOpen} setIsOpen={setCreateOpen} onSuccess={refetch} />
+        </div>
     );
 };
 

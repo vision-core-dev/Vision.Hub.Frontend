@@ -167,11 +167,10 @@ export const SidebarNavigation = ({
         <>
             <MobileNavigationHeader>{content}</MobileNavigationHeader>
 
-            <div className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:flex">{content}</div>
+            <div className="hidden lg:flex lg:shrink-0" style={{ width: MAIN_SIDEBAR_WIDTH }}>{content}</div>
 
             <div
-                style={{ paddingLeft: MAIN_SIDEBAR_WIDTH }}
-                className="invisible hidden lg:sticky lg:top-0 lg:bottom-0 lg:left-0 lg:block"
+                className="hidden"
             />
             <HubCommandMenu isOpen={isCommandMenuOpen} onOpenChange={setIsCommandMenuOpen} />
         </>

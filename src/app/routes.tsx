@@ -16,6 +16,7 @@ const UsersListPage = lazy(() => import("@/features/users/UsersListPage"));
 const UserDetailsPage = lazy(() => import("@/features/users/UserDetails/UserDetailsPage"));
 const RolesPage = lazy(() => import("@/features/users/Roles/RolesPage"));
 const BadgesPage = lazy(() => import("@/features/users/Badges/BadgesPage"));
+const PositionsPage = lazy(() => import("@/features/users/Positions/PositionsPage"));
 const UnifiedCalendarPage = lazy(() => import("@/features/events/UnifiedCalendarPage/UnifiedCalendarPage"));
 const EventDetailRouter = lazy(() => import("@/features/events/EventDetails/EventDetailRouter"));
 const CreateEventPage = lazy(() => import("@/features/events/CreateEventPage"));
@@ -90,6 +91,7 @@ export function AppRoutes() {
                             <Route path="list" element={<UsersListPage />} />
                             <Route path="roles" element={<RolesPage />} />
                             <Route path="badges" element={<BadgesPage />} />
+                            <Route path="positions" element={<PositionsPage />} />
                             <Route path="u/:id" element={<UserDetailsPage />} />
                         </Route>
 

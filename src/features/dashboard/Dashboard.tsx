@@ -21,6 +21,7 @@ import Leaderboard from "./components/Leaderboard.tsx";
 import BadgeTimeline from "./components/BadgeTimeline.tsx";
 import NotifySetupWizard from "./components/NotifySetupWizard.tsx";
 import { getUnfinishedForm } from "@/features/forms/SubmitForm/SubmitForm";
+import ProfileCard from "./components/ProfileCard";
 import { FileText } from "lucide-react";
 import { Edit01, Trash01, Plus } from "@untitledui/icons";
 import { TextEditor } from "@/shared/ui/text-editor/text-editor.tsx";
@@ -311,10 +312,13 @@ interface DashboardData {
     leaderboard: any[];
     badge_awards: any[];
     news: NewsItem[];
+    positions: any[];
+    supervisors: any[];
+    subordinates: any[];
 }
 
 const DashboardPage: React.FC = () => {
-    const { user } = useAuth();
+    const { user, role } = useAuth();
     const [birthdayModal, setBirthdayModal] = useState(false);
     const [notifySetup, setNotifySetup] = useState(false);
     const [data, setData] = useState<DashboardData | null>(null);
@@ -375,6 +379,15 @@ const DashboardPage: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 items-start">
                 <div className="flex flex-col gap-4">
+                    {role && (
+                        <ProfileCard
+                            user={user}
+                            role={role}
+                            positions={data?.positions || []}
+                            supervisors={data?.supervisors || []}
+                            subordinates={data?.subordinates || []}
+                        />
+                    )}
                     <h3 className="text-lg font-semibold flex items-center gap-2 text-primary">
                         ✅ Мої задачі
                     </h3>

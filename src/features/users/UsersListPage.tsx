@@ -22,12 +22,12 @@ import { FeaturedIcon } from "@/shared/assets/icons/featured-icon/featured-icon.
 import { CloseButton } from "@/shared/ui/buttons/close-button.tsx";
 import { Input, InputBase } from "@/shared/ui/input/input.tsx";
 import { InputGroup } from "@/shared/ui/input/input-group.tsx";
-import { Shuffle } from "lucide-react";
+import { Shuffle, Shield, Award, Briefcase } from "lucide-react";
 import { DiscordIcon, TelegramIcon } from "@/shared/assets/icons/oauth-icons";
 import type { Role } from "@/features/users/UserDetails/UserDetailsPage.tsx";
 import { Select } from "@/shared/ui/select/select.tsx";
 import { Tooltip } from "@/shared/ui/tooltip/tooltip";
-
+import { useAuth } from "@/core/auth/AuthContext";
 
 const UsersTable = ({
     title,
@@ -149,6 +149,7 @@ const UsersTable = ({
 };
 
 const UsersListPage = () => {
+    const { role } = useAuth();
     const [loading, setLoading] = useState(true);
     const [activeUsers, setActiveUsers] = useState<UserType[]>([]);
     const [archivedUsers, setArchivedUsers] = useState<UserType[]>([]);
@@ -172,9 +173,24 @@ const UsersListPage = () => {
                 isLoading={loading}
                 title="Користувачі"
                 action={
-                    <Button onClick={() => setCreateModalOpen(true)} iconLeading={Plus}>
-                        Додати
-                    </Button>
+                    <div className="flex items-center gap-2">
+                        {role && role.order <= 3 && (
+                            <>
+                                <Tooltip title="Ролі">
+                                    <Button size="sm" color="secondary" iconLeading={Shield} onClick={() => navigate("/users/roles")} />
+                                </Tooltip>
+                                <Tooltip title="Бейджики">
+                                    <Button size="sm" color="secondary" iconLeading={Award} onClick={() => navigate("/users/badges")} />
+                                </Tooltip>
+                                <Tooltip title="Посади">
+                                    <Button size="sm" color="secondary" iconLeading={Briefcase} onClick={() => navigate("/users/positions")} />
+                                </Tooltip>
+                            </>
+                        )}
+                        <Button onClick={() => setCreateModalOpen(true)} iconLeading={Plus}>
+                            Додати
+                        </Button>
+                    </div>
                 }
             >
                 <UsersTable

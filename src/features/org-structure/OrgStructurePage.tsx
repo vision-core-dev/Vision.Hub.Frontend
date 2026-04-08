@@ -1,6 +1,6 @@
 import { useEffect, useState, createContext, useContext } from "react";
 import type { FormEvent } from "react";
-import { Plus, Search, Building2, Briefcase, User as UserIcon, ChevronRight, ChevronDown, FolderTree, Trash2, Edit2, LayoutList, Network } from "lucide-react";
+import { Plus, Search, Building2, Briefcase, User as UserIcon, ChevronRight, ChevronDown, FolderTree, Trash2, Edit2, LayoutList, Network, Crown } from "lucide-react";
 import type { OrgNode, NodeType } from "./types";
 import { orgStructureApi } from "./api";
 import { Button } from "@/shared/ui/buttons/button";
@@ -18,17 +18,19 @@ import LoaderDots from "@/shared/ui/loader-dots/LoaderDots";
 interface TreeContextType {
     onCreateChild: (parentId: string) => void;
     onEdit: (node: OrgNode) => void;
+    onSetHead: (node: OrgNode, userId: string | null) => void;
     onDelete: (node: OrgNode) => void;
 }
 
 const TreeContext = createContext<TreeContextType>({
     onCreateChild: () => { },
     onEdit: () => { },
+    onSetHead: () => { },
     onDelete: () => { },
 });
 
 const OrgNodeItemWrapper = ({ node, level, searchQuery }: { node: OrgNode, level: number, searchQuery?: string }) => {
-    const { onCreateChild, onEdit, onDelete } = useContext(TreeContext);
+    const { onCreateChild, onEdit, onDelete, onSetHead } = useContext(TreeContext);
     const [isExpanded, setIsExpanded] = useState(true);
     const hasChildren = node.children && node.children.length > 0;
 
@@ -66,18 +68,35 @@ const OrgNodeItemWrapper = ({ node, level, searchQuery }: { node: OrgNode, level
                             <AvatarLabelGroup
                                 userId={node.user_id || undefined}
                                 title={`${node.user?.first_name} ${node.user?.last_name || ''}`}
-                                subtitle={node.user?.role?.name}
+                                subtitle={node.name ? `${node.name} · ${node.user?.role?.name || ""}` : node.user?.role?.name}
                                 badgeEmoji={node.user?.active_badge_emoji}
                                 size="sm"
                                 src={node.user?.avatar_url}
                             />
                         </div>
                     ) : (
-                        <span className="text-sm text-primary">{node.name}</span>
+                        <div className="flex items-center gap-2">
+                            <span className="text-sm text-primary">{node.name}</span>
+                            {node.meta_data?.head_user_id && (() => {
+                                const headChild = node.children?.find(c => c.user_id === node.meta_data?.head_user_id);
+                                const headName = headChild?.user ? `${headChild.user.first_name} ${headChild.user.last_name || ''}`.trim() : null;
+                                return headName ? (
+                                    <span className="inline-flex items-center gap-1 text-xs text-fg-warning-primary bg-warning-primary/10 rounded-md px-1.5 py-0.5">
+                                        <Crown size={10} />
+                                        {headName}
+                                    </span>
+                                ) : null;
+                            })()}
+                        </div>
                     )}
                 </div>
 
                 <div className="invisible flex items-center gap-1 opacity-0 transition-all group-hover:visible group-hover:opacity-100">
+                    {node.node_type === 'user' && node.parent_id && (
+                        <Button size="sm" color="secondary" onClick={() => onSetHead(node, node.user_id)} title="Призначити керівником" className="h-7 w-7 p-0">
+                            <Crown size={14} />
+                        </Button>
+                    )}
                     <Button size="sm" color="secondary" onClick={() => onCreateChild(node.id)} title="Додати підрозділ" className="h-7 w-7 p-0">
                         <Plus size={14} />
                     </Button>
@@ -130,7 +149,7 @@ const CreateEditNodeModal = ({ isOpen, onOpenChange, parentId, editNode, onSucce
         if (isOpen) {
             // Load users for select
             api.get('/v1/Hub/Users/List').then(res => res.json()).then(data => {
-                setUsers(data.list || []);
+                setUsers((data.list || []).filter((u: UserType) => u.is_active));
             }).catch(() => setUsers([]));
 
             if (editNode) {
@@ -162,11 +181,9 @@ const CreateEditNodeModal = ({ isOpen, onOpenChange, parentId, editNode, onSucce
                     order: 0 // Default order
                 });
             }
-            alert(editNode ? "Оновлено успішно" : "Створено успішно");
             onSuccess();
         } catch (error) {
             console.error(error);
-            alert("Помилка при збереженні");
         } finally {
             setIsSubmitting(false);
         }
@@ -266,20 +283,19 @@ const OrgStructurePage = () => {
     const [editNode, setEditNode] = useState<OrgNode | null>(null);
     const [viewMode, setViewMode] = useState<'list' | 'chart'>('chart');
 
-    const loadTree = async () => {
+    const loadTree = async (showLoader = false) => {
         try {
-            setLoading(true);
+            if (showLoader) setLoading(true);
             const data = await orgStructureApi.getTree();
             setRoots(data.roots);
         } catch (error) {
             console.error(error);
-            alert("Не вдалося завантажити структуру");
         } finally {
             setLoading(false);
         }
     };
 
-    useEffect(() => { loadTree(); }, []);
+    useEffect(() => { loadTree(true); }, []);
 
     const handleCreateChild = (parentId: string) => {
         setSelectedParentId(parentId);
@@ -293,11 +309,33 @@ const OrgStructurePage = () => {
         setIsCreateModalOpen(true);
     };
 
+    const handleSetHead = async (userNode: OrgNode, userId: string | null) => {
+        if (!userNode.parent_id) return;
+        // Find the parent node to get its current meta_data
+        const findNode = (nodes: OrgNode[], id: string): OrgNode | null => {
+            for (const n of nodes) {
+                if (n.id === id) return n;
+                if (n.children) {
+                    const found = findNode(n.children, id);
+                    if (found) return found;
+                }
+            }
+            return null;
+        };
+        const parent = findNode(roots, userNode.parent_id);
+        if (!parent) return;
+
+        const isAlreadyHead = parent.meta_data?.head_user_id === userId;
+        const newMeta = { ...(parent.meta_data || {}), head_user_id: isAlreadyHead ? null : userId };
+
+        await api.patch(`/v1/Hub/OrgStructure/Node/${parent.id}`, { meta_data: newMeta });
+        loadTree();
+    };
+
     const handleDelete = async (node: OrgNode) => {
         if (!window.confirm(`Видалити ${node.name || 'елемент'}?`)) return;
         try {
             await orgStructureApi.deleteNode(node.id, true);
-            alert("Видалено");
             loadTree();
         } catch (e) { alert("Помилка видалення"); }
     };
@@ -308,7 +346,7 @@ const OrgStructurePage = () => {
     };
 
     return (
-        <TreeContext.Provider value={{ onCreateChild: handleCreateChild, onEdit: handleEdit, onDelete: handleDelete }}>
+        <TreeContext.Provider value={{ onCreateChild: handleCreateChild, onEdit: handleEdit, onSetHead: handleSetHead, onDelete: handleDelete }}>
             <div className="flex h-full flex-col gap-6 p-6">
                 <div className="flex items-center justify-between">
                     <div>

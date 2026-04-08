@@ -115,6 +115,8 @@ export const OnlineUsersProvider = ({ children }: OnlineUsersProviderProps) => {
         return onlineUserIds.has(userId);
     }, [onlineUserIds]);
 
+    const showBanner = !isConnected && reconnectAttemptsRef.current >= 2;
+
     const value: OnlineUsersContextType = {
         onlineUserIds,
         isUserOnline,
@@ -124,23 +126,25 @@ export const OnlineUsersProvider = ({ children }: OnlineUsersProviderProps) => {
 
     return (
         <OnlineUsersContext.Provider value={value}>
-            {!isConnected && (
-                <div className="fixed top-0 left-0 right-0 z-[9999] animate-in slide-in-from-top duration-300">
-                    <div className="bg-amber-500 text-white px-4 py-2 flex items-center justify-center gap-3 shadow-lg">
-                        <AlertTriangle size={18} className="animate-pulse" />
-                        <span className="text-sm font-semibold tracking-wide uppercase">
-                            Відсутнє підключення до сервера
-                        </span>
-                        <div className="flex items-center gap-1.5 ml-4 px-2 py-0.5 bg-amber-600/50 rounded-full text-[10px] font-bold">
-                           <RefreshCw size={10} className="animate-spin" />
-                           ПЕРЕПІДКЛЮЧЕННЯ...
+            <div className="flex flex-col h-screen">
+                {showBanner && (
+                    <div className="w-full z-[9999] animate-in slide-in-from-top duration-300 shrink-0">
+                        <div className="bg-amber-500 text-white px-4 py-2 flex items-center justify-center gap-3 shadow-lg">
+                            <AlertTriangle size={18} className="animate-pulse" />
+                            <span className="text-sm font-semibold tracking-wide uppercase">
+                                Відсутнє підключення до сервера
+                            </span>
+                            <div className="flex items-center gap-1.5 ml-4 px-2 py-0.5 bg-amber-600/50 rounded-full text-[10px] font-bold">
+                               <RefreshCw size={10} className="animate-spin" />
+                               ПЕРЕПІДКЛЮЧЕННЯ...
+                            </div>
                         </div>
+                        <div className="h-0.5 bg-amber-400 w-full animate-progress" />
                     </div>
-                    <div className="h-0.5 bg-amber-400 w-full animate-progress" />
+                )}
+                <div className="flex-1 min-h-0">
+                    {children}
                 </div>
-            )}
-            <div className={!isConnected ? "mt-9 transition-all duration-300" : "transition-all duration-300"}>
-               {children}
             </div>
         </OnlineUsersContext.Provider>
     );
