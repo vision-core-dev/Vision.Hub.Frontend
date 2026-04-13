@@ -124,7 +124,12 @@ const AttachmentsSection: React.FC<Props> = ({
     const handleRename = async (att: Attachment) => {
         const newName = prompt("Введіть нову назву", att.name);
         if (!newName || newName === att.name) return;
-        notifyChange(localAttachments.map(a => a.id === att.id ? { ...a, name: newName } : a));
+        try {
+            const res = await api.post(`/v1/Hub/Tasks/${taskId}/Attachments/${att.id}/Rename`, { new_name: newName });
+            if (res.ok) {
+                notifyChange(localAttachments.map(a => a.id === att.id ? { ...a, name: newName } : a));
+            }
+        } catch (e) { console.error(e); }
     };
 
     const hasSelection = selected.size > 0;
