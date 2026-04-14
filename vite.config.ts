@@ -17,7 +17,7 @@ export default defineConfig({
     server: {
         host: "0.0.0.0",
         port: 5173,
-        allowedHosts: ["hub.vcore.dev", "hub.visioncore.dev"]
+        allowedHosts: ["hub.visioncore.dev", "hub.visioncore.dev"]
     },
     build: {
         rollupOptions: {

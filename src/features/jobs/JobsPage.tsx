@@ -121,17 +121,17 @@ const JobsPageContent: React.FC = () => {
 
                 {/* Open Graph / Facebook */}
                 <meta property="og:type" content="website" />
-                <meta property="og:url" content="https://hub.vcore.dev/jobs" />
+                <meta property="og:url" content="https://hub.visioncore.dev/jobs" />
                 <meta property="og:title" content="Kareria | Vision Core Dev" />
                 <meta property="og:description" content="Join our team of visionaries and builders. Explore open positions at Vision Core Dev." />
-                <meta property="og:image" content="https://hub.vcore.dev/og-image.jpg" />
+                <meta property="og:image" content="https://hub.visioncore.dev/og-image.jpg" />
 
                 {/* Twitter */}
                 <meta property="twitter:card" content="summary_large_image" />
-                <meta property="twitter:url" content="https://hub.vcore.dev/jobs" />
+                <meta property="twitter:url" content="https://hub.visioncore.dev/jobs" />
                 <meta property="twitter:title" content="Kareria | Vision Core Dev" />
                 <meta property="twitter:description" content="Join our team of visionaries and builders. Explore open positions at Vision Core Dev." />
-                <meta property="twitter:image" content="https://hub.vcore.dev/og-image.jpg" />
+                <meta property="twitter:image" content="https://hub.visioncore.dev/og-image.jpg" />
             </Helmet>
 
             {/* Header with Language Switcher */}

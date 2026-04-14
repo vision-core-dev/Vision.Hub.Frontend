@@ -100,17 +100,17 @@ export const JobDetailsSidebar: React.FC<JobDetailsSidebarProps> = ({ job, isOpe
 
                     {/* Open Graph / Facebook */}
                     <meta property="og:type" content="article" />
-                    <meta property="og:url" content={`https://hub.vcore.dev/jobs/${job.slug}`} />
+                    <meta property="og:url" content={`https://hub.visioncore.dev/jobs/${job.slug}`} />
                     <meta property="og:title" content={`${getLocalized(job.title)} | Vision Core Dev`} />
                     <meta property="og:description" content={getLocalized(job.description).slice(0, 160)} />
-                    <meta property="og:image" content="https://hub.vcore.dev/og-image.jpg" />
+                    <meta property="og:image" content="https://hub.visioncore.dev/og-image.jpg" />
 
                     {/* Twitter */}
                     <meta property="twitter:card" content="summary_large_image" />
-                    <meta property="twitter:url" content={`https://hub.vcore.dev/jobs/${job.slug}`} />
+                    <meta property="twitter:url" content={`https://hub.visioncore.dev/jobs/${job.slug}`} />
                     <meta property="twitter:title" content={`${getLocalized(job.title)} | Vision Core Dev`} />
                     <meta property="twitter:description" content={getLocalized(job.description).slice(0, 160)} />
-                    <meta property="twitter:image" content="https://hub.vcore.dev/og-image.jpg" />
+                    <meta property="twitter:image" content="https://hub.visioncore.dev/og-image.jpg" />
                 </Helmet>
             )}
             <div

@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   appName: 'Vision Core Hub',
   webDir: 'dist',
   server: {
-    url: 'https://hub.vcore.dev',
+    url: 'https://hub.visioncore.dev',
     cleartext: false,
   },
 };

@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://hub.vcore.dev/sitemap.xml
+Sitemap: https://hub.visioncore.dev/sitemap.xml
