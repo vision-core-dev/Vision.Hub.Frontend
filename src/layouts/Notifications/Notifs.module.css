@@ -13,7 +13,7 @@
 .panel {
     width: 30%;
     max-width: 90%;
-    background: #ffffff;
+    background: var(--color-bg-primary);
     height: 100%;
     box-shadow: -4px 0 15px rgba(0, 0, 0, 0.1);
     display: flex;
@@ -43,10 +43,10 @@
     align-items: center;
     justify-content: space-between;
     padding: 1.2rem 1.5rem;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--color-border-secondary);
     position: sticky;
     top: 0;
-    background: #fff;
+    background: var(--color-bg-primary);
     z-index: 5;
 }
 
@@ -66,13 +66,13 @@
 }
 
 .list::-webkit-scrollbar-thumb {
-    background-color: #cbd5e1;
+    background-color: var(--color-border-primary);
     border-radius: 3px;
 }
 
 .notification {
-    background: #f9fafb;
-    border: 1px solid #e5e7eb;
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-secondary);
     border-radius: 12px;
     padding: 1rem;
     display: flex;
@@ -91,11 +91,12 @@
     font-size: 1rem;
     font-weight: 600;
     margin-bottom: 0.3rem;
+    color: var(--color-text-primary);
 }
 
 .notification p {
     font-size: 0.9rem;
-    color: #4b5563;
+    color: var(--color-text-secondary);
 }
 
 .notification.read {
@@ -106,8 +107,8 @@
     display: flex;
     justify-content: center;
     padding: 1rem 1.5rem;
-    border-top: 1px solid #e5e7eb;
-    background: #fff;
+    border-top: 1px solid var(--color-border-secondary);
+    background: var(--color-bg-primary);
     position: sticky;
     bottom: 0;
 }
@@ -115,17 +116,19 @@
 .markAll {
     width: 100%;
     padding: 0.9rem;
-    background: #f3f4f6;
+    background: var(--color-bg-secondary);
+    color: var(--color-text-primary);
     border: none;
     border-radius: 10px;
     cursor: pointer;
     font-weight: 500;
     font-size: 0.95rem;
-    transition: background 0.2s;
+    transition: background 0.2s, color 0.2s;
 }
 
 .markAll:hover {
-    background: #e6f8ef;
+    background: var(--color-bg-brand-secondary);
+    color: var(--color-text-brand-primary);
 }
 
 .allViewed {
@@ -133,7 +136,7 @@
     padding: 0.9rem;
     font-weight: 500;
     text-align: center;
-    color: #6b7280;
+    color: var(--color-text-tertiary);
     font-size: 0.9rem;
 }
 
@@ -164,7 +167,7 @@
     align-items: center;
     gap: 0.3rem;
     font-size: 0.8rem;
-    color: #9ca3af;
+    color: var(--color-text-quaternary);
     margin-top: 0.3rem;
 }
 
@@ -191,8 +194,8 @@
     display: flex;
     align-items: center;
     gap: 0.3rem;
-    background: #f3f4f6;
-    color: #374151;
+    background: var(--color-bg-secondary);
+    color: var(--color-text-secondary);
     border: none;
     padding: 0.4rem 0.7rem;
     border-radius: 6px;
@@ -202,15 +205,15 @@
 }
 
 .viewButton:hover {
-    background: #e6f8ef;
-    color: #00a86b;
+    background: var(--color-bg-brand-secondary);
+    color: var(--color-text-brand-primary);
 }
 
 .readIcon {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #22c55e;
+    color: var(--color-fg-success-primary);
 }
 
 .notification.read .readIcon {
@@ -218,8 +221,8 @@
 }
 
 .linkButton {
-    background: #00a86b;
-    color: #fff;
+    background: var(--color-bg-brand-solid);
+    color: var(--color-text-white);
     border: none;
     padding: 0.5rem 0.9rem;
     border-radius: 6px;
@@ -230,5 +233,5 @@
 }
 
 .linkButton:hover {
-    background: #059669;
+    background: var(--color-bg-brand-solid_hover);
 }
