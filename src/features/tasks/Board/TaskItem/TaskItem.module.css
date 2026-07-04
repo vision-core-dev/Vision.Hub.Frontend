@@ -227,7 +227,7 @@
 
 /* 🔥 Прострочена задача */
 .overdue {
-    outline-color: var(--color-error-600) !important;
+    outline-color: var(--color-red-600) !important;
     /* червона рамка */
     background: var(--color-bg-error-primary);
     /* легкий червонуватий фон */
