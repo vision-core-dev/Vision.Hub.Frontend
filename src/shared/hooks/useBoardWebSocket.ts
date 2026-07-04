@@ -61,7 +61,8 @@ export const useBoardWebSocket = ({ boardId, onUpdate, onUserPresenceChange, ena
         }
 
         try {
-            const wsUrl = `${import.meta.env.VITE_WS_URL}/v1/Hub/Boards/${boardId}/ws`;
+            const token = localStorage.getItem("token");
+            const wsUrl = `${import.meta.env.VITE_WS_URL}/v1/Hub/Boards/${boardId}/ws` + (token ? `?token=${token}` : "");
 
             const ws = new WebSocket(wsUrl);
             wsRef.current = ws;

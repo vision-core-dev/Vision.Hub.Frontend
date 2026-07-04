@@ -127,6 +127,7 @@ const BoardPage = ({ is_public = false }: Props) => {
     const [boardLists, setBoardLists] = useState<List[]>([]);
 
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     const [showSettings, setShowSettings] = useState(false);
 
@@ -166,7 +167,20 @@ const BoardPage = ({ is_public = false }: Props) => {
     const fetchBoard = useCallback(async (silent = false) => {
         try {
             if (!silent) setLoading(true);
+            setError(null);
             const res = await api.get(`/v1/Hub/Boards/${id}` + (is_public ? "/GetPublicDetails" : "/GetDetails"));
+            
+            if (!res.ok) {
+                if (res.status === 403) {
+                    setError("У вас немає доступу до цієї дошки 🔐");
+                } else if (res.status === 404) {
+                    setError("Дошку не знайдено 😔");
+                } else {
+                    setError("Помилка завантаження дошки 😭");
+                }
+                return;
+            }
+
             const data: BoardDetails = await res.json();
 
             setBoardLists(data.lists)
@@ -184,6 +198,7 @@ const BoardPage = ({ is_public = false }: Props) => {
             setBoardDetails({ ...data, lists: listsWithTasks });
         } catch (err: any) {
             console.error("Помилка при оновленні дошки:", err);
+            setError("Помилка завантаження дошки 😭");
         } finally {
             if (!silent) setLoading(false);
         }
@@ -285,6 +300,7 @@ const BoardPage = ({ is_public = false }: Props) => {
     }, [boardDetails, filterName, filterAssignees, filterTags, hasActiveFilters, is_public]);
 
     if (loading) return <LoaderDots />;
+    if (error) return <div className={styles.error}>{error}</div>;
     if (!boardDetails) return <div className={styles.error}>Дошку не знайдено 😔</div>;
 
     return (
