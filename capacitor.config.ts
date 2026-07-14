@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'dev.vcore.hub',
+  appId: 'dev.visioncore.hub',
   appName: 'Vision Core Hub',
   webDir: 'dist',
   server: {
