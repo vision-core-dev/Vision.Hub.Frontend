@@ -74,6 +74,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
                     if (data.detail === "user_is_deactivated") {
                         navigate("/deactivated");
                     } else {
+                        // Invalid/expired/malformed token — drop it so the stale
+                        // value doesn't keep failing on every protected request.
+                        tokenStorage.remove();
                         if (!currentPath.startsWith("/public")) {
                             navigate("/login");
                         }
