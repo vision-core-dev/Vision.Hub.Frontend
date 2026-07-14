@@ -11,7 +11,11 @@ async function _fetch(
     options: RequestInit = {},
     retries = MAX_RETRIES,
 ): Promise<Response> {
-    const token = localStorage.getItem("token");
+    const rawToken = localStorage.getItem("token");
+    // Guard against sentinel garbage ("None"/"null"/"undefined") that would be
+    // sent as `Bearer None` and rejected on every request — treat as no token.
+    const token =
+        rawToken && !["None", "null", "undefined"].includes(rawToken) ? rawToken : null;
 
     const headers: Record<string, string> = {
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
