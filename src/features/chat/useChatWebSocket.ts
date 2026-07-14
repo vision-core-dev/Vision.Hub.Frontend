@@ -28,10 +28,11 @@ export function useChatWebSocket(userId: string | null, events: ChatWebSocketEve
 
         ws.onopen = () => {
             console.log("[Chat WS] Connected");
-            // Identify user
+            // Authenticate with the session token — the server derives identity
+            // from it (client-supplied user_id is no longer trusted).
             ws.send(JSON.stringify({
                 type: "identify",
-                user_id: userId,
+                token: localStorage.getItem("token"),
             }));
         };
 

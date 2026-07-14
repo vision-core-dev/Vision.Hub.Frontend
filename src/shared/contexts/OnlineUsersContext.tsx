@@ -52,9 +52,11 @@ export const OnlineUsersProvider = ({ children }: OnlineUsersProviderProps) => {
             setIsConnected(true);
             reconnectAttemptsRef.current = 0;
 
+            // Authenticate with the session token — the server derives identity
+            // from it (client-supplied user_id is no longer trusted).
             websocket.send(JSON.stringify({
                 type: 'identify',
-                user_id: user.id,
+                token: localStorage.getItem("token"),
             }));
         };
 
